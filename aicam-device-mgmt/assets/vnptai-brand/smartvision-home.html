@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
+  <title>VNPT Smart Vision</title>
+  <!-- CSS here -->
+  <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/animate.min.css">
+  <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/fontawesome-all.min.css">
+  <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/slicknav.css">
+  <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/styles.min.css">
+  <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/app.css">
+    <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/style_en.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="https://smartvision.vnpt.vn/favicon.ico">
+  <link href="https://fonts.cdnfonts.com/css/barlow-condensed" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://smartvision.vnpt.vn/css/slick.css">
+<link rel="stylesheet" href="https://smartvision.vnpt.vn/css/slick-theme.css">
+<link rel="stylesheet" href="https://smartvision.vnpt.vn/css/home.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-73HJ580E0N"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-73HJ580E0N');
+  </script>
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+      });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-NDTCGBW');
+  </script>
+  <script type='text/javascript'>
+    var VNPT = VNPT || {};
+    VNPT.q = VNPT.q || [];
+
+    VNPT.app_key = 'ebe6477d3eb935479ef5142a7493290c3e70bc7e';
+
+    VNPT.url = 'https://console-smartux.vnpt.vn';
+
+    VNPT.q.push(['track_sessions']);
+    VNPT.q.push(['track_pageview']);
+    VNPT.q.push(['track_clicks']);
+    VNPT.q.push(['track_scrolls']);
+    VNPT.q.push(['track_errors']);
+    VNPT.q.push(['track_links']);
+    VNPT.q.push(['track_forms']);
+    VNPT.q.push(['collect_from_forms']);
+
+    (function () {
+      const paths = ['https://console-smartux.vnpt.vn/sdk/web/core-track.js', 'https://console-smartux.vnpt.vn/sdk/web/minify.min.js'];
+      for (let i in paths) {
+        var cly = document.createElement('script');
+        cly.type = 'text/javascript';
+        cly.async = true;
+        cly.src = paths[i];
+        cly.onload = i == 0 ? function () {
+          VNPT.init()
+        } : function () {
+          window.minify = require("html-minifier").minify;
+        };
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(cly, s);
+      }
+    })();
+  </script>
+  <!-- End Google Tag Manager -->
+</head>
+
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDTCGBW" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar navbar-expand-lg nav-header">
+    <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/en">
+            <img class="img-fluid" src="https://smartvision.vnpt.vn/images/logo-header.svg" />
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <img src="https://smartvision.vnpt.vn/images/hamburger.svg" alt="">
+        </button>
+        <div class="collapse navbar-collapse navbar-container" id="navbarTogglerDemo01">
+            <ul class="navbar-nav menu-item">
+                <div class="featute-item">
+                    <li class="nav-item js-scroll-trigger  " id="use_cases" href="https://smartvision.vnpt.vn/en/use-cases">
+                        <a id="featureElement" class="nav-link" aria-current="page" href="https://smartvision.vnpt.vn/en/feature">Tính
+                            năng</a>
+                    </li>
+                    <li class="nav-item  ">
+                        <a id="storyElement" class="nav-link" href="https://smartvision.vnpt.vn/en/success-story">Câu chuyện thành công</a>
+                    </li>
+
+                    <li class="nav-item ">
+                        <a id="contactElement" class="nav-link" href="https://smartvision.vnpt.vn/en/contact">Liên hệ</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuTailieu" data-bs-toggle="dropdown" aria-expanded="false">Tài liệu</a>
+                            <ul class="dropdown-menu border-0 p-3" aria-labelledby="dropdownMenuTailieu">
+                                <li><a id="guideElement" class="dropdown-item text-16 text-neutral" href="https://ekyc.vnpt.vn/admin-dashboard/vi/documents/api" target="_blank">Hướng dẫn tích hợp</a></li>
+                                <li class="mt-2"><a id="salekitElement" class="dropdown-item text-16 text-neutral" href="https://ekyc.vnpt.vn/img/update/vi_salekit.pdf" target="_blank">Sales kit</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </div>
+                <li class="nav-item lang-icon">
+                    <div class="dropdown">
+                        <a class="nav-link d-flex align-items-center" href="#" id="dropDownLang" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://smartvision.vnpt.vn/images/vi.svg" width="24" alt="">
+                            <span class="text-14 text-neutral font-600 ms-1">VI</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="modal fade bd-example-modal-xl" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <a type="button" class="btn-close" data-dismiss="modal" aria-label="Close" href="#">
+        <img src="https://smartvision.vnpt.vn/images/close.svg" alt="icon_close" aria-hidden="true" />
+    </a>
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        
+        <div class="modal-content">
+            <div class="modal-body">
+                <div>
+                    <video width="100%" height="auto" controls autoplay muted loop>
+                        <source src="https://smartvision.vnpt.vn/video/demo.m4v" type="video/mp4">
+                        <source src="https://smartvision.vnpt.vn/video/demo.m4v" type="video/ogg">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  <div class="bg-section-1">
+    <section id="section-1" class="position-relative">
+        <div class="container position-relative">
+            <img src="https://smartvision.vnpt.vn/images/bg-opacity-1.png" class="position-absolute bg-opacity-1" alt="">
+            <div>
+                <div>
+                    <div class="row mt-5 mb-4 mx-0">
+                        <div class="col-lg-6 col-xs-6">
+                            <div class="my-5">
+                                <p class="normal-text d-flex"> Một sản phẩm của hệ sinh thái &nbsp; <img src="images/vnpt-ai.svg" alt="">
+                                </p>
+                                <h1 class="text-product font-700 text-50 mb-0">VNPT Smart Vision
+                                </h1>
+                                <h2 class="text-title text-34 font-700 mt-2">Nền tảng nhận diện hình ảnh bằng công nghệ Trí tuệ nhân tạo</h2>
+                                <div class="mt-3">
+                                    <span class="text-neutral text-18 font-400">Ứng dụng công nghệ trí tuệ nhân tạo AI trong lĩnh vực Computer Vision,
+                                        VNPT Smart Vision cung cấp đa dạng các AI models,
+                                        hướng tới những giải pháp đột phá cho thành phố của tương lai.</span>
+                                </div>
+                                <!-- <img src="https://smartvision.vnpt.vn/images/ibeta-descript.png" width="658" class="img-fluid"
+                                    alt=""> -->
+                            </div>
+
+                            <div class="mt-5">
+                                <a href="https://smartvision.vnpt.vn/en/contact" class="btn-home-contact text-white bg-primary text-decoration-none rounded px-5 box-shadow-primary text-18 font-700 trial d-flex align-items-center justify-content-center">Trải
+                                    nghiệm
+                                    ngay</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xs-6">
+                            <img srcset="https://smartvision.vnpt.vn/images/banner_image.png 2x" class="img-fluid" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="doitac position-relative pb-5">
+            <div class="text-center mt-5">
+                <div class="doitac-text">
+                    <span class="text-20 text-neutral font-500 d-flex align-items-center justify-content-center">Chúng tôi
+                        được tin tưởng bởi hơn&nbsp;
+                    </span>
+                    <div>
+                        <span class="text-primary cursor-pointer font-700" data-bs-toggle="modal" data-bs-target="#modal-doitac">30+ Tỉnh/TP</span>
+                        <span class="text-20 text-neutral font-500">và hơn</span>
+                        <span class="text-primary cursor-pointer font-700" data-bs-toggle="modal" data-bs-target="#modal-doitac"> 50+
+                            đối tác hàng đầu
+                            <img src="https://smartvision.vnpt.vn/images/right-up.svg" alt=""></span>
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="modal-doitac" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-24 text-title flex-fill border-0" id="exampleModalLabel">Đối
+                                    tác hàng đầu của
+                                    chúng
+                                    tôi</h5>
+                                <button type="button" class="border-0 rounded-circle" data-bs-dismiss="modal" aria-label="Close">
+                                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="16" cy="16" r="16" fill="#ECEEF9" />
+                                        <path d="M17.1749 16.0002L22.4249 10.7585C22.5818 10.6016 22.6699 10.3887 22.6699 10.1668C22.6699 9.9449 22.5818 9.73207 22.4249 9.57515C22.2679 9.41823 22.0551 9.33008 21.8332 9.33008C21.6113 9.33008 21.3985 9.41823 21.2415 9.57515L15.9999 14.8252L10.7582 9.57515C10.6013 9.41823 10.3885 9.33008 10.1665 9.33008C9.94462 9.33008 9.73179 9.41823 9.57487 9.57515C9.41795 9.73207 9.32979 9.9449 9.32979 10.1668C9.32979 10.3887 9.41795 10.6016 9.57487 10.7585L14.8249 16.0002L9.57487 21.2418C9.49676 21.3193 9.43477 21.4115 9.39246 21.513C9.35015 21.6146 9.32837 21.7235 9.32837 21.8335C9.32837 21.9435 9.35015 22.0524 9.39246 22.154C9.43477 22.2555 9.49676 22.3477 9.57487 22.4252C9.65234 22.5033 9.7445 22.5653 9.84605 22.6076C9.9476 22.6499 10.0565 22.6717 10.1665 22.6717C10.2765 22.6717 10.3855 22.6499 10.487 22.6076C10.5886 22.5653 10.6807 22.5033 10.7582 22.4252L15.9999 17.1752L21.2415 22.4252C21.319 22.5033 21.4112 22.5653 21.5127 22.6076C21.6143 22.6499 21.7232 22.6717 21.8332 22.6717C21.9432 22.6717 22.0521 22.6499 22.1537 22.6076C22.2552 22.5653 22.3474 22.5033 22.4249 22.4252C22.503 22.3477 22.565 22.2555 22.6073 22.154C22.6496 22.0524 22.6714 21.9435 22.6714 21.8335C22.6714 21.7235 22.6496 21.6146 22.6073 21.513C22.565 21.4115 22.503 21.3193 22.4249 21.2418L17.1749 16.0002Z" fill="#666C8A" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <img src="https://smartvision.vnpt.vn/images/doitac/group-client.png" class="img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="d-flex align-items-center marquee-content">
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vnpt-money.png" alt="https://smartvision.vnpt.vn/VNPT Money">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vinaphone.png" alt="https://smartvision.vnpt.vn/Vinaphone">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/hdbank.png" alt="https://smartvision.vnpt.vn/HDBank">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/mbbank.png" alt="https://smartvision.vnpt.vn/MBBank">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vietcombank.png" alt="https://smartvision.vnpt.vn/Vietcombank">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/momo.png" alt="https://smartvision.vnpt.vn/Momo">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/shb.png" alt="https://smartvision.vnpt.vn/Shb">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/kbfina.png" alt="https://smartvision.vnpt.vn/Kb Fina">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/itel.png" alt="https://smartvision.vnpt.vn/Itel">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vmg.png" alt="https://smartvision.vnpt.vn/Vmg">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/altiss.png" alt="https://smartvision.vnpt.vn/Altiss">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/kis.png" alt="https://smartvision.vnpt.vn/Kis">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/csi.png" alt="https://smartvision.vnpt.vn/Csi">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/baoviet.png" alt="https://smartvision.vnpt.vn/Bao viet">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/hbs.png" alt="https://smartvision.vnpt.vn/Hbs">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/misa.png" alt="https://smartvision.vnpt.vn/Misa">
+                    </div>
+                    
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vnpt-money.png" alt="https://smartvision.vnpt.vn/VNPT Money">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vinaphone.png" alt="https://smartvision.vnpt.vn/Vinaphone">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/hdbank.png" alt="https://smartvision.vnpt.vn/HDBank">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/mbbank.png" alt="https://smartvision.vnpt.vn/MBBank">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vietcombank.png" alt="https://smartvision.vnpt.vn/Vietcombank">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/momo.png" alt="https://smartvision.vnpt.vn/Momo">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/shb.png" alt="https://smartvision.vnpt.vn/Shb">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/kbfina.png" alt="https://smartvision.vnpt.vn/Kb Fina">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/itel.png" alt="https://smartvision.vnpt.vn/Itel">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/vmg.png" alt="https://smartvision.vnpt.vn/Vmg">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/altiss.png" alt="https://smartvision.vnpt.vn/Altiss">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/kis.png" alt="https://smartvision.vnpt.vn/Kis">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/csi.png" alt="https://smartvision.vnpt.vn/Csi">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/baoviet.png" alt="https://smartvision.vnpt.vn/Bao viet">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/hbs.png" alt="https://smartvision.vnpt.vn/Hbs">
+                    </div>
+                                        <div class="marquee-item">
+                        <img src="https://smartvision.vnpt.vn/images/doitac/misa.png" alt="https://smartvision.vnpt.vn/Misa">
+                    </div>
+                                    </div>
+            </div>
+        </div>
+
+        <div class="hop-tac-cung-chung-toi container position-relative">
+            <div class="row align-items-center px-md-0 px-3">
+                <div class="col-lg-6 col-xs-6">
+                    <h1 class="text-title font-700 text-46">Hợp tác cùng <br> chúng tôi !</h1>
+                    <p class="text-18 text-neutral mt-3 mb-4">Chúng tôi luôn đồng hành cùng bạn trong việc ứng <br> dụng công nghệ tiên tiến, chất lượng nhất, an toàn <br> bảo mật nhất để mang đến những dịch vụ thông <br> minh và tối ưu cho các khách hàng của bạn.</p>
+                    <div class="d-md-block d-grid">
+                        <a href="https://smartvision.vnpt.vn/en/contact" class="btn-home-contact bg-primary-opacity text-primary font-700 text-14 rounded px-7 py-3 hover-primary d-flex text-decoration-none align-items-center justify-content-center">Liên hệ ngay</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-xs-6">
+                    <img src="https://smartvision.vnpt.vn/images/contact-image.png" class="img-fluid" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="chatgpt container position-relative">
+            <img src="https://smartvision.vnpt.vn/images/bg-2.png" class="position-absolute bg-opacity-1" alt="">
+
+            <div class="row align-items-center gx-5">
+                <div class="col-lg-6 col-xs-6  order-md-1 order-2">
+                    <img src="https://smartvision.vnpt.vn/images/chatgpt-image.png" class="img-fluid" alt="">
+                </div>
+                <div class="col-lg-6 col-xs-6 order-md-2 order-1">
+                    <h1 class="text-title font-700 text-46">Chat GPT nói gì về <br> chúng tôi?</h1>
+                    <p class="text-18 text-neutral mt-3 mb-4">ChatGPT là một trong những từ khóa "hot" nhất <br> cộng đồng
+                        công nghệ thế giới hiện nay. Hãy cùng <br> chúng tôi tìm hiểu ChatGPT và những điều cần biết.</p>
+
+                    <span class="text-primary cursor-pointer font-700 ms-2">Tìm hiểu ngay</span>
+                    <img src="https://smartvision.vnpt.vn/images/right-up.svg" class="img-fluid" alt=""></span>
+                </div>
+            </div>
+        </div>
+        <div class="giatrimanglai container position-relative">
+            <div class="text-center">
+                <h1 class="text-title font-700 text-46">Giá trị cốt lõi</h1>
+                <div id="video_eKyc" class="mt-4">
+                    <img onClick="showVideo()" srcset="https://smartvision.vnpt.vn/images/giatricotloi.png 2x" class="img-fluid cursor-pointer" alt="">
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-lg-4 col-xs-6">
+                    <div class="text-center">
+                        <img src="https://smartvision.vnpt.vn/images/phong-phu.png" width="72" class="img-fluid" alt="">
+                        <h4 class="text-title text-18 font-700">AI Models phong phú, đa dạng</h4>
+                        <p class="text-neutral text-16 font-400 mt-3">Cung cấp +40 AI Models có khả năng ứng dụng <br>
+                            trong nhiều lĩnh vực khác nhau như: <br>
+                            giao thông, an ninh, y tế, tài chính ngân <br>
+                            hàng, và nhiều lĩnh vực khác</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xs-6">
+                    <div class="text-center">
+                        <img src="https://smartvision.vnpt.vn/images/xu-li.png" width="72" class="img-fluid" alt="">
+                        <h4 class="text-title text-18 font-700">Chất lượng và tốc độ xử lý vượt trội</h4>
+                        <p class="text-neutral text-16 font-400 mt-3">Các AI Models được training liên tục trên <br>
+                            tập dữ liệu lớn, độ chính xác lên tới 99,99%, <br>
+                            và được tối ưu tốc độ xử lý trên GPU của <br>
+                            NVIDIA, tăng tốc độ xử lý gấp 5 lần</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xs-6">
+                    <div class="text-center">
+                        <img src="https://smartvision.vnpt.vn/images/danentang.png" width="72" class="img-fluid" alt="">
+                        <h4 class="text-title text-18 font-700">Tích hợp đa nền tảng</h4>
+                        <p class="text-neutral text-16 font-400 mt-3">Các AI Models được đóng gói dưới dạng <br>
+                            các docker tích hợp vào các API, SDK, có <br>
+                            khả năng tích hợp đa nền tảng Mobile, <br>
+                            Server, và trên Edge Computing</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+
+                <div class="col-lg-4 col-xs-6">
+                    <div class="text-center">
+                        <img src="https://smartvision.vnpt.vn/images/tuongthich.png" width="72" class="img-fluid" alt="">
+                        <h4 class="text-title text-18 font-700">Khả năng tương thích cao</h4>
+                        <p class="text-neutral text-16 font-400 mt-3">Các AI Models đáp ứng trên phần cứng <br>
+                            CPU, GPU, có khả năng tương thích cao với <br>
+                            hầu hết các camera trên thị trường hiện <br>
+                            nay, dễ dàng tích hợp vào các cơ sở hạ <br>
+                            tầng có sẵn giúp khách hàng tối ưu chi phí.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xs-6">
+                    <div class="text-center">
+                        <img src="https://smartvision.vnpt.vn/images/nangcap.png" width="72" class="img-fluid" alt="">
+                        <h4 class="text-title text-18 font-700">Nâng cấp mở rộng dễ dàng</h4>
+                        <p class="text-neutral text-16 font-400 mt-3">
+                            Các AI Models có khả năng nâng cấp, điều <br>
+                            chỉnh dễ dàng và nhanh chóng. Việc phát <br>
+                            triển mới AI Models có thể được thực hiện <br>
+                            trong thời gian ngắn, tối đa hiệu quả về chi <br>
+                            phí cho khách hàng
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xs-6">
+                    <div class="text-center">
+                        <img src="https://smartvision.vnpt.vn/images/antoan.png" width="72" class="img-fluid" alt="">
+                        <h4 class="text-title text-18 font-700">An toàn bảo mật thông tin</h4>
+                        <p class="text-neutral text-16 font-400 mt-3">
+                            Sản phẩm có thể được triển khai trên hạ <br>
+                            tầng của khách hàng (On-Premise) bảo <br>
+                            mật về thông tin dữ liệu. Nhiều AI Models <br>
+                            có thể triển khai On-Cloud, đáp ứng các <br>
+                            tiêu chuẩn quốc tế về bảo mật
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+<section id="section-2">
+    <div class="text-center">
+        <h1 class="text-title font-700 text-46">Tính năng nổi bật</h1>
+        <p class="text-18 text-neutral mt-4 mb-5">VNPT Smart Vision được phát triển dựa trên những công
+            nghệ tân tiến nhất thế giới
+        </p>
+    </div>
+    <div class="position-relative container">
+        <div class="slide-feature">
+                        <div>
+                <div class="feature-item h-100 p-4">
+                    <div class="card-image">
+                        <img src="https://smartvision.vnpt.vn/images/tinhnang/01.png" class="img-fluid mx-auto" alt="">
+                    </div>
+                    <h4 class="text-title text-18 font-700 overflow-2-line">Giám sát giao thông</h4>
+                    <p class="text-14 text-neutral overflow-2-line">Nhận diện được nhiều các loại phương tiện và bóc tách biển số xe, phát hiện và cảnh báo các vi phạm giao thông giúp các nhà chức trách kịp thời theo dõi và xử lý</p>
+                    <a href="/vi/feature?tabId=1" class="text-14 text-primary text-decoration-none font-600 d-flex align-items-center">Xem thêm
+                        <img src="https://smartvision.vnpt.vn/images/right-up.svg" class="img-fluid" alt=""></a>
+                </div>
+            </div>
+                        <div>
+                <div class="feature-item h-100 p-4">
+                    <div class="card-image">
+                        <img src="https://smartvision.vnpt.vn/images/tinhnang/02.png" class="img-fluid mx-auto" alt="">
+                    </div>
+                    <h4 class="text-title text-18 font-700 overflow-2-line">Giám sát an toàn an ninh</h4>
+                    <p class="text-14 text-neutral overflow-2-line">Cung cấp các chức năng tự động bám sát và phân tích hành động của con người, từ đó đưa ra các cảnh báo an ninh cần thiết như đánh nhau, tai nạn, mang vũ khí, giám sát đối tượng, hỗ trợ các lực lượng chức năng truy vết đối tượng nhằm đảm bảo an toàn an ninh</p>
+                    <a href="/vi/feature?tabId=2" class="text-14 text-primary text-decoration-none font-600 d-flex align-items-center">Xem thêm
+                        <img src="https://smartvision.vnpt.vn/images/right-up.svg" class="img-fluid" alt=""></a>
+                </div>
+            </div>
+                        <div>
+                <div class="feature-item h-100 p-4">
+                    <div class="card-image">
+                        <img src="https://smartvision.vnpt.vn/images/tinhnang/03.png" class="img-fluid mx-auto" alt="">
+                    </div>
+                    <h4 class="text-title text-18 font-700 overflow-2-line">Nhận diện và tìm kiếm khuôn mặt</h4>
+                    <p class="text-14 text-neutral overflow-2-line">Nhận diện sinh trắc học khuôn mặt con người, từ đó cho phép tìm kiếm khuôn mặt với tốc độ nhanh và độ chính xác cao. Một số ứng dụng nổi bật như: định danh điện tử, nhận diện khách hàng VIP/Blacklist, nhận diện khuôn mặt đối tượng nghi vấn…</p>
+                    <a href="/vi/feature?tabId=3" class="text-14 text-primary text-decoration-none font-600 d-flex align-items-center">Xem thêm
+                        <img src="https://smartvision.vnpt.vn/images/right-up.svg" class="img-fluid" alt=""></a>
+                </div>
+            </div>
+                        <div>
+                <div class="feature-item h-100 p-4">
+                    <div class="card-image">
+                        <img src="https://smartvision.vnpt.vn/images/tinhnang/04.png" class="img-fluid mx-auto" alt="">
+                    </div>
+                    <h4 class="text-title text-18 font-700 overflow-2-line">Số hóa văn bản</h4>
+                    <p class="text-14 text-neutral overflow-2-line">Số hóa đa dạng các loại giấy tờ, văn bản hiện nay tại Việt Nam. Nhận dạng và tự động trích xuất chính xác các trường thông tin mong muốn. Phát hiện giấy tờ không đủ điều kiện sử dụng.</p>
+                    <a href="/vi/feature?tabId=4" class="text-14 text-primary text-decoration-none font-600 d-flex align-items-center">Xem thêm
+                        <img src="https://smartvision.vnpt.vn/images/right-up.svg" class="img-fluid" alt=""></a>
+                </div>
+            </div>
+                    </div>
+        <button class="btn-feature-pre border-0 bg-transparent position-absolute">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="24" cy="24" rx="24" ry="24" transform="rotate(-180 24 24)" fill="black" fill-opacity="0.3" />
+                <path d="M20.46 24.71L26.12 30.36C26.213 30.4537 26.3236 30.5281 26.4454 30.5789C26.5673 30.6297 26.698 30.6558 26.83 30.6558C26.962 30.6558 27.0927 30.6297 27.2146 30.5789C27.3365 30.5281 27.4471 30.4537 27.54 30.36C27.7263 30.1726 27.8308 29.9192 27.8308 29.655C27.8308 29.3908 27.7263 29.1374 27.54 28.95L22.59 23.95L27.54 19C27.7263 18.8126 27.8308 18.5592 27.8308 18.295C27.8308 18.0308 27.7263 17.7774 27.54 17.59C27.4474 17.4955 27.337 17.4203 27.2151 17.3688C27.0932 17.3173 26.9623 17.2905 26.83 17.29C26.6977 17.2905 26.5668 17.3173 26.445 17.3688C26.3231 17.4203 26.2126 17.4955 26.12 17.59L20.46 23.24C20.3585 23.3336 20.2775 23.4473 20.2221 23.5738C20.1667 23.7003 20.1381 23.8369 20.1381 23.975C20.1381 24.1131 20.1667 24.2497 20.2221 24.3762C20.2775 24.5027 20.3585 24.6164 20.46 24.71V24.71Z" fill="white" />
+            </svg>
+        </button>
+        <button class="btn-feature-next border-0 bg-transparent position-absolute">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="24" cy="24" rx="24" ry="24" fill="black" fill-opacity="0.3" />
+                <path d="M27.54 23.29L21.88 17.64C21.787 17.5463 21.6764 17.4719 21.5546 17.4211C21.4327 17.3703 21.302 17.3442 21.17 17.3442C21.038 17.3442 20.9073 17.3703 20.7854 17.4211C20.6635 17.4719 20.5529 17.5463 20.46 17.64C20.2737 17.8274 20.1692 18.0808 20.1692 18.345C20.1692 18.6092 20.2737 18.8626 20.46 19.05L25.41 24.05L20.46 29C20.2737 29.1874 20.1692 29.4408 20.1692 29.705C20.1692 29.9692 20.2737 30.2226 20.46 30.41C20.5526 30.5045 20.663 30.5797 20.7849 30.6312C20.9068 30.6827 21.0377 30.7095 21.17 30.71C21.3023 30.7095 21.4332 30.6827 21.555 30.6312C21.6769 30.5797 21.7874 30.5045 21.88 30.41L27.54 24.76C27.6415 24.6664 27.7225 24.5527 27.7779 24.4262C27.8333 24.2997 27.8619 24.1631 27.8619 24.025C27.8619 23.8869 27.8333 23.7503 27.7779 23.6238C27.7225 23.4973 27.6415 23.3836 27.54 23.29Z" fill="white" />
+            </svg>
+        </button>
+    </div>
+</section>
+<div class="bg-section-3">
+    <section id="section-3" class="position-relative">
+        <img src="https://smartvision.vnpt.vn/images/bg-3.png" class="position-absolute bg-opacity-2" alt="">
+        <div class="taisaochonchungtoi container position-relative">
+            <div class="row">
+                <div class="col-lg-6 col-xs-6 col-12">
+                    <div class="position-relative">
+                        <div class="position-absolute line-throught"></div>
+                        <div class="d-flex align-items-center position-relative">
+                            <img src="https://smartvision.vnpt.vn/images/dot.png" class="img-fluid" alt="">
+                            <div class="item p-3 ms-4">
+                                <h1 class="text-40 text-neutral-2 font-700">55</h1>
+                                <p class="text-16 font-500 text-neutral-2">Top 55 Thương hiệu Viễn thông trên toàn TG
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center position-relative mt-3">
+                            <img src="https://smartvision.vnpt.vn/images/dot.png" class="img-fluid" alt="">
+                            <div class="item p-3 ms-4">
+                                <h1 class="text-40 text-neutral-2 font-700">10</h1>
+                                <p class="text-16 font-500 text-neutral-2">Top 10 doanh nghiệp CNTT Việt Nam</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center position-relative mt-3">
+                            <img src="https://smartvision.vnpt.vn/images/dot.png" class="img-fluid" alt="">
+                            <div class="item p-3 ms-4">
+                                <h1 class="text-40 text-neutral-2 font-700">5000+</h1>
+                                <p class="text-16 font-500 text-neutral-2">Kỹ sư Information Technology tài năng</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center position-relative mt-3">
+                            <img src="https://smartvision.vnpt.vn/images/dot.png" class="img-fluid" alt="">
+                            <div class="item p-3 ms-4">
+                                <h1 class="text-40 text-neutral-2 font-700">100+</h1>
+                                <p class="text-16 font-500 text-neutral-2">Chuyên gia AI giàu kinh nghiệm</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-xs-6 col-12">
+                    <div class="mt-5">
+                        <h1 class="text-title font-700 text-46">Tại sao <br> chọn chúng tôi</h1>
+                        <p class="text-18 text-neutral mt-4">VNPT là nhà cung cấp dịch vụ ICT hàng đầu tại Việt Nam với <br>
+                            mạng
+                            lưới và cơ sở hạ tầng rộng khắp; là doanh nghiệp cung <br> cấp các giải pháp số trên nền tảng
+                            công
+                            nghệ
+                            AI chất lượng <br> vươn tầm thế giới, đáp ứng cao các nhu cầu chuyển đổi số của Chính phủ và
+                            doanh
+                            nghiệp.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="giaithuong position-relative">
+            <div class="text-center">
+                <h1 class="text-title font-700 text-46">Giải thưởng</h1>
+                <p class="text-18 text-neutral mt-4 mb-5">Giải pháp VNPT Smart Vision vinh dự đạt được nhiều giải thưởng danh giá
+                </p>
+            </div>
+            <div class="container">
+                <div class="slide-giaithuong py-5">
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-5 col-12">
+                                <div class="d-flex align-items-start mt-5">
+                                    <img srcset="https://smartvision.vnpt.vn/images/medal.png 2x" class="img-fluid" alt="">
+                                    <div class="ms-3">
+                                        <h4 class="text-32 font-700 text-primary">Top 10 DN CNTT
+                                        </h4>
+                                        <div>
+                                            <p class="text-neutral text-16">Đạt Top 10 Doanh nghiệp CNTT năm 2021 - Lĩnh vực Chuyển đổi số</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7 col-12">
+                                <img srcset="https://smartvision.vnpt.vn/images/giaithuong/giaithuong1.png 2x" class="img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-5 col-12">
+                                <div class="d-flex align-items-start mt-5">
+                                    <img srcset="https://smartvision.vnpt.vn/images/medal.png 2x" class="img-fluid" alt="">
+                                    <div class="ms-3">
+                                        <h4 class="text-32 font-700 text-primary">IT World Awards
+                                        </h4>
+                                        <div>
+                                            <p class="text-neutral text-16">Giải <b> Đồng</b> tại giải thưởng Công Nghệ Thông Tin Thế giới (IT World Awards) hạng mục AI năm 2021
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7 col-12">
+                                <img srcset="https://smartvision.vnpt.vn/images/giaithuong/giaithuong2.png 2x" class="img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-5 col-12">
+                                <div class="d-flex align-items-start mt-5">
+                                    <img srcset="https://smartvision.vnpt.vn/images/medal.png 2x" class="img-fluid" alt="">
+                                    <div class="ms-3">
+                                        <h4 class="text-32 font-700 text-primary">Security Global <br> Excellence Awards
+                                            <div>
+                                                <p class="text-neutral font-400 text-16">Giải <b>Vàng</b> tại Cyber Security Global <br> Excellence Awards
+                                                    hạng mục <br> “ <b> Ứng dụng AI về bảo mật</b>”
+                                                </p>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7 col-12">
+                                <img srcset="https://smartvision.vnpt.vn/images/giaithuong/giaithuong3.png 2x" class="img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-5 col-12">
+                                <div class="d-flex align-items-start mt-5">
+                                    <img srcset="https://smartvision.vnpt.vn/images/medal.png 2x" class="img-fluid" alt="">
+                                    <div class="ms-3">
+                                        <h4 class="text-32 font-700 text-primary">Sao khuê</h4>
+                                        <div>
+                                            <p class="text-neutral text-16">Đạt danh hiệu Sao Khuê 2021</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7 col-12">
+                                <img src="https://smartvision.vnpt.vn/images/giaithuong/giaithuong4.png" class="img-fluid" alt="">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="hesinhthai position-relative mt-5 d-lg-block d-none">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-5 col-xs-6">
+                        <h1 class="text-title font-700 text-46">Hệ sinh thái <br> VNPT AI</h1>
+                        <p class="text-18 text-neutral mt-3 mb-4">Hãy đồng hành cùng chúng tôi khai phá sức mạnh <br>
+                            Trí
+                            Tuệ Nhân Tạo (AI) để tạo ra những mô hình kinh <br> doanh mới trong kỷ nguyên 4.0</p>
+                    </div>
+                    <div class="col-lg-7 col-xs-6">
+                        <div class="position-relative">
+                            <lottie-player src="https://smartvision.vnpt.vn/images/Circle.json" class="position-absolute radial-waves" background="transparent" speed="1" loop autoplay></lottie-player>
+                            <!-- <img src="https://smartvision.vnpt.vn/images/radial-waves.gif"
+                                class="img-fluid position-absolute radial-waves" alt=""> -->
+                            <a href="https://icenter.ai/" target="_blank">
+                                <img src="https://smartvision.vnpt.vn/images/product-icenter.svg" class="img-fluid position-absolute icenter" alt="">
+                            </a>
+                            <div class="text-center">
+                                <img src="https://smartvision.vnpt.vn/images/row-1.png" class="img-fluid" alt="">
+                                <img src="https://smartvision.vnpt.vn/images/row-1.png" class="img-fluid" alt="" style="margin-left: 24px;">
+                            </div>
+                            <div class="item mt-3 item-1 position-relative">
+                                <img src="https://smartvision.vnpt.vn/images/row-2-1.png" class="position-absolute row-1-1 img-fluid" alt="">
+                                <img src="https://smartvision.vnpt.vn/images/row-2-2.png" class="position-absolute row-1-2 img-fluid" alt="">
+                                <a href="https://smartvision.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-vision.svg" class="position-absolute row-1-3 img-fluid" alt="">
+                                </a>
+                                <a href="https://smartvision.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-vncallbot.svg" class="position-absolute row-1-4 img-fluid" alt="">
+                                </a>
+                            </div>
+                            <div class="item mt-3 position-relative">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-1.png" class="position-absolute row-2-1 img-fluid" alt="">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-2.png" class="position-absolute row-2-2 img-fluid" alt="">
+                                <a>
+                                    <img src="https://smartvision.vnpt.vn/images/product-smartux.svg" class="position-absolute row-2-3 img-fluid" alt="">
+                                </a>
+
+                                <a href="https://smartbot.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-bot.svg" class="position-absolute row-2-4 img-fluid" alt="">
+                                </a>
+
+                            </div>
+                            <div class="item mt-3 position-relative">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-1.png" class="position-absolute row-3-1 img-fluid" alt="">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-2.png" class="position-absolute row-3-2 img-fluid" alt="">
+                                <a href="https://isee.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-isee.svg" class="position-absolute row-3-3 img-fluid" alt="">
+                                </a>
+
+                                <a href="https://smartreader.vnpt.vn/vi" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-rpa.svg" class="position-absolute row-3-4 img-fluid" alt="">
+                                </a>
+
+                            </div>
+                            <div class="item mt-3 position-relative">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-1.png" class="position-absolute row-4-1 img-fluid" alt="">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-2.png" class="position-absolute row-4-2 img-fluid" alt="">
+                                <a href="https://vnsocial.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-vnsocial.svg" class="position-absolute row-4-3 img-fluid" alt="">
+                                </a>
+                                <a href="https://ekyc.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-ekyc.svg" class="position-absolute row-4-4 img-fluid" alt="">
+                                </a>
+
+                            </div>
+                            <div class="item mt-3 position-relative">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-1.png" class="position-absolute row-5-1 img-fluid" alt="">
+                                <img src="https://smartvision.vnpt.vn/images/row-3-2.png" class="position-absolute row-5-2 img-fluid" alt="">
+                                <a href="https://smartvoice.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-voice.svg" class="position-absolute row-5-3 img-fluid" alt="">
+                                </a>
+                                <a href="https://vnface.vnpt.vn" target="_blank">
+                                    <img src="https://smartvision.vnpt.vn/images/product-vnface.svg" class="position-absolute row-5-4 img-fluid" alt="">
+                                </a>
+                            </div>
+                            <div class="text-center mt-3">
+                                <img src="https://smartvision.vnpt.vn/images/row-7.png" class="img-fluid" alt="">
+                                <img src="https://smartvision.vnpt.vn/images/row-7.png" class="img-fluid" alt="" style="margin-left: 24px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tintuc position-relative mt-5">
+            <div class="text-center pt-4">
+                <p class="text-18 text-neutral my-4">Chúng tôi được đưa tin bởi những kênh tin tức uy tín tại Việt Nam
+                </p>
+            </div>
+            <div>
+                <div class="d-flex justify-content-center marquee-content">
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://vtv.vn/cong-nghe/ra-mat-nen-tang-dinh-danh-dien-tu-make-in-vietnam-vnpt-ekyc-20201023134505035.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/01.png" alt="https://smartvision.vnpt.vn/01">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://nld.com.vn/cong-nghe/vnpt-chinh-thuc-ra-mat-giai-phap-dinh-danh-dien-tu-ekyc-20200915165811565.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/02.png" alt="https://smartvision.vnpt.vn/02">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.sggp.org.vn/ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc-post572715.html" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/03.png" alt="https://smartvision.vnpt.vn/03">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.vietnamplus.vn/bo-thong-tin-truyen-thong-ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc/670964.vnp" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/04.png" alt="https://smartvision.vnpt.vn/04">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://baotintuc.vn/khoa-hoc-cong-nghe/nen-tang-dinh-danh-dien-tu-vnpt-ekyc-tao-giay-thong-hanh-buoc-vao-the-gioi-so-20201023130937308.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/05.png" alt="https://smartvision.vnpt.vn/05">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="http://hanoimoi.com.vn/tin-tuc/Oto-xemay/981681/nen-tang-dinh-danh-dien-tu-vnpt-ekyc---giay-thong-hanh-cho-moi-truong-so" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/06.png" alt="https://smartvision.vnpt.vn/06">
+                        </a>
+                    </div>
+                                                            <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://vtv.vn/cong-nghe/ra-mat-nen-tang-dinh-danh-dien-tu-make-in-vietnam-vnpt-ekyc-20201023134505035.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/01.png" alt="https://smartvision.vnpt.vn/01">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://nld.com.vn/cong-nghe/vnpt-chinh-thuc-ra-mat-giai-phap-dinh-danh-dien-tu-ekyc-20200915165811565.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/02.png" alt="https://smartvision.vnpt.vn/02">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.sggp.org.vn/ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc-post572715.html" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/03.png" alt="https://smartvision.vnpt.vn/03">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.vietnamplus.vn/bo-thong-tin-truyen-thong-ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc/670964.vnp" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/04.png" alt="https://smartvision.vnpt.vn/04">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://baotintuc.vn/khoa-hoc-cong-nghe/nen-tang-dinh-danh-dien-tu-vnpt-ekyc-tao-giay-thong-hanh-buoc-vao-the-gioi-so-20201023130937308.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/05.png" alt="https://smartvision.vnpt.vn/05">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="http://hanoimoi.com.vn/tin-tuc/Oto-xemay/981681/nen-tang-dinh-danh-dien-tu-vnpt-ekyc---giay-thong-hanh-cho-moi-truong-so" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/06.png" alt="https://smartvision.vnpt.vn/06">
+                        </a>
+                    </div>
+                                                            <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://vtv.vn/cong-nghe/ra-mat-nen-tang-dinh-danh-dien-tu-make-in-vietnam-vnpt-ekyc-20201023134505035.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/01.png" alt="https://smartvision.vnpt.vn/01">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://nld.com.vn/cong-nghe/vnpt-chinh-thuc-ra-mat-giai-phap-dinh-danh-dien-tu-ekyc-20200915165811565.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/02.png" alt="https://smartvision.vnpt.vn/02">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.sggp.org.vn/ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc-post572715.html" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/03.png" alt="https://smartvision.vnpt.vn/03">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.vietnamplus.vn/bo-thong-tin-truyen-thong-ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc/670964.vnp" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/04.png" alt="https://smartvision.vnpt.vn/04">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://baotintuc.vn/khoa-hoc-cong-nghe/nen-tang-dinh-danh-dien-tu-vnpt-ekyc-tao-giay-thong-hanh-buoc-vao-the-gioi-so-20201023130937308.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/05.png" alt="https://smartvision.vnpt.vn/05">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="http://hanoimoi.com.vn/tin-tuc/Oto-xemay/981681/nen-tang-dinh-danh-dien-tu-vnpt-ekyc---giay-thong-hanh-cho-moi-truong-so" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/06.png" alt="https://smartvision.vnpt.vn/06">
+                        </a>
+                    </div>
+                                                            <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://vtv.vn/cong-nghe/ra-mat-nen-tang-dinh-danh-dien-tu-make-in-vietnam-vnpt-ekyc-20201023134505035.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/01.png" alt="https://smartvision.vnpt.vn/01">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://nld.com.vn/cong-nghe/vnpt-chinh-thuc-ra-mat-giai-phap-dinh-danh-dien-tu-ekyc-20200915165811565.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/02.png" alt="https://smartvision.vnpt.vn/02">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.sggp.org.vn/ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc-post572715.html" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/03.png" alt="https://smartvision.vnpt.vn/03">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.vietnamplus.vn/bo-thong-tin-truyen-thong-ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc/670964.vnp" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/04.png" alt="https://smartvision.vnpt.vn/04">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://baotintuc.vn/khoa-hoc-cong-nghe/nen-tang-dinh-danh-dien-tu-vnpt-ekyc-tao-giay-thong-hanh-buoc-vao-the-gioi-so-20201023130937308.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/05.png" alt="https://smartvision.vnpt.vn/05">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="http://hanoimoi.com.vn/tin-tuc/Oto-xemay/981681/nen-tang-dinh-danh-dien-tu-vnpt-ekyc---giay-thong-hanh-cho-moi-truong-so" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/06.png" alt="https://smartvision.vnpt.vn/06">
+                        </a>
+                    </div>
+                                                            <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://vtv.vn/cong-nghe/ra-mat-nen-tang-dinh-danh-dien-tu-make-in-vietnam-vnpt-ekyc-20201023134505035.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/01.png" alt="https://smartvision.vnpt.vn/01">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://nld.com.vn/cong-nghe/vnpt-chinh-thuc-ra-mat-giai-phap-dinh-danh-dien-tu-ekyc-20200915165811565.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/02.png" alt="https://smartvision.vnpt.vn/02">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.sggp.org.vn/ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc-post572715.html" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/03.png" alt="https://smartvision.vnpt.vn/03">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://www.vietnamplus.vn/bo-thong-tin-truyen-thong-ra-mat-nen-tang-dinh-danh-dien-tu-vnpt-ekyc/670964.vnp" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/04.png" alt="https://smartvision.vnpt.vn/04">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="https://baotintuc.vn/khoa-hoc-cong-nghe/nen-tang-dinh-danh-dien-tu-vnpt-ekyc-tao-giay-thong-hanh-buoc-vao-the-gioi-so-20201023130937308.htm" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/05.png" alt="https://smartvision.vnpt.vn/05">
+                        </a>
+                    </div>
+                                        <div class="marquee-item" style="margin-top: 10px;">
+                        <a href="http://hanoimoi.com.vn/tin-tuc/Oto-xemay/981681/nen-tang-dinh-danh-dien-tu-vnpt-ekyc---giay-thong-hanh-cho-moi-truong-so" target="_blank">
+                            <img src="https://smartvision.vnpt.vn/images/tintuc/06.png" alt="https://smartvision.vnpt.vn/06">
+                        </a>
+                    </div>
+                                    </div>
+            </div>
+        </div>
+    </section>
+</div>
+  <footer>
+    <!-- Footer Start-->
+    <div class="footer-area">
+        <div class="container">
+            <div class="row justify-content-between pt-4">
+                <div class="col-lg-5 mt-md-0 mt-4">
+                    <img src="https://smartvision.vnpt.vn/images/logo_footer.png" alt="logo_footer">
+                    <div>
+                        <p class="text-14 text-neutral font-400 mt-3" style="margin-left: 0px;">Sản phẩm thuộc hệ sinh thái
+                            <svg width="77" height="20" viewBox="0 0 77 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_3211_3162)">
+                                    <path d="M10.9557 6.48778C10.9032 5.98 10.663 5.52778 10.3055 5.20111C9.91235 4.84 9.69788 4.32444 9.69788 3.79333V3.74778C9.69788 3.29444 9.86878 2.86333 10.1503 2.50556C10.3558 2.24333 10.4787 1.91333 10.4787 1.55444C10.4787 0.695556 9.78054 0.00111111 8.91707 0C8.0536 0.00111111 7.35545 0.695556 7.35545 1.55444C7.35545 1.91333 7.47833 2.24333 7.68386 2.50556C7.96535 2.86333 8.13626 3.29444 8.13626 3.74778V3.79333C8.13626 4.32444 7.92179 4.84 7.52859 5.20111C7.17114 5.52778 6.93098 5.98 6.87848 6.48778C6.87736 6.49667 6.87624 6.50444 6.87624 6.51333C6.87513 6.51667 6.87513 6.52 6.87513 6.52444C6.87401 6.52667 6.87401 6.52889 6.87401 6.53222C6.87178 6.55222 6.87066 6.57222 6.86954 6.59333C6.86843 6.62889 6.86731 6.66333 6.86731 6.69889C6.86731 6.72222 6.86731 6.74555 6.86842 6.76889C6.86842 6.77333 6.86843 6.77778 6.86954 6.78333C6.86954 6.79556 6.87066 6.80778 6.87066 6.82C6.87178 6.82556 6.87178 6.83 6.87178 6.83444C6.87289 6.85778 6.87513 6.88 6.87736 6.90222C6.87736 6.90556 6.87848 6.90889 6.87848 6.91111C6.8863 6.98222 6.89747 7.05111 6.91311 7.12C6.91311 7.12222 6.91422 7.12444 6.91422 7.12667C6.92204 7.16 6.92874 7.19444 6.93768 7.22667C6.94438 7.25 6.95109 7.27222 6.95779 7.29444C6.96114 7.30556 6.96449 7.31667 6.96896 7.32667C6.97566 7.35 6.98348 7.37222 6.99242 7.39444C6.99353 7.4 6.99577 7.40444 6.99688 7.41C6.99912 7.41556 7.00024 7.42 7.00247 7.42556C7.00694 7.43556 7.01029 7.44444 7.01476 7.45444C7.02034 7.46778 7.02481 7.48 7.0304 7.49222C7.03486 7.50222 7.03821 7.51333 7.04268 7.52333C7.04827 7.53555 7.05385 7.54667 7.05944 7.55889C7.06726 7.57889 7.07731 7.59889 7.08736 7.61889C7.0963 7.63667 7.10524 7.65444 7.11529 7.67111C7.12423 7.68778 7.13428 7.70555 7.14433 7.72222C7.14768 7.73 7.15215 7.73667 7.15662 7.74333C7.15774 7.74556 7.15997 7.74889 7.16109 7.75111C7.16109 7.75222 7.16109 7.75222 7.16109 7.75333C7.36215 8.12444 7.36997 8.58889 7.1421 8.98111C6.91422 9.37444 6.5065 9.59889 6.08203 9.61222C6.10884 9.61333 6.13453 9.61444 6.16022 9.61555C6.18592 9.61667 6.21161 9.61889 6.2373 9.62222C6.28645 9.62667 6.3356 9.63333 6.38475 9.64111C6.41826 9.64667 6.45177 9.65333 6.4864 9.66111C6.52996 9.67111 6.57464 9.68222 6.61821 9.69444C6.64278 9.70222 6.66736 9.70889 6.69193 9.71778C6.71651 9.72555 6.74108 9.73444 6.76566 9.74333C6.78912 9.75222 6.81369 9.76222 6.83715 9.77222C6.98125 9.83111 7.11752 9.90778 7.24487 9.99889C7.4437 9.85778 7.61796 9.67889 7.75759 9.46667C7.77881 9.43555 7.79892 9.40222 7.81791 9.37C7.8369 9.33667 7.85588 9.30333 7.87264 9.26889C7.9877 9.04222 8.05583 8.80333 8.07929 8.56111C8.07929 8.56 8.07929 8.56 8.07929 8.55889C8.08041 8.55889 8.08153 8.56 8.08264 8.56C8.08935 8.49111 8.0927 8.42333 8.0927 8.35444C8.0927 8.31111 8.09158 8.26778 8.08823 8.22555C8.08599 8.18555 8.08264 8.14555 8.07706 8.10667C8.07706 8.10111 8.07594 8.09555 8.07482 8.09C8.07036 8.04889 8.06365 8.00889 8.05583 7.96889C8.04913 7.93111 8.0402 7.89444 8.03126 7.85778C8.02903 7.85 8.02791 7.84333 8.02567 7.83555C8.01562 7.79667 8.00445 7.75778 7.99105 7.71889C7.97764 7.67889 7.96312 7.63778 7.94748 7.59778C7.93184 7.55778 7.91397 7.51889 7.8961 7.48C7.87711 7.44111 7.85812 7.40222 7.8369 7.36444C7.83578 7.36111 7.83354 7.35889 7.83243 7.35555C7.82796 7.34889 7.82461 7.34111 7.82014 7.33333C7.81791 7.33 7.81567 7.32667 7.81455 7.32333C7.70844 7.13889 7.64812 6.92556 7.64812 6.69889C7.64812 6.33222 7.8045 6.00222 8.05472 5.77222C8.60877 5.26222 8.91707 4.54333 8.91707 3.79222C8.91707 3.47778 8.87015 3.16333 8.77185 2.86778C8.67355 2.57111 8.52387 2.29333 8.31945 2.05333C8.20552 1.91778 8.13626 1.74333 8.13626 1.55333C8.13626 1.12333 8.48589 0.776667 8.91707 0.776667C9.34824 0.776667 9.69788 1.12333 9.69788 1.55333C9.69788 1.74333 9.62862 1.91778 9.51468 2.05333C9.31027 2.29333 9.16058 2.57111 9.06228 2.86778C8.96398 3.16333 8.91707 3.47778 8.91707 3.79222C8.91707 4.54333 9.22537 5.26222 9.77942 5.77222C10.0296 6.00222 10.186 6.33222 10.186 6.69889C10.186 6.92556 10.1257 7.13889 10.0196 7.32333C10.0375 7.29333 10.0553 7.26444 10.0743 7.23667C10.0788 7.22889 10.0833 7.22111 10.0888 7.21444C10.0989 7.2 10.1089 7.18556 10.1201 7.17222C10.1391 7.14333 10.1603 7.11556 10.1838 7.08778C10.1894 7.07889 10.1961 7.07111 10.2028 7.06333C10.2207 7.04111 10.2396 7.01889 10.2597 6.99667C10.2609 6.99556 10.2631 6.99333 10.2642 6.99111C10.2653 6.98889 10.2676 6.98667 10.2698 6.98444C10.2732 6.98111 10.2765 6.97778 10.2799 6.97333C10.281 6.97222 10.2821 6.97111 10.2832 6.97C10.2933 6.95889 10.3033 6.94778 10.3145 6.93778C10.3212 6.93 10.3279 6.92222 10.3357 6.91444L10.3391 6.91111C10.3458 6.90333 10.3525 6.89667 10.3592 6.89222C10.3636 6.88667 10.3703 6.88 10.377 6.87556C10.3826 6.86889 10.3882 6.86444 10.3938 6.85889C10.3994 6.85333 10.405 6.84889 10.4105 6.84333C10.4195 6.83444 10.4284 6.82667 10.4374 6.82C10.4418 6.81667 10.4463 6.81222 10.4508 6.80778C10.4619 6.79889 10.4742 6.78889 10.4865 6.77889C10.4921 6.77222 10.4988 6.76778 10.5055 6.76222C10.5077 6.76111 10.5088 6.76 10.5111 6.75778C10.52 6.75 10.529 6.74333 10.5368 6.73778C10.5379 6.73667 10.5401 6.73556 10.5412 6.73444C10.5446 6.73111 10.5479 6.72778 10.5524 6.72555C10.5591 6.71889 10.5669 6.71444 10.5736 6.71C10.5882 6.69778 10.6027 6.68778 10.6172 6.67889C10.6261 6.67111 10.6351 6.66556 10.644 6.66C10.6496 6.65555 10.6541 6.65222 10.6596 6.65C10.6943 6.62667 10.73 6.60444 10.7669 6.58333C10.7937 6.56667 10.8227 6.55222 10.8507 6.53778C10.8853 6.52 10.9199 6.50333 10.9557 6.48778Z" fill="#A1A5BA" />
+                                    <path d="M6.8769 6.48779C6.40887 6.2789 5.89503 6.26001 5.43146 6.40446C4.92097 6.56223 4.36469 6.49001 3.90224 6.22446L3.86202 6.20112C3.46771 5.97446 3.17728 5.61223 3.00637 5.19001C2.88126 4.88223 2.65451 4.61112 2.34285 4.43112C1.59667 4.00223 0.642724 4.25668 0.210431 5.00001C-0.220745 5.74446 0.0350567 6.69334 0.782354 7.12223C1.09512 7.30112 1.44364 7.36112 1.77428 7.31446C2.22668 7.25112 2.6869 7.3189 3.08233 7.54557L3.12254 7.5689C3.585 7.83446 3.92681 8.27668 4.0441 8.79557C4.15022 9.26668 4.42389 9.70001 4.83943 9.9989C4.84613 10.0045 4.85283 10.0089 4.86065 10.0133C4.86289 10.0156 4.86624 10.0178 4.86959 10.02C4.87071 10.0222 4.87294 10.0233 4.87629 10.0245C4.89305 10.0367 4.9098 10.0478 4.92768 10.0589C4.95784 10.0778 4.988 10.0956 5.01816 10.1133C5.03826 10.1256 5.05837 10.1367 5.07959 10.1478C5.08294 10.15 5.08741 10.1522 5.093 10.1545C5.10417 10.16 5.11534 10.1656 5.12539 10.1722C5.13098 10.1745 5.13433 10.1767 5.13879 10.1789C5.16002 10.19 5.18013 10.1989 5.20023 10.2078C5.20358 10.21 5.20693 10.21 5.20805 10.2111C5.27396 10.24 5.33986 10.2645 5.40688 10.2856C5.40912 10.2867 5.41135 10.2867 5.41359 10.2878C5.44598 10.2978 5.47949 10.3089 5.51189 10.3178C5.53534 10.3233 5.55768 10.3289 5.58114 10.3345C5.59231 10.3367 5.60348 10.34 5.61465 10.3411C5.63811 10.3467 5.66157 10.3511 5.68503 10.3545C5.69061 10.3567 5.69508 10.3567 5.70066 10.3589C5.70625 10.36 5.71072 10.3611 5.71742 10.3622C5.72859 10.3633 5.73753 10.3645 5.7487 10.3656C5.76322 10.3678 5.77551 10.37 5.78891 10.3711C5.80008 10.3722 5.81125 10.3745 5.82242 10.3767C5.83583 10.3778 5.84811 10.3789 5.86152 10.38C5.88274 10.3833 5.90508 10.3845 5.92742 10.3856C5.94753 10.3867 5.96764 10.3878 5.98663 10.3878C6.00562 10.3889 6.02572 10.3889 6.04583 10.3878C6.05476 10.3889 6.06258 10.3878 6.0704 10.3878C6.07264 10.3878 6.07711 10.3878 6.07934 10.3878C6.08046 10.3889 6.08046 10.3889 6.08157 10.3889C6.50493 10.4011 6.91377 10.6267 7.14052 11.0189C7.36952 11.4122 7.36058 11.8756 7.15951 12.2478C7.17403 12.2256 7.18744 12.2033 7.20196 12.1822C7.21537 12.1611 7.231 12.14 7.24664 12.1189C7.27457 12.0789 7.30585 12.04 7.33712 12.0011C7.35835 11.9745 7.3818 11.95 7.40526 11.9233C7.43542 11.8911 7.46782 11.8578 7.50021 11.8267C7.5192 11.8089 7.53707 11.7911 7.55718 11.7745C7.57617 11.7567 7.59627 11.74 7.61638 11.7233C7.63537 11.7078 7.65659 11.6911 7.6767 11.6767C7.79958 11.5822 7.93474 11.5033 8.07772 11.4389C8.05426 11.1967 7.98612 10.9578 7.87107 10.7311C7.85431 10.6978 7.83532 10.6633 7.81745 10.6311C7.79846 10.5978 7.77835 10.5656 7.75713 10.5333C7.6175 10.3211 7.44324 10.1433 7.24441 10.0011C7.24329 10.0011 7.24329 10.0011 7.24217 10C7.24329 9.9989 7.24441 9.9989 7.24441 9.99779C7.18744 9.95779 7.13047 9.92112 7.07015 9.88668C7.03217 9.86446 6.99419 9.84446 6.95621 9.82557C6.92047 9.80779 6.88361 9.79001 6.84674 9.77557C6.84228 9.77223 6.83669 9.77112 6.83111 9.7689C6.79313 9.75223 6.75515 9.73779 6.71605 9.72446C6.68031 9.71112 6.64344 9.70112 6.60658 9.69001C6.59876 9.68779 6.59206 9.68557 6.58424 9.68334C6.54514 9.67223 6.50605 9.66223 6.46583 9.65446C6.4245 9.64557 6.38094 9.63779 6.33849 9.63112C6.29604 9.62446 6.2536 9.62001 6.21003 9.61668C6.16647 9.61334 6.1229 9.61001 6.07934 9.61001C6.07599 9.6089 6.07264 9.61001 6.06929 9.6089C6.06147 9.6089 6.05253 9.6089 6.04471 9.6089C6.04024 9.6089 6.03689 9.6089 6.03354 9.6089C5.82019 9.60779 5.60348 9.55334 5.40688 9.44001C5.08741 9.25668 4.87853 8.95668 4.80368 8.62668C4.63613 7.89446 4.16474 7.27001 3.51127 6.89446C3.2376 6.73779 2.94047 6.62001 2.6344 6.55779C2.32721 6.49446 2.00998 6.48446 1.69944 6.54001C1.52407 6.57001 1.33752 6.54334 1.1722 6.44779C0.797992 6.23334 0.67065 5.7589 0.886238 5.38668C1.10183 5.01557 1.5788 4.88779 1.95301 5.10223C2.11833 5.19668 2.23562 5.34446 2.29706 5.51001C2.40429 5.80557 2.57073 6.07334 2.77961 6.30668C2.98738 6.5389 3.2376 6.73668 3.51127 6.89446C4.16474 7.27001 4.94555 7.36334 5.66604 7.14112C5.99109 7.04112 6.35636 7.07112 6.67584 7.25446C6.87355 7.36779 7.02882 7.52668 7.13606 7.71001C7.1193 7.68001 7.10254 7.65001 7.08802 7.62001C7.08356 7.61223 7.07909 7.60446 7.07574 7.59668C7.06792 7.58112 7.0601 7.56446 7.05451 7.5489C7.03887 7.51779 7.02547 7.48557 7.01318 7.45223C7.00871 7.44334 7.00536 7.43334 7.00089 7.42334C6.99084 7.39668 6.98079 7.3689 6.97185 7.34112C6.97185 7.34001 6.97073 7.33668 6.96962 7.33446C6.9685 7.33223 6.96738 7.3289 6.96627 7.32668C6.96515 7.32223 6.96403 7.31779 6.9618 7.31223C6.9618 7.31112 6.96068 7.3089 6.96068 7.30779C6.95621 7.29334 6.95175 7.2789 6.94839 7.26446C6.94504 7.25446 6.94169 7.24557 6.93834 7.23446L6.93722 7.23001C6.93387 7.22001 6.93164 7.21112 6.93052 7.20334C6.92829 7.19668 6.92494 7.18779 6.92494 7.18001C6.92159 7.17223 6.92047 7.16446 6.91823 7.15668C6.916 7.1489 6.91488 7.14223 6.91265 7.13446C6.9093 7.12223 6.90706 7.11112 6.90595 7.10001C6.90483 7.09446 6.90371 7.0889 6.90148 7.08223C6.89924 7.06779 6.89701 7.05223 6.89478 7.03668C6.89143 7.0289 6.89142 7.02001 6.88919 7.01223C6.88919 7.01001 6.88919 7.00779 6.88807 7.00557C6.88584 6.99446 6.88472 6.98334 6.88361 6.97334C6.88361 6.97223 6.88361 6.9689 6.88249 6.96779C6.88137 6.96334 6.88025 6.9589 6.88025 6.95334C6.87802 6.94446 6.87802 6.93557 6.8769 6.92779C6.87355 6.9089 6.87244 6.89112 6.87132 6.87446C6.86908 6.86334 6.86908 6.85223 6.86797 6.84223C6.86685 6.83557 6.86573 6.83001 6.86685 6.82334C6.8635 6.78223 6.86238 6.74001 6.86238 6.69779C6.86126 6.66668 6.8635 6.63446 6.86462 6.60334C6.8702 6.56446 6.87244 6.52668 6.8769 6.48779Z" fill="#A1A5BA" />
+                                    <path d="M4.83845 10C4.42291 10.2989 4.14924 10.7322 4.04312 11.2033C3.92583 11.7222 3.58402 12.1656 3.12157 12.4311L3.08135 12.4544C2.68704 12.6811 2.22571 12.7489 1.77331 12.6856C1.44266 12.64 1.09303 12.6989 0.781377 12.8778C0.0340801 13.3067 -0.221721 14.2556 0.209455 15C0.641748 15.7433 1.5957 15.9978 2.34299 15.5678C2.65576 15.3889 2.88141 15.1178 3.00651 14.8089C3.17742 14.3878 3.46673 14.0244 3.86216 13.7978L3.90238 13.7744C4.36483 13.5089 4.92111 13.4356 5.4316 13.5944C5.89517 13.7389 6.40789 13.72 6.87704 13.5111C6.88486 13.5078 6.89268 13.5044 6.9005 13.5C6.90385 13.4989 6.9072 13.4978 6.91055 13.4956C6.91279 13.4956 6.91502 13.4944 6.91837 13.4922C6.93736 13.4844 6.95524 13.4756 6.97423 13.4656C7.0055 13.4489 7.03678 13.4322 7.06694 13.4144C7.08705 13.4033 7.10715 13.3911 7.12726 13.3789C7.13061 13.3767 7.13508 13.3744 7.13955 13.3711C7.15072 13.3644 7.16077 13.3578 7.17082 13.3522C7.17529 13.3489 7.17864 13.3467 7.18311 13.3444C7.20322 13.3322 7.22109 13.3189 7.23896 13.3056C7.24231 13.3033 7.24455 13.3011 7.24567 13.3C7.30375 13.2578 7.35849 13.2133 7.40987 13.1656C7.4121 13.1644 7.41322 13.1622 7.41545 13.1611C7.44003 13.1378 7.46684 13.1144 7.4903 13.0911C7.50705 13.0733 7.52269 13.0567 7.53945 13.04C7.54727 13.0311 7.55508 13.0233 7.56179 13.0144C7.57854 12.9967 7.59418 12.9789 7.6087 12.96C7.61317 12.9567 7.6154 12.9522 7.61987 12.9489C7.62322 12.9444 7.62657 12.9411 7.63104 12.9367C7.63774 12.9278 7.64333 12.92 7.65003 12.9111C7.65897 12.9 7.66679 12.89 7.67461 12.8789C7.68131 12.87 7.68913 12.8611 7.69583 12.8522C7.70365 12.8411 7.71035 12.8311 7.71817 12.82C7.73158 12.8033 7.74386 12.7844 7.75615 12.7656C7.76732 12.7489 7.77849 12.7322 7.78743 12.7156C7.79748 12.7 7.80754 12.6822 7.81759 12.6644C7.82317 12.6578 7.82652 12.65 7.82987 12.6433C7.83099 12.6411 7.83323 12.6378 7.83434 12.6356C7.83546 12.6344 7.83546 12.6344 7.83658 12.6344C8.05887 12.2756 8.45988 12.0367 8.91452 12.0367C9.37139 12.0367 9.77017 12.2756 9.99357 12.6344C9.98129 12.6111 9.969 12.5878 9.95783 12.5656C9.94554 12.5433 9.93549 12.52 9.92544 12.4956C9.90421 12.4511 9.88634 12.4056 9.86847 12.3589C9.85618 12.3278 9.84613 12.2956 9.83496 12.2611C9.82155 12.2189 9.80926 12.1744 9.79809 12.1311C9.79251 12.1056 9.78581 12.0811 9.78134 12.0556C9.77575 12.03 9.77128 12.0044 9.76682 11.9789C9.76235 11.9544 9.759 11.9278 9.75565 11.9033C9.73442 11.75 9.7333 11.5944 9.74894 11.4389C9.52665 11.3378 9.28426 11.2778 9.02957 11.2633C8.99159 11.2611 8.9525 11.26 8.91563 11.26C8.87766 11.26 8.83856 11.2611 8.80058 11.2633C8.5459 11.2778 8.3035 11.3378 8.08121 11.4389C8.08009 11.4389 8.08009 11.4389 8.07897 11.44C8.07897 11.4389 8.07897 11.4378 8.07786 11.4367C8.01419 11.4656 7.95387 11.4967 7.89355 11.5311C7.85557 11.5522 7.81871 11.5756 7.78408 11.5989C7.75057 11.6211 7.71706 11.6433 7.68578 11.6678C7.68131 11.6711 7.67684 11.6744 7.67237 11.6778C7.63886 11.7022 7.60759 11.7278 7.57631 11.7544C7.54727 11.7789 7.51934 11.8056 7.49141 11.8311C7.48583 11.8367 7.48024 11.8411 7.47466 11.8467C7.44562 11.8744 7.41769 11.9033 7.39088 11.9344C7.36295 11.9656 7.33391 11.9989 7.3071 12.0322C7.28029 12.0656 7.25572 12.1 7.23003 12.1356C7.20545 12.1711 7.18088 12.2067 7.15854 12.2444C7.1563 12.2467 7.15519 12.25 7.15295 12.2522C7.1496 12.2589 7.14401 12.2667 7.14066 12.2733C7.13843 12.2767 7.13731 12.28 7.13508 12.2833C7.02784 12.4667 6.87146 12.6256 6.67486 12.7389C6.35539 12.9222 5.99012 12.9522 5.66506 12.8522C4.94457 12.63 4.16376 12.7233 3.5103 13.0989C3.23662 13.2556 2.98641 13.4533 2.77864 13.6867C2.56975 13.92 2.4022 14.1878 2.29608 14.4833C2.23464 14.6489 2.11735 14.7956 1.95203 14.8911C1.57782 15.1056 1.10085 14.9778 0.885262 14.6067C0.669674 14.2356 0.797016 13.7611 1.17122 13.5456C1.33654 13.4511 1.52309 13.4233 1.69846 13.4533C2.01012 13.5089 2.32624 13.5 2.63342 13.4356C2.93949 13.3722 3.23662 13.2556 3.5103 13.0989C4.16376 12.7233 4.63627 12.0989 4.80271 11.3667C4.87755 11.0367 5.08643 10.7367 5.40591 10.5533C5.60362 10.44 5.81921 10.3856 6.03256 10.3844C5.99794 10.3844 5.96331 10.3833 5.9298 10.3811C5.92086 10.3811 5.91192 10.3811 5.90299 10.38C5.88512 10.3789 5.86724 10.3767 5.85049 10.3744C5.81586 10.3722 5.78123 10.3678 5.74549 10.3622C5.73543 10.3622 5.72538 10.36 5.71421 10.3578C5.68628 10.3533 5.65724 10.3478 5.6282 10.3422C5.62708 10.3422 5.62373 10.3411 5.62149 10.3411C5.61926 10.3411 5.61591 10.34 5.61256 10.34C5.60809 10.3389 5.60362 10.3378 5.59804 10.3367C5.59692 10.3367 5.59469 10.3356 5.59357 10.3356C5.57905 10.3322 5.56453 10.3289 5.55 10.3244C5.53995 10.3222 5.5299 10.3211 5.51873 10.3178L5.51426 10.3167C5.50421 10.3144 5.49527 10.3122 5.48745 10.3089C5.48075 10.3078 5.47069 10.3056 5.46399 10.3022C5.45506 10.3011 5.44835 10.2978 5.44054 10.2967C5.43272 10.2944 5.42601 10.2922 5.41819 10.29C5.40591 10.2867 5.39474 10.2833 5.38468 10.2789C5.3791 10.2767 5.37351 10.2756 5.36681 10.2733C5.35341 10.2678 5.33888 10.2622 5.32436 10.2567C5.31543 10.2556 5.30872 10.2511 5.29979 10.2489C5.29755 10.2478 5.29644 10.2467 5.29309 10.2467C5.28192 10.2433 5.27186 10.2389 5.26293 10.2344C5.26181 10.2344 5.25957 10.2322 5.25734 10.2322C5.25287 10.2311 5.2484 10.23 5.24394 10.2267C5.235 10.2244 5.22718 10.22 5.21936 10.2167C5.20149 10.21 5.18585 10.2022 5.17021 10.1944C5.15904 10.1911 5.1501 10.1856 5.14005 10.1811C5.13335 10.1789 5.12776 10.1767 5.1233 10.1722C5.08532 10.1544 5.04846 10.1344 5.01159 10.1133C4.98367 10.0989 4.95686 10.0811 4.93005 10.0644C4.90212 10.0444 4.86973 10.0233 4.83845 10Z" fill="#A1A5BA" />
+                                    <path d="M6.87793 13.5122C6.93043 14.02 7.17059 14.4722 7.52804 14.7989C7.92124 15.16 8.13571 15.6755 8.13571 16.2067V16.2522C8.13571 16.7055 7.96481 17.1367 7.68331 17.4944C7.47778 17.7567 7.3549 18.0867 7.3549 18.4455C7.3549 19.3044 8.05305 19.9989 8.91652 20C9.77999 19.9989 10.4781 19.3044 10.4781 18.4455C10.4781 18.0867 10.3553 17.7567 10.1497 17.4944C9.86824 17.1367 9.69733 16.7055 9.69733 16.2522V16.2067C9.69733 15.6755 9.9118 15.16 10.305 14.7989C10.6624 14.4722 10.9026 14.02 10.9551 13.5122C10.9562 13.5033 10.9573 13.4955 10.9573 13.4867C10.9585 13.4833 10.9585 13.48 10.9585 13.4755C10.9596 13.4733 10.9596 13.4711 10.9596 13.4678C10.9618 13.4478 10.9629 13.4278 10.964 13.4067C10.9652 13.3711 10.9663 13.3367 10.9663 13.3011C10.9663 13.2778 10.9663 13.2544 10.9652 13.2311C10.9652 13.2267 10.9652 13.2222 10.964 13.2167C10.964 13.2044 10.9629 13.1922 10.9629 13.18C10.9618 13.1744 10.9618 13.17 10.9618 13.1655C10.9607 13.1422 10.9585 13.12 10.9562 13.0978C10.9562 13.0944 10.9551 13.0911 10.9551 13.0889C10.9473 13.0178 10.9361 12.9489 10.9205 12.88C10.9205 12.8778 10.9194 12.8755 10.9194 12.8733C10.9115 12.84 10.9048 12.8055 10.8959 12.7733C10.8892 12.75 10.8825 12.7278 10.8758 12.7055C10.8725 12.6944 10.8691 12.6833 10.8646 12.6733C10.8579 12.65 10.8501 12.6278 10.8412 12.6055C10.8401 12.6 10.8378 12.5955 10.8367 12.59C10.8345 12.5844 10.8334 12.58 10.8311 12.5744C10.8267 12.5644 10.8233 12.5555 10.8188 12.5455C10.8132 12.5322 10.8088 12.52 10.8032 12.5078C10.7987 12.4978 10.7954 12.4867 10.7909 12.4767C10.7853 12.4644 10.7797 12.4533 10.7742 12.4411C10.7663 12.4211 10.7563 12.4011 10.7462 12.3811C10.7373 12.3633 10.7284 12.3455 10.7183 12.3289C10.7094 12.3122 10.6993 12.2944 10.6893 12.2778C10.6859 12.27 10.6814 12.2633 10.677 12.2567C10.6759 12.2544 10.6736 12.2511 10.6725 12.2489C10.6725 12.2478 10.6725 12.2478 10.6725 12.2467C10.4714 11.8755 10.4636 11.4111 10.6915 11.0189C10.9194 10.6255 11.3271 10.4011 11.7516 10.3878C11.7247 10.3867 11.6991 10.3855 11.6734 10.3844C11.6477 10.3833 11.622 10.3811 11.5963 10.3778C11.5471 10.3733 11.498 10.3667 11.4488 10.3589C11.4153 10.3533 11.3818 10.3467 11.3472 10.3389C11.3036 10.3289 11.2589 10.3178 11.2154 10.3055C11.1908 10.2978 11.1662 10.2911 11.1417 10.2822C11.1171 10.2744 11.0925 10.2655 11.0679 10.2567C11.0445 10.2478 11.0199 10.2378 10.9964 10.2278C10.8523 10.1689 10.7161 10.0922 10.5887 10.0011C10.3899 10.1422 10.2156 10.3211 10.076 10.5333C10.0548 10.5644 10.0347 10.5978 10.0157 10.63C9.9967 10.6633 9.9777 10.6967 9.96095 10.7311C9.84589 10.9578 9.77776 11.1967 9.7543 11.4389C9.7543 11.44 9.7543 11.44 9.7543 11.4411C9.75318 11.4411 9.75206 11.44 9.75095 11.44C9.74424 11.5089 9.74089 11.5767 9.74089 11.6455C9.74089 11.6889 9.74201 11.7322 9.74536 11.7744C9.7476 11.8144 9.75095 11.8544 9.75653 11.8933C9.75653 11.8989 9.75765 11.9044 9.75877 11.91C9.76323 11.9511 9.76994 11.9911 9.77776 12.0311C9.78446 12.0689 9.79339 12.1055 9.80233 12.1422C9.80456 12.15 9.80568 12.1567 9.80792 12.1644C9.81797 12.2033 9.82914 12.2422 9.84254 12.2811C9.85595 12.3211 9.87047 12.3622 9.88611 12.4022C9.90175 12.4422 9.91962 12.4811 9.93749 12.52C9.95648 12.5589 9.97547 12.5978 9.99669 12.6355C9.99781 12.6389 10 12.6411 10.0012 12.6444C10.0056 12.6511 10.009 12.6589 10.0135 12.6655C10.0157 12.6689 10.0179 12.6722 10.019 12.6755C10.1252 12.86 10.1855 13.0733 10.1855 13.3C10.1855 13.6667 10.0291 13.9967 9.77887 14.2267C9.22482 14.7367 8.91652 15.4555 8.91652 16.2067C8.91652 16.5211 8.96344 16.8355 9.06174 17.1311C9.16003 17.4278 9.30972 17.7055 9.51413 17.9455C9.62807 18.0811 9.69733 18.2555 9.69733 18.4455C9.69733 18.8755 9.3477 19.2222 8.91652 19.2222C8.48534 19.2222 8.13571 18.8755 8.13571 18.4455C8.13571 18.2555 8.20497 18.0811 8.31891 17.9455C8.52332 17.7055 8.67301 17.4278 8.77131 17.1311C8.8696 16.8355 8.91652 16.5211 8.91652 16.2067C8.91652 15.4555 8.60822 14.7367 8.05417 14.2267C7.80395 13.9967 7.64757 13.6667 7.64757 13.3C7.64757 13.0733 7.70789 12.86 7.81401 12.6755C7.79613 12.7055 7.77826 12.7344 7.75927 12.7622C7.7548 12.77 7.75034 12.7778 7.74475 12.7844C7.7347 12.7989 7.72464 12.8133 7.71347 12.8267C7.69448 12.8555 7.67326 12.8833 7.6498 12.9111C7.64422 12.92 7.63751 12.9278 7.63081 12.9355C7.61294 12.9578 7.59395 12.98 7.57384 13.0022C7.57273 13.0033 7.57049 13.0055 7.56938 13.0078C7.56826 13.01 7.56602 13.0122 7.56379 13.0144C7.56044 13.0178 7.55709 13.0211 7.55374 13.0255C7.55262 13.0267 7.5515 13.0278 7.55039 13.0289C7.54033 13.04 7.53028 13.0511 7.51911 13.0611C7.51241 13.0689 7.5057 13.0767 7.49789 13.0844L7.49453 13.0878C7.48783 13.0955 7.48113 13.1022 7.47443 13.1067C7.46996 13.1122 7.46326 13.1189 7.45655 13.1233C7.45097 13.13 7.44538 13.1344 7.4398 13.14C7.43421 13.1455 7.42863 13.15 7.42304 13.1555C7.41411 13.1644 7.40517 13.1722 7.39623 13.1789C7.39177 13.1822 7.3873 13.1867 7.38283 13.1911C7.37166 13.2 7.35937 13.21 7.34708 13.22C7.3415 13.2267 7.3348 13.2311 7.3281 13.2367C7.32586 13.2378 7.32474 13.2389 7.32251 13.2411C7.31357 13.2489 7.30464 13.2555 7.29682 13.2611C7.2957 13.2622 7.29347 13.2633 7.29235 13.2644C7.289 13.2678 7.28565 13.2711 7.28118 13.2733C7.27448 13.28 7.26666 13.2844 7.25996 13.2889C7.24543 13.3011 7.23091 13.3111 7.21639 13.32C7.20746 13.3278 7.19852 13.3333 7.18958 13.3389C7.184 13.3433 7.17953 13.3467 7.17394 13.3489C7.13932 13.3722 7.10357 13.3944 7.06671 13.4155C7.0399 13.4322 7.01086 13.4467 6.98293 13.4611C6.9483 13.48 6.91367 13.4967 6.87793 13.5122Z" fill="#A1A5BA" />
+                                    <path d="M10.9556 13.5122C11.4236 13.7211 11.9374 13.74 12.401 13.5955C12.9115 13.4377 13.4678 13.51 13.9302 13.7755L13.9704 13.7989C14.3648 14.0255 14.6552 14.3877 14.8261 14.81C14.9512 15.1177 15.178 15.3889 15.4896 15.5689C16.2369 15.9977 17.1909 15.7444 17.6231 15.0011C18.0543 14.2566 17.7985 13.3077 17.0512 12.8789C16.7385 12.7 16.3899 12.64 16.0593 12.6866C15.6069 12.75 15.1467 12.6822 14.7512 12.4555L14.711 12.4322C14.2486 12.1666 13.9068 11.7244 13.7895 11.2055C13.6834 10.7344 13.4097 10.3011 12.9941 10.0022C12.9874 9.99663 12.9807 9.99219 12.9729 9.98774C12.9707 9.98552 12.9673 9.9833 12.964 9.98107C12.9629 9.97885 12.9606 9.97774 12.9573 9.97663C12.9405 9.96441 12.9238 9.9533 12.9059 9.94219C12.8757 9.9233 12.8456 9.90552 12.8154 9.88774C12.7953 9.87663 12.7752 9.86441 12.754 9.8533C12.7506 9.85107 12.7462 9.84885 12.7406 9.84663C12.7294 9.84107 12.7182 9.83552 12.7082 9.82885C12.7026 9.82663 12.6992 9.82441 12.6948 9.82219C12.6736 9.81107 12.6535 9.80219 12.6333 9.7933C12.63 9.79107 12.6266 9.79107 12.6255 9.78996C12.5596 9.76107 12.4937 9.73663 12.4267 9.71552C12.4245 9.71441 12.4222 9.71441 12.42 9.7133C12.3876 9.7033 12.3541 9.69219 12.3217 9.6833C12.2982 9.67774 12.2759 9.67219 12.2524 9.66663C12.2413 9.66441 12.2301 9.66107 12.2189 9.65996C12.1955 9.65441 12.172 9.64996 12.1486 9.64663C12.143 9.64441 12.1385 9.64441 12.1329 9.64218C12.1273 9.64107 12.1229 9.63996 12.1162 9.63885C12.105 9.63774 12.0961 9.63663 12.0849 9.63552C12.0704 9.6333 12.0581 9.63107 12.0447 9.62996C12.0335 9.62885 12.0223 9.62663 12.0112 9.62441C11.9978 9.6233 11.9855 9.62218 11.9721 9.62107C11.9508 9.61774 11.9285 9.61663 11.9062 9.61552C11.886 9.61441 11.8659 9.6133 11.847 9.6133C11.828 9.61218 11.8079 9.61218 11.7877 9.6133C11.7788 9.61218 11.771 9.6133 11.7632 9.6133C11.7609 9.6133 11.7565 9.6133 11.7542 9.6133C11.7531 9.61218 11.7531 9.61219 11.752 9.61219C11.3286 9.59996 10.9198 9.37441 10.6931 8.98218C10.4641 8.58885 10.473 8.12552 10.6741 7.7533C10.6595 7.77552 10.6461 7.79774 10.6316 7.81885C10.6182 7.83996 10.6026 7.86107 10.5869 7.88219C10.559 7.92219 10.5277 7.96107 10.4965 7.99996C10.4752 8.02552 10.4518 8.05107 10.4283 8.07774C10.3982 8.10996 10.3658 8.1433 10.3334 8.17441C10.3144 8.19218 10.2965 8.20996 10.2764 8.22663C10.2574 8.24441 10.2373 8.26107 10.2172 8.27774C10.1982 8.2933 10.177 8.30996 10.1569 8.32441C10.034 8.41885 9.89884 8.49774 9.75586 8.56218C9.77932 8.80441 9.84746 9.0433 9.96251 9.26996C9.97927 9.3033 9.99826 9.33774 10.0161 9.36996C10.0351 9.4033 10.0552 9.43552 10.0764 9.46774C10.2161 9.67996 10.3903 9.85774 10.5892 9.99996C10.5903 9.99996 10.5903 9.99996 10.5914 10.0011C10.5914 10.0022 10.5892 10.0022 10.5892 10.0033C10.6461 10.0433 10.7031 10.08 10.7634 10.1144C10.8014 10.1366 10.8394 10.1566 10.8774 10.1755C10.9131 10.1933 10.95 10.2111 10.9868 10.2255C10.9913 10.2289 10.9969 10.23 11.0025 10.2322C11.0405 10.2489 11.0784 10.2633 11.1175 10.2766C11.1533 10.29 11.1901 10.3 11.227 10.3111C11.2348 10.3133 11.2415 10.3155 11.2493 10.3177C11.2884 10.3289 11.3275 10.3389 11.3677 10.3466C11.4091 10.3555 11.4526 10.3633 11.4951 10.37C11.5375 10.3766 11.58 10.3811 11.6235 10.3844C11.6671 10.3877 11.7107 10.3911 11.7542 10.3911C11.7576 10.3922 11.7609 10.3911 11.7643 10.3922C11.7721 10.3922 11.781 10.3922 11.7889 10.3922C11.7933 10.3922 11.7967 10.3922 11.8 10.3922C12.0134 10.3933 12.2301 10.4477 12.4267 10.5611C12.7462 10.7444 12.9551 11.0444 13.0299 11.3744C13.1974 12.1066 13.6688 12.7311 14.3223 13.1066C14.596 13.2633 14.8931 13.3811 15.1992 13.4433C15.5064 13.5066 15.8236 13.5166 16.1341 13.4611C16.3095 13.4311 16.4961 13.4577 16.6614 13.5533C17.0356 13.7677 17.1629 14.2433 16.9473 14.6144C16.7318 14.9855 16.2548 15.1133 15.8806 14.8989C15.7152 14.8044 15.598 14.6566 15.5365 14.4911C15.4293 14.1955 15.2628 13.9277 15.054 13.6944C14.8462 13.4622 14.596 13.2644 14.3223 13.1066C13.6688 12.7311 12.888 12.6377 12.1675 12.86C11.8425 12.96 11.4772 12.93 11.1577 12.7466C10.96 12.6333 10.8048 12.4744 10.6975 12.2911C10.7143 12.3211 10.731 12.3511 10.7456 12.3811C10.75 12.3889 10.7545 12.3966 10.7578 12.4044C10.7657 12.42 10.7735 12.4366 10.7791 12.4522C10.7947 12.4833 10.8081 12.5155 10.8204 12.5489C10.8249 12.5577 10.8282 12.5677 10.8327 12.5777C10.8427 12.6044 10.8528 12.6322 10.8617 12.66C10.8617 12.6611 10.8628 12.6644 10.864 12.6666C10.8651 12.6689 10.8662 12.6722 10.8673 12.6744C10.8684 12.6789 10.8695 12.6833 10.8718 12.6889C10.8718 12.69 10.8729 12.6922 10.8729 12.6933C10.8774 12.7077 10.8818 12.7222 10.8852 12.7366C10.8885 12.7466 10.8919 12.7555 10.8952 12.7666L10.8964 12.7711C10.8997 12.7811 10.9019 12.79 10.9031 12.7977C10.9053 12.8044 10.9086 12.8133 10.9086 12.8211C10.912 12.8289 10.9131 12.8366 10.9153 12.8444C10.9176 12.8522 10.9187 12.8589 10.9209 12.8666C10.9243 12.8789 10.9265 12.89 10.9276 12.9011C10.9287 12.9066 10.9299 12.9122 10.9321 12.9189C10.9343 12.9333 10.9366 12.9489 10.9388 12.9644C10.9422 12.9722 10.9422 12.9811 10.9444 12.9889C10.9444 12.9911 10.9444 12.9933 10.9455 12.9955C10.9477 13.0066 10.9489 13.0177 10.95 13.0277C10.95 13.0289 10.95 13.0322 10.9511 13.0333C10.9522 13.0377 10.9533 13.0422 10.9533 13.0477C10.9556 13.0566 10.9556 13.0655 10.9567 13.0733C10.96 13.0922 10.9611 13.11 10.9623 13.1266C10.9645 13.1377 10.9645 13.1489 10.9656 13.1589C10.9667 13.1655 10.9678 13.1711 10.9667 13.1777C10.9701 13.2189 10.9712 13.2611 10.9712 13.3033C10.9723 13.3344 10.9701 13.3666 10.969 13.3977C10.9623 13.4355 10.96 13.4733 10.9556 13.5122Z" fill="#A1A5BA" />
+                                    <path d="M12.994 10C13.4095 9.70115 13.6832 9.26782 13.7893 8.79671C13.9066 8.27782 14.2484 7.83449 14.7109 7.56893L14.7511 7.5456C15.1454 7.31893 15.6067 7.25115 16.0591 7.31449C16.3898 7.36004 16.7394 7.30115 17.0511 7.12226C17.7984 6.69338 18.0542 5.74449 17.623 5.00004C17.1907 4.25671 16.2367 4.00226 15.4894 4.43226C15.1767 4.61115 14.951 4.88226 14.8259 5.19115C14.655 5.61226 14.3657 5.9756 13.9703 6.20226L13.9301 6.22449C13.4676 6.49004 12.9113 6.56338 12.4008 6.40449C11.9373 6.26004 11.4246 6.27893 10.9554 6.48782C10.9476 6.49115 10.9398 6.49449 10.9319 6.49893C10.9286 6.50004 10.9252 6.50115 10.9219 6.50338C10.9197 6.50338 10.9174 6.50449 10.9141 6.50671C10.8951 6.51449 10.8772 6.52338 10.8582 6.53338C10.8269 6.55004 10.7957 6.56671 10.7655 6.58449C10.7454 6.5956 10.7253 6.60782 10.7052 6.62004C10.7018 6.62226 10.6974 6.62449 10.6929 6.62782C10.6817 6.63338 10.6717 6.64115 10.6616 6.64671C10.6571 6.65004 10.6538 6.65226 10.6493 6.65449C10.6292 6.66671 10.6114 6.68004 10.5935 6.69338C10.5901 6.6956 10.5879 6.69782 10.5868 6.69893C10.5287 6.74115 10.474 6.7856 10.4226 6.83338C10.4203 6.83449 10.4192 6.83671 10.417 6.83782C10.3924 6.86115 10.3656 6.88449 10.3421 6.90782C10.3254 6.9256 10.3098 6.94226 10.293 6.95893C10.2852 6.96782 10.2774 6.9756 10.2707 6.98449C10.2539 7.00226 10.2383 7.02004 10.2237 7.03893C10.2193 7.04226 10.217 7.04671 10.2126 7.05004C10.2092 7.05449 10.2059 7.05782 10.2014 7.06226C10.1947 7.07115 10.1891 7.07893 10.1824 7.08782C10.1735 7.09893 10.1657 7.10893 10.1578 7.12004C10.1511 7.12893 10.1433 7.13782 10.1366 7.14671C10.1288 7.15782 10.1221 7.16782 10.1143 7.17893C10.1009 7.1956 10.0886 7.21449 10.0763 7.23338C10.0651 7.25004 10.0539 7.26671 10.045 7.28338C10.035 7.29893 10.0249 7.31671 10.0149 7.33449C10.0093 7.34115 10.0059 7.34893 10.0026 7.3556C10.0014 7.35782 9.99922 7.36115 9.9981 7.36337C9.99698 7.36449 9.99698 7.36449 9.99586 7.36449C9.77357 7.72338 9.37256 7.96226 8.91792 7.96226C8.46106 7.96226 8.06227 7.72338 7.83887 7.36449C7.85115 7.38782 7.86344 7.41115 7.87461 7.43338C7.8869 7.4556 7.89695 7.47893 7.90701 7.50338C7.92823 7.54782 7.9461 7.59338 7.96398 7.64004C7.97626 7.67115 7.98632 7.70338 7.99749 7.73782C8.01089 7.78004 8.02318 7.82449 8.03435 7.86782C8.03993 7.89338 8.04664 7.91782 8.0511 7.94338C8.05669 7.96893 8.06116 7.99449 8.06563 8.02004C8.07009 8.04449 8.07345 8.07115 8.07568 8.0956C8.0969 8.24893 8.09802 8.40449 8.08238 8.56004C8.30467 8.66115 8.54707 8.72115 8.80175 8.7356C8.83973 8.73782 8.87883 8.73893 8.91569 8.73893C8.95367 8.73893 8.99277 8.73782 9.03074 8.7356C9.28543 8.72115 9.52783 8.66115 9.75012 8.56004C9.75123 8.56004 9.75123 8.56004 9.75235 8.55893C9.75235 8.56004 9.75235 8.56115 9.75347 8.56226C9.81714 8.53338 9.87746 8.50226 9.93778 8.46782C9.97576 8.44671 10.0126 8.42338 10.0472 8.40004C10.0808 8.37782 10.1143 8.3556 10.1455 8.33115C10.15 8.32782 10.1545 8.32449 10.159 8.32115C10.1925 8.29671 10.2237 8.27115 10.255 8.24449C10.2841 8.22004 10.312 8.19338 10.3399 8.16782C10.3455 8.16226 10.3511 8.15782 10.3567 8.15226C10.3857 8.12449 10.4136 8.0956 10.4404 8.06449C10.4684 8.03338 10.4974 8.00004 10.5242 7.96671C10.551 7.93338 10.5756 7.89893 10.6013 7.86338C10.6259 7.82782 10.6504 7.79226 10.6728 7.75449C10.675 7.75226 10.6761 7.74893 10.6784 7.74671C10.6817 7.74004 10.6873 7.73226 10.6907 7.7256C10.6929 7.72226 10.694 7.71893 10.6962 7.7156C10.8035 7.53226 10.9599 7.37337 11.1565 7.26004C11.4759 7.07671 11.8412 7.04671 12.1663 7.14671C12.8868 7.36893 13.6676 7.2756 14.321 6.90004C14.5947 6.74338 14.8449 6.5456 15.0527 6.31226C15.2616 6.07893 15.4291 5.81115 15.5352 5.5156C15.5967 5.35004 15.714 5.20338 15.8793 5.10782C16.2535 4.89338 16.7305 5.02115 16.9461 5.39226C17.1617 5.76338 17.0343 6.23782 16.6601 6.45338C16.4948 6.54782 16.3082 6.5756 16.1329 6.5456C15.8212 6.49004 15.5051 6.49893 15.1979 6.56338C14.8918 6.62671 14.5947 6.74338 14.321 6.90004C13.6676 7.2756 13.1951 7.90004 13.0286 8.63226C12.9538 8.96226 12.7449 9.26226 12.4254 9.4456C12.2277 9.55893 12.0121 9.61338 11.7988 9.61449C11.8334 9.61449 11.868 9.6156 11.9015 9.61782C11.9105 9.61782 11.9194 9.61782 11.9283 9.61893C11.9462 9.62004 11.9641 9.62226 11.9808 9.62449C12.0155 9.62671 12.0501 9.63115 12.0858 9.63671C12.0959 9.63671 12.1059 9.63893 12.1171 9.64115C12.145 9.6456 12.1741 9.65115 12.2031 9.65671C12.2042 9.65671 12.2076 9.65782 12.2098 9.65782C12.2121 9.65782 12.2154 9.65893 12.2188 9.65893C12.2232 9.66004 12.2277 9.66115 12.2333 9.66226C12.2344 9.66226 12.2366 9.66338 12.2378 9.66338C12.2523 9.66671 12.2668 9.67004 12.2813 9.67449C12.2914 9.67671 12.3014 9.67782 12.3126 9.68115L12.3171 9.68226C12.3271 9.68449 12.3361 9.68671 12.3439 9.69004C12.3506 9.69115 12.3606 9.69338 12.3673 9.69671C12.3763 9.69782 12.383 9.70115 12.3908 9.70226C12.3986 9.70449 12.4053 9.70671 12.4131 9.70893C12.4254 9.71226 12.4366 9.7156 12.4466 9.72004C12.4522 9.72226 12.4578 9.72338 12.4645 9.7256C12.4779 9.73115 12.4924 9.73671 12.507 9.74226C12.5159 9.74338 12.5226 9.74782 12.5315 9.75004C12.5338 9.75115 12.5349 9.75226 12.5382 9.75226C12.5494 9.7556 12.5595 9.76004 12.5684 9.76449C12.5695 9.76449 12.5717 9.76671 12.574 9.76671C12.5785 9.76782 12.5829 9.76893 12.5874 9.77226C12.5963 9.77449 12.6041 9.77893 12.612 9.78226C12.6298 9.78893 12.6455 9.79671 12.6611 9.80449C12.6723 9.80782 12.6812 9.81338 12.6913 9.81782C12.698 9.82004 12.7036 9.82226 12.708 9.82671C12.746 9.84449 12.7829 9.86449 12.8197 9.8856C12.8477 9.90004 12.8745 9.91782 12.9013 9.93449C12.9303 9.9556 12.9627 9.97671 12.994 10Z" fill="#A1A5BA" />
+                                    <path d="M0.886103 5.38893C1.10169 5.01781 1.57867 4.89004 1.95287 5.10448C2.11819 5.20004 2.23548 5.3467 2.29692 5.51226C2.40304 5.80893 2.57059 6.0767 2.77948 6.31004C2.98836 6.54226 3.23858 6.74004 3.51225 6.8967C4.16572 7.27226 4.94541 7.3667 5.66702 7.14448C5.99207 7.04337 6.35735 7.07337 6.67682 7.2567C6.87453 7.37004 7.0298 7.52893 7.13704 7.71337C7.12028 7.68226 7.10464 7.65226 7.089 7.62226C7.08454 7.61448 7.08007 7.6067 7.07783 7.59893C7.07001 7.58337 7.0622 7.5667 7.05661 7.55115C7.04097 7.52004 7.02645 7.48781 7.01416 7.45337C7.0097 7.44448 7.00634 7.43448 7.00299 7.42448C6.99182 7.39893 6.98289 7.37115 6.97283 7.34226C6.97283 7.34115 6.97172 7.33781 6.9706 7.33559C6.96948 7.33337 6.96836 7.33115 6.96725 7.32781C6.96613 7.32337 6.96501 7.31893 6.96278 7.31337C6.96278 7.31226 6.96166 7.31115 6.96166 7.30893C6.95719 7.29448 6.95273 7.28115 6.94937 7.26559C6.94602 7.2567 6.94267 7.2467 6.93932 7.23559L6.9382 7.23115C6.93485 7.22226 6.93262 7.21226 6.9315 7.20448C6.92927 7.19781 6.92703 7.18893 6.92592 7.18115C6.92368 7.17337 6.92257 7.16559 6.92033 7.15781C6.9181 7.15115 6.91698 7.14337 6.91475 7.13559C6.9114 7.12337 6.90916 7.11226 6.90804 7.10115C6.90693 7.09559 6.90581 7.09004 6.90469 7.08337C6.90246 7.07004 6.89911 7.05448 6.89687 7.03893C6.89352 7.03004 6.89352 7.02226 6.89241 7.01337C6.89241 7.01115 6.89129 7.01004 6.89129 7.0067C6.88905 6.99559 6.88682 6.98448 6.88682 6.97448C6.8857 6.97337 6.8857 6.97004 6.8857 6.96893C6.88459 6.96448 6.88347 6.96004 6.88347 6.95448C6.88124 6.94559 6.88124 6.9367 6.88012 6.92893C6.87677 6.91004 6.87565 6.89226 6.87565 6.87559C6.87342 6.86448 6.8723 6.85337 6.8723 6.84337C6.87118 6.8367 6.87007 6.83115 6.87118 6.82448C6.86783 6.78337 6.86671 6.74115 6.86671 6.69893C6.8656 6.66781 6.86783 6.63559 6.86895 6.60448C6.87007 6.56448 6.8723 6.5267 6.87677 6.48781C6.40873 6.27893 5.89489 6.26004 5.43132 6.40448C4.92084 6.56337 4.36455 6.49004 3.9021 6.22448L3.863 6.20115C3.46757 5.97448 3.17826 5.61226 3.00735 5.19115C2.88225 4.88226 2.65549 4.61226 2.34383 4.43226C1.59542 4.00337 0.642589 4.2567 0.210296 5.00004C0.185721 5.04226 0.164497 5.08448 0.145508 5.12781L0.886103 5.38893Z" fill="#A1A5BA" />
+                                    <path d="M10.5076 7.98339C10.4864 8.01006 10.4629 8.03673 10.4406 8.06117C10.4138 8.09228 10.3847 8.12117 10.3568 8.14895C10.3512 8.15562 10.3456 8.15895 10.3401 8.16562C10.3121 8.19117 10.2853 8.21784 10.2552 8.24228C10.225 8.26895 10.1926 8.29451 10.1591 8.31895C10.1546 8.32228 10.1513 8.32673 10.1457 8.32895C10.1144 8.35339 10.082 8.37673 10.0485 8.39784C10.0128 8.42228 9.9759 8.44451 9.93792 8.46673C9.8776 8.50117 9.81728 8.53228 9.75361 8.56117V8.55673C9.75249 8.55784 9.75249 8.55784 9.75137 8.55784C9.52908 8.65895 9.28669 8.72006 9.032 8.73451C8.99402 8.73673 8.95493 8.73784 8.91695 8.73784C8.87897 8.73784 8.83987 8.73673 8.80189 8.73451C8.54721 8.72006 8.30481 8.65895 8.08252 8.55895C8.09816 8.40339 8.09704 8.24784 8.07582 8.09339C8.07247 8.06895 8.06912 8.04228 8.06577 8.01784C8.0613 7.99228 8.05683 7.96673 8.05124 7.94117C8.04566 7.91562 8.04007 7.89117 8.03449 7.86673C8.02332 7.82228 8.00991 7.77895 7.99763 7.73562C7.98646 7.70228 7.97529 7.67006 7.96412 7.63895C7.94624 7.59228 7.92725 7.54673 7.90715 7.50228C7.89709 7.47784 7.88592 7.45562 7.87364 7.43228C7.86247 7.41006 7.85018 7.38673 7.83789 7.36339C8.0613 7.72228 8.4612 7.96117 8.91695 7.96117C9.3727 7.96117 9.7726 7.72228 9.996 7.36339C9.99712 7.36339 9.99712 7.36339 9.99712 7.36228C9.99935 7.36006 10.0005 7.35673 10.0016 7.35451C10.0061 7.34784 10.0094 7.34006 10.0139 7.33339C10.0239 7.31673 10.034 7.29895 10.044 7.28339C10.0541 7.26562 10.0653 7.24895 10.0753 7.23228C10.0831 7.22228 10.091 7.21117 10.0988 7.20117L10.5076 7.98339Z" fill="#A1A5BA" />
+                                    <path d="M0.886236 14.6111C0.670648 14.24 0.79799 13.7656 1.1722 13.55C1.33752 13.4556 1.52406 13.4278 1.69944 13.4578C2.01109 13.5144 2.32721 13.5044 2.63551 13.4411C2.94158 13.3778 3.23983 13.2611 3.51239 13.1033C4.16585 12.7278 4.63836 12.1033 4.80592 11.3711C4.88076 11.0411 5.08964 10.7411 5.408 10.5578C5.60571 10.4444 5.8213 10.39 6.03577 10.39C6.00003 10.3889 5.96652 10.3878 5.93301 10.3856C5.92407 10.3856 5.91513 10.3856 5.90731 10.3833C5.88944 10.3822 5.87157 10.3811 5.85481 10.3778C5.82018 10.3756 5.78444 10.3722 5.74869 10.3656C5.73864 10.3644 5.72859 10.3633 5.71742 10.3611C5.68949 10.3578 5.66045 10.3522 5.63029 10.3456C5.62917 10.3456 5.62582 10.3444 5.62359 10.3444C5.62135 10.3444 5.61912 10.3444 5.61465 10.3433C5.61018 10.3422 5.60571 10.3411 5.60013 10.34C5.59901 10.3389 5.59789 10.34 5.59566 10.3389C5.58114 10.3356 5.56662 10.3322 5.5521 10.3278C5.54316 10.3267 5.53199 10.3244 5.52082 10.3211L5.51635 10.32C5.50741 10.3189 5.49736 10.3156 5.48954 10.3122C5.48284 10.3111 5.4739 10.3078 5.46608 10.3056C5.45826 10.3033 5.45045 10.3011 5.44263 10.2989C5.43592 10.2978 5.4281 10.2944 5.42029 10.2922C5.408 10.2889 5.39683 10.2856 5.38677 10.2811C5.38119 10.2789 5.3756 10.2778 5.37002 10.2756C5.35773 10.2711 5.34209 10.2656 5.32757 10.26C5.31863 10.2589 5.31193 10.2544 5.303 10.2511C5.30076 10.25 5.29965 10.25 5.29629 10.2489C5.28512 10.2456 5.27507 10.2411 5.26613 10.2367C5.26502 10.2367 5.26167 10.2356 5.26055 10.2344C5.25608 10.2333 5.25161 10.2322 5.24715 10.2289C5.23821 10.2267 5.23039 10.2222 5.22369 10.2189C5.20581 10.2122 5.18906 10.2044 5.17454 10.1956C5.16337 10.1922 5.15331 10.1878 5.14438 10.1822C5.13768 10.18 5.13209 10.1778 5.12762 10.1733C5.08964 10.1556 5.05278 10.1356 5.01592 10.1144C4.98799 10.1 4.96118 10.0822 4.93437 10.0656C4.89975 10.0444 4.86847 10.0233 4.83719 10C4.42166 10.2989 4.14798 10.7322 4.04186 11.2033C3.92457 11.7222 3.58276 12.1644 3.12031 12.43L3.08009 12.4522C2.68466 12.68 2.22556 12.7478 1.77316 12.6844C1.4414 12.6378 1.09289 12.6978 0.781235 12.8767C0.0339374 13.3067 -0.222981 14.2556 0.208195 14.9989C0.23277 15.0411 0.258462 15.0811 0.287505 15.1189L0.886236 14.6111Z" fill="#A1A5BA" />
+                                    <path d="M7.95642 7.62226C7.96871 7.65337 7.98099 7.68782 7.99105 7.71893C8.00445 7.75782 8.01562 7.79671 8.02567 7.83449C8.02902 7.84226 8.02903 7.84893 8.03126 7.85671C8.03908 7.89337 8.04913 7.93004 8.05583 7.96782C8.06365 8.00671 8.07036 8.04782 8.07482 8.08893C8.07594 8.09449 8.07818 8.10004 8.07706 8.1056C8.08264 8.14448 8.08711 8.18449 8.08823 8.22337C8.09158 8.26671 8.0927 8.30893 8.0927 8.35337C8.0927 8.42226 8.08935 8.49004 8.08264 8.55893L8.07929 8.55671C8.07929 8.55782 8.07929 8.55782 8.07929 8.55893C8.05583 8.80115 7.9877 9.04004 7.87376 9.26671C7.857 9.30004 7.83801 9.33448 7.81902 9.36782C7.80003 9.40004 7.77993 9.43337 7.7587 9.4656C7.61907 9.67782 7.44482 9.8556 7.24598 9.99782C7.11864 9.90671 6.98236 9.83004 6.83715 9.77115C6.81369 9.76226 6.78912 9.75115 6.76677 9.74226C6.7422 9.73337 6.71762 9.72448 6.69305 9.71671C6.66848 9.70893 6.6439 9.70115 6.61933 9.69337C6.57464 9.68115 6.53108 9.67115 6.4864 9.66004C6.45177 9.65337 6.41826 9.64671 6.38587 9.64004C6.33672 9.63226 6.28757 9.6256 6.23842 9.62115C6.21161 9.61782 6.18703 9.6156 6.16022 9.61449C6.13565 9.61337 6.10884 9.61226 6.08203 9.61115C6.5065 9.59782 6.91422 9.37337 7.1421 8.98004C7.36997 8.58782 7.36215 8.12337 7.16109 7.75226C7.16109 7.75115 7.16109 7.75115 7.16109 7.75115C7.15997 7.74782 7.15774 7.7456 7.15662 7.74337C7.15327 7.73671 7.14768 7.72893 7.14433 7.72226C7.1354 7.7056 7.12423 7.68782 7.11641 7.67115C7.10635 7.65337 7.09742 7.6356 7.08736 7.61893C7.0829 7.60671 7.07731 7.59449 7.07173 7.58337L7.95642 7.62226Z" fill="#A1A5BA" />
+                                    <path d="M8.91568 19.2223C8.48451 19.2223 8.13488 18.8756 8.13488 18.4456C8.13488 18.2556 8.20413 18.0812 8.31807 17.9456C8.5236 17.7056 8.67217 17.4279 8.77159 17.1312C8.86877 16.8356 8.9168 16.5212 8.91568 16.2068C8.91568 15.4556 8.6085 14.7379 8.05445 14.2268C7.80423 13.9979 7.64785 13.6679 7.64785 13.3012C7.64785 13.0745 7.70817 12.8612 7.8154 12.6768C7.79641 12.7068 7.77854 12.7356 7.75955 12.7634C7.75508 12.7712 7.75062 12.779 7.74503 12.7845C7.73498 12.799 7.72492 12.8145 7.71375 12.8268C7.69476 12.8556 7.67354 12.8845 7.65008 12.9123C7.6445 12.9201 7.6378 12.929 7.62998 12.9368C7.61322 12.959 7.59311 12.9812 7.57301 13.0034C7.57189 13.0034 7.56966 13.0068 7.56854 13.009C7.56742 13.0112 7.5663 13.0134 7.56295 13.0156C7.5596 13.019 7.55625 13.0223 7.5529 13.0268C7.55178 13.0268 7.55178 13.029 7.54955 13.0301C7.5395 13.0412 7.52944 13.0512 7.51827 13.0623C7.51269 13.0701 7.50487 13.0779 7.49705 13.0856L7.4937 13.089C7.48811 13.0968 7.48029 13.1034 7.47359 13.1079C7.46912 13.1134 7.46242 13.119 7.45572 13.1245C7.45013 13.1301 7.44343 13.1356 7.43785 13.1412C7.43338 13.1468 7.42668 13.1512 7.42109 13.1568C7.41215 13.1656 7.40322 13.1734 7.39428 13.1801C7.38981 13.1834 7.38535 13.1879 7.38088 13.1923C7.37082 13.2012 7.35854 13.2112 7.34625 13.2212C7.34066 13.229 7.33396 13.2323 7.32614 13.2379C7.32391 13.239 7.32391 13.2401 7.32056 13.2423C7.31162 13.2501 7.3038 13.2568 7.29487 13.2623C7.29487 13.2634 7.29151 13.2656 7.2904 13.2656C7.28705 13.269 7.2837 13.2723 7.27923 13.2745C7.27252 13.2812 7.26471 13.2856 7.25912 13.2901C7.2446 13.3023 7.22896 13.3123 7.21444 13.3201C7.2055 13.3279 7.19657 13.3345 7.18763 13.339C7.18204 13.3434 7.17758 13.3468 7.17199 13.349C7.13736 13.3723 7.10162 13.3945 7.06476 13.4156C7.03795 13.4323 7.0089 13.4468 6.98098 13.4612C6.94523 13.4801 6.91172 13.4968 6.87598 13.5123C6.92848 14.0201 7.16864 14.4723 7.52609 14.799C7.91929 15.159 8.13376 15.6745 8.13376 16.2056L8.13264 16.2512C8.13264 16.7056 7.96285 17.1356 7.68136 17.4934C7.47471 17.7556 7.35295 18.0856 7.35295 18.4445C7.35407 19.3034 8.0511 19.999 8.91457 19.999C8.96372 19.999 9.01063 19.9968 9.05866 19.9912L8.91568 19.2223Z" fill="#A1A5BA" />
+                                    <path d="M6.36551 9.63782C6.39902 9.64226 6.43476 9.65004 6.46716 9.65671C6.50737 9.66448 6.54758 9.67448 6.58556 9.68448C6.5945 9.6856 6.60008 9.68893 6.6079 9.69115C6.64365 9.70226 6.68051 9.71226 6.71737 9.7256C6.75535 9.73782 6.79445 9.75337 6.83243 9.77004C6.83801 9.77226 6.8436 9.77337 6.84807 9.77671C6.88493 9.79115 6.92179 9.80782 6.95642 9.8256C6.99551 9.84448 7.03349 9.86448 7.07147 9.88671C7.13179 9.92115 7.18876 9.95782 7.24573 9.99782L7.24238 10C7.2435 10 7.2435 10 7.24461 10.0012C7.44345 10.1423 7.6177 10.32 7.75845 10.5323C7.77967 10.5634 7.79978 10.5967 7.81877 10.63C7.83776 10.6623 7.85675 10.6967 7.8735 10.7312C7.98856 10.9578 8.0567 11.1967 8.08016 11.4389C7.93718 11.5034 7.80201 11.5823 7.67802 11.6778C7.65792 11.6934 7.63669 11.7089 7.6177 11.7245C7.5976 11.7412 7.57749 11.7578 7.5585 11.7756C7.53951 11.7934 7.52052 11.81 7.50153 11.8267C7.46802 11.8589 7.43786 11.8923 7.40547 11.9245C7.38201 11.9512 7.35967 11.9767 7.33844 12.0012C7.30717 12.04 7.27701 12.0789 7.24796 12.1189C7.23121 12.14 7.2178 12.16 7.20328 12.1823C7.18988 12.2034 7.17536 12.2256 7.16084 12.2478C7.3619 11.8756 7.36972 11.4123 7.14185 11.02C6.91397 10.6278 6.50625 10.4023 6.08178 10.3889C6.08178 10.3878 6.08178 10.3878 6.08066 10.3889C6.07731 10.3878 6.07396 10.3889 6.07173 10.3889C6.06391 10.3889 6.05497 10.3889 6.04715 10.3889C6.02816 10.3889 6.00694 10.3889 5.98906 10.3878C5.96896 10.3878 5.94885 10.3867 5.92874 10.3867C5.91646 10.3845 5.90305 10.3834 5.88965 10.3823L6.36551 9.63782Z" fill="#A1A5BA" />
+                                    <path d="M16.9462 14.6111C16.7307 14.9822 16.2537 15.11 15.8795 14.8955C15.7142 14.8 15.5969 14.6533 15.5354 14.4877C15.4293 14.1911 15.2618 13.9233 15.0529 13.69C14.844 13.4577 14.5938 13.26 14.3201 13.1033C13.6666 12.7277 12.8869 12.6333 12.1653 12.8555C11.8403 12.9566 11.475 12.9266 11.1555 12.7433C10.9578 12.63 10.8025 12.4711 10.6953 12.2866C10.7121 12.3177 10.7277 12.3477 10.7433 12.3777C10.7478 12.3855 10.7523 12.3933 10.7545 12.4011C10.7623 12.4166 10.7702 12.4333 10.7757 12.4488C10.7914 12.48 10.8059 12.5122 10.8182 12.5466C10.8227 12.5555 10.826 12.5655 10.8294 12.5755C10.8405 12.6011 10.8495 12.6288 10.8595 12.6577C10.8595 12.6588 10.8606 12.6622 10.8618 12.6644C10.8629 12.6666 10.864 12.6688 10.8651 12.6722C10.8662 12.6766 10.8673 12.6811 10.8696 12.6866C10.8696 12.6877 10.8707 12.6888 10.8707 12.6911C10.8752 12.7055 10.8796 12.7188 10.883 12.7344C10.8863 12.7433 10.8897 12.7533 10.893 12.7644L10.8941 12.7688C10.8975 12.7777 10.8997 12.7877 10.9008 12.7955C10.9031 12.8022 10.9053 12.8111 10.9064 12.8188C10.9087 12.8266 10.9098 12.8344 10.912 12.8422C10.9143 12.8488 10.9154 12.8566 10.9176 12.8644C10.921 12.8766 10.9232 12.8877 10.9243 12.8988C10.9254 12.9044 10.9265 12.91 10.9277 12.9166C10.9299 12.93 10.9332 12.9455 10.9355 12.9611C10.9388 12.97 10.9388 12.9777 10.9399 12.9866C10.9399 12.9888 10.9411 12.99 10.9411 12.9933C10.9433 13.0044 10.9455 13.0155 10.9455 13.0255C10.9466 13.0266 10.9466 13.03 10.9466 13.0311C10.9478 13.0355 10.9489 13.04 10.9489 13.0455C10.9511 13.0544 10.9511 13.0633 10.9522 13.0711C10.9556 13.09 10.9567 13.1077 10.9567 13.1244C10.9589 13.1355 10.9601 13.1466 10.9601 13.1566C10.9612 13.1633 10.9623 13.1688 10.9612 13.1755C10.9645 13.2166 10.9656 13.2588 10.9656 13.3011C10.9668 13.3322 10.9645 13.3644 10.9634 13.3955C10.9623 13.4355 10.9601 13.4733 10.9556 13.5122C11.4236 13.7211 11.9375 13.74 12.401 13.5955C12.9115 13.4366 13.4678 13.51 13.9302 13.7755L13.9693 13.7988C14.3648 14.0255 14.6541 14.3877 14.825 14.8088C14.9501 15.1177 15.1769 15.3877 15.4885 15.5677C16.2369 15.9966 17.1909 15.7433 17.6232 15C17.6477 14.9577 17.669 14.9155 17.688 14.8722L16.9462 14.6111Z" fill="#A1A5BA" />
+                                    <path d="M7.32617 12.0167C7.3474 11.99 7.37085 11.9633 7.39319 11.9389C7.42 11.9078 7.44905 11.8789 7.47697 11.8511C7.48256 11.8444 7.48814 11.8411 7.49373 11.8344C7.52165 11.8089 7.54846 11.7822 7.57862 11.7578C7.60878 11.7311 7.64118 11.7055 7.67469 11.6811C7.67915 11.6778 7.68251 11.6733 7.68809 11.6711C7.71937 11.6467 7.75176 11.6233 7.78527 11.6022C7.82102 11.5778 7.85788 11.5555 7.89586 11.5333C7.95618 11.4989 8.0165 11.4678 8.08017 11.4389V11.4433C8.08129 11.4422 8.08129 11.4422 8.0824 11.4422C8.3047 11.3411 8.54709 11.28 8.80178 11.2655C8.83976 11.2633 8.87885 11.2622 8.91683 11.2622C8.95481 11.2622 8.99391 11.2633 9.03189 11.2655C9.28657 11.28 9.52897 11.3411 9.75126 11.4411C9.73562 11.5967 9.73674 11.7522 9.75796 11.9067C9.76131 11.9311 9.76466 11.9578 9.76801 11.9822C9.77248 12.0078 9.77695 12.0333 9.78253 12.0589C9.78812 12.0844 9.7937 12.1089 9.79929 12.1333C9.81046 12.1778 9.82386 12.2211 9.83615 12.2644C9.84732 12.2978 9.85849 12.33 9.86966 12.3611C9.88754 12.4078 9.90652 12.4533 9.92663 12.4978C9.93669 12.5222 9.94786 12.5444 9.96014 12.5678C9.97131 12.59 9.9836 12.6133 9.99589 12.6367C9.77248 12.2778 9.37258 12.0389 8.91683 12.0389C8.46108 12.0389 8.06118 12.2778 7.83777 12.6367C7.83666 12.6367 7.83666 12.6367 7.83666 12.6378C7.83442 12.64 7.83331 12.6433 7.83219 12.6455C7.82772 12.6522 7.82437 12.66 7.8199 12.6667C7.80985 12.6833 7.7998 12.7011 7.78974 12.7167C7.77969 12.7344 7.76852 12.7511 7.75846 12.7678C7.75065 12.7778 7.74283 12.7889 7.73501 12.7989L7.32617 12.0167Z" fill="#A1A5BA" />
+                                    <path d="M16.9464 5.38888C17.162 5.75999 17.0347 6.23444 16.6604 6.44999C16.4951 6.54444 16.3086 6.57221 16.1332 6.54221C15.8216 6.48555 15.5054 6.49555 15.1971 6.55888C14.8911 6.62221 14.5928 6.73888 14.3203 6.89666C13.6668 7.27221 13.1943 7.89666 13.0267 8.62888C12.9519 8.95888 12.743 9.25888 12.4246 9.44221C12.2269 9.55555 12.0113 9.60999 11.7969 9.60999C11.8326 9.6111 11.8661 9.61221 11.9008 9.61444C11.9097 9.61444 11.9186 9.61444 11.9265 9.61666C11.9443 9.61777 11.9622 9.61888 11.979 9.62221C12.0136 9.62444 12.0493 9.62777 12.0851 9.63444C12.0951 9.63555 12.1052 9.63666 12.1163 9.63888C12.1443 9.64221 12.1733 9.64777 12.2035 9.65444C12.2046 9.65444 12.2079 9.65555 12.2102 9.65555C12.2124 9.65555 12.2146 9.65555 12.2191 9.65666C12.2236 9.65777 12.2281 9.65888 12.2336 9.65999C12.2348 9.6611 12.2359 9.65999 12.2381 9.6611C12.2526 9.66444 12.2671 9.66777 12.2817 9.67221C12.2906 9.67333 12.3018 9.67555 12.3129 9.67888L12.3174 9.67999C12.3264 9.6811 12.3364 9.68444 12.3442 9.68777C12.3509 9.68888 12.3599 9.69221 12.3677 9.69444C12.3755 9.69666 12.3833 9.69888 12.3911 9.7011C12.3978 9.70221 12.4057 9.70555 12.4135 9.70777C12.4258 9.7111 12.4369 9.71444 12.447 9.71888C12.4526 9.7211 12.4582 9.72221 12.4637 9.72444C12.476 9.72888 12.4917 9.73444 12.5062 9.73999C12.5151 9.7411 12.5218 9.74555 12.5308 9.74888C12.533 9.74999 12.5341 9.74999 12.5375 9.7511C12.5486 9.75444 12.5587 9.75888 12.5676 9.76333C12.5687 9.76333 12.5721 9.76444 12.5732 9.76555C12.5777 9.76666 12.5822 9.76777 12.5866 9.7711C12.5956 9.77333 12.6034 9.77777 12.6101 9.7811C12.6279 9.78777 12.6447 9.79555 12.6592 9.80444C12.6704 9.80777 12.6805 9.81221 12.6894 9.81777C12.6961 9.81999 12.7017 9.82222 12.7061 9.82666C12.7441 9.84444 12.781 9.86444 12.8178 9.88555C12.8458 9.89999 12.8726 9.91777 12.8994 9.93444C12.934 9.95555 12.9653 9.97666 12.9966 9.99999C13.4121 9.7011 13.6858 9.26777 13.7919 8.79666C13.9092 8.27777 14.251 7.83555 14.7135 7.56999L14.7537 7.54777C15.1491 7.31999 15.6082 7.25221 16.0606 7.31555C16.3924 7.36221 16.7409 7.30221 17.0525 7.12333C17.7998 6.69333 18.0567 5.74444 17.6256 5.0011C17.601 4.95888 17.5753 4.91888 17.5463 4.8811L16.9464 5.38888Z" fill="#A1A5BA" />
+                                    <path d="M9.87651 12.3778C9.86423 12.3467 9.85194 12.3122 9.84188 12.2811C9.82848 12.2422 9.81731 12.2033 9.80726 12.1655C9.80391 12.1578 9.8039 12.1511 9.80167 12.1422C9.79385 12.1055 9.7838 12.0689 9.7771 12.0311C9.76928 11.9922 9.76257 11.9511 9.75811 11.91C9.75699 11.9044 9.75476 11.8989 9.75587 11.8933C9.75029 11.8544 9.74582 11.8144 9.7447 11.7755C9.74135 11.7322 9.74023 11.69 9.74023 11.6455C9.74023 11.5767 9.74359 11.5089 9.75029 11.44L9.75364 11.4422C9.75364 11.4411 9.75364 11.4411 9.75364 11.44C9.7771 11.1978 9.84524 10.9589 9.95917 10.7322C9.97593 10.6989 9.99492 10.6644 10.0139 10.6311C10.0329 10.5989 10.053 10.5655 10.0742 10.5333C10.2139 10.3211 10.3881 10.1433 10.5869 10.0011C10.7143 10.0922 10.8506 10.1689 10.9958 10.2278C11.0192 10.2367 11.0438 10.2478 11.0662 10.2567C11.0907 10.2655 11.1153 10.2744 11.1399 10.2822C11.1645 10.29 11.189 10.2978 11.2125 10.3055C11.2572 10.3178 11.3007 10.3278 11.3454 10.3389C11.38 10.3455 11.4136 10.3522 11.4459 10.3589C11.4951 10.3667 11.5442 10.3733 11.5934 10.3778C11.6202 10.3811 11.6448 10.3833 11.6716 10.3844C11.6962 10.3855 11.723 10.3867 11.7498 10.3878C11.3253 10.4011 10.9176 10.6255 10.6897 11.0189C10.4618 11.4111 10.4697 11.8755 10.6707 12.2467C10.6707 12.2478 10.6707 12.2478 10.6707 12.2478C10.6718 12.2511 10.6741 12.2533 10.6752 12.2555C10.6785 12.2622 10.6841 12.27 10.6875 12.2767C10.6964 12.2933 10.7076 12.3111 10.7154 12.3278C10.7255 12.3455 10.7344 12.3633 10.7444 12.38C10.7489 12.3922 10.7545 12.4044 10.7601 12.4155L9.87651 12.3778Z" fill="#A1A5BA" />
+                                    <path d="M8.91656 0.777778C9.34773 0.777778 9.69737 1.12444 9.69737 1.55444C9.69737 1.74444 9.62811 1.91889 9.51417 2.05444C9.30864 2.29444 9.16007 2.57222 9.06066 2.86889C8.96347 3.16444 8.91544 3.47889 8.91656 3.79333C8.91656 4.54444 9.22374 5.26222 9.77779 5.77333C10.028 6.00222 10.1844 6.33222 10.1844 6.69889C10.1844 6.92556 10.1241 7.13889 10.0168 7.32333C10.0358 7.29333 10.0537 7.26444 10.0727 7.23667C10.0772 7.22889 10.0816 7.22111 10.0872 7.21556C10.0973 7.20111 10.1073 7.18556 10.1185 7.17333C10.1375 7.14444 10.1587 7.11556 10.1822 7.08778C10.1877 7.08 10.1944 7.07111 10.2023 7.06333C10.219 7.04111 10.2391 7.01889 10.2592 6.99667C10.2604 6.99556 10.2626 6.99333 10.2637 6.99111C10.2648 6.98889 10.2659 6.98667 10.2693 6.98444C10.2726 6.98111 10.276 6.97778 10.2793 6.97333C10.2805 6.97333 10.2805 6.97111 10.2827 6.97C10.2927 6.95889 10.3028 6.94889 10.314 6.93778C10.3196 6.93 10.3274 6.92222 10.3352 6.91444L10.3385 6.91111C10.3441 6.90333 10.352 6.89667 10.3587 6.89222C10.3631 6.88667 10.3698 6.88111 10.3765 6.87556C10.3821 6.87 10.3888 6.86444 10.3944 6.85889C10.3989 6.85333 10.4056 6.84889 10.4112 6.84333C10.4201 6.83444 10.429 6.82667 10.438 6.82C10.4424 6.81667 10.4469 6.81222 10.4514 6.80778C10.4614 6.79889 10.4737 6.78889 10.486 6.77889C10.4916 6.77111 10.4983 6.76778 10.5061 6.76222C10.5083 6.76111 10.5083 6.76 10.5117 6.75778C10.5206 6.75 10.5284 6.74333 10.5374 6.73778C10.5374 6.73667 10.5407 6.73444 10.5418 6.73444C10.5452 6.73111 10.5485 6.72778 10.553 6.72556C10.5597 6.71889 10.5675 6.71444 10.5731 6.71C10.5876 6.69778 10.6033 6.68778 10.6178 6.68C10.6267 6.67222 10.6357 6.66556 10.6446 6.66111C10.6502 6.65667 10.6547 6.65333 10.6603 6.65111C10.6949 6.62778 10.7306 6.60556 10.7675 6.58444C10.7943 6.56778 10.8233 6.55333 10.8513 6.53889C10.887 6.52 10.9205 6.50333 10.9563 6.48778C10.9038 5.98 10.6636 5.52778 10.3062 5.20111C9.91296 4.84111 9.69848 4.32556 9.69848 3.79444L9.6996 3.74889C9.6996 3.29444 9.86939 2.86444 10.1509 2.50667C10.3575 2.24444 10.4793 1.91444 10.4793 1.55556C10.4771 0.695556 9.78003 0.00111111 8.91656 0C8.86741 0 8.82049 0.00222222 8.77246 0.00777778L8.91656 0.777778Z" fill="#A1A5BA" />
+                                    <path d="M11.4666 10.3622C11.4331 10.3578 11.3973 10.35 11.365 10.3433C11.3247 10.3355 11.2845 10.3255 11.2465 10.3155C11.2376 10.3144 11.232 10.3111 11.2242 10.3089C11.1885 10.2978 11.1516 10.2878 11.1147 10.2744C11.0768 10.2622 11.0377 10.2466 10.9997 10.23C10.9941 10.2278 10.9885 10.2266 10.984 10.2233C10.9472 10.2089 10.9103 10.1922 10.8757 10.1744C10.8366 10.1555 10.7986 10.1355 10.7606 10.1133C10.7003 10.0789 10.6433 10.0422 10.5864 10.0022L10.5897 9.99998C10.5886 9.99998 10.5886 9.99998 10.5875 9.99886C10.3887 9.85775 10.2144 9.67998 10.0737 9.46775C10.0524 9.43664 10.0323 9.40331 10.0133 9.36998C9.99435 9.33775 9.97536 9.30331 9.9586 9.26886C9.84355 9.0422 9.77541 8.80331 9.75195 8.56109C9.89493 8.49664 10.0301 8.41775 10.1541 8.3222C10.1742 8.30664 10.1954 8.29109 10.2144 8.27553C10.2345 8.25886 10.2546 8.2422 10.2736 8.22442C10.2926 8.20664 10.3116 8.18998 10.3306 8.17331C10.3641 8.14109 10.3942 8.10775 10.4266 8.07553C10.4501 8.04886 10.4724 8.02331 10.4937 7.99886C10.5249 7.95998 10.5551 7.92109 10.5841 7.88109C10.6009 7.85998 10.6143 7.83998 10.6288 7.81775C10.6422 7.79664 10.6568 7.77442 10.6713 7.7522C10.4702 8.12442 10.4624 8.58775 10.6903 8.97998C10.9181 9.3722 11.3259 9.59775 11.7503 9.61109C11.7503 9.6122 11.7503 9.6122 11.7514 9.61109C11.7548 9.6122 11.7581 9.61109 11.7604 9.61109C11.7682 9.61109 11.7771 9.61109 11.785 9.61109C11.8039 9.61109 11.8252 9.61109 11.843 9.6122C11.8632 9.6122 11.8833 9.61331 11.9034 9.61331C11.9157 9.61553 11.9291 9.61664 11.9425 9.61775L11.4666 10.3622Z" fill="#A1A5BA" />
+                                    <path d="M4.56509 2.50331C5.17164 2.15442 5.94798 2.36109 6.29873 2.96553C6.64948 3.56887 6.44171 4.34109 5.83404 4.68998C5.22749 5.03887 4.45115 4.8322 4.1004 4.22775C3.75077 3.62331 3.95854 2.8522 4.56509 2.50331Z" fill="#A1A5BA" />
+                                    <path d="M1.48282 11.2622C2.18364 11.2622 2.75177 10.6971 2.75177 10C2.75177 9.30291 2.18364 8.73779 1.48282 8.73779C0.781997 8.73779 0.213867 9.30291 0.213867 10C0.213867 10.6971 0.781997 11.2622 1.48282 11.2622Z" fill="#A1A5BA" />
+                                    <path d="M4.56509 17.4966C3.95854 17.1477 3.75077 16.3766 4.1004 15.7722C4.45115 15.1688 5.22637 14.9622 5.83404 15.3099C6.44059 15.6588 6.64836 16.4299 6.29873 17.0344C5.94798 17.6388 5.17164 17.8455 4.56509 17.4966Z" fill="#A1A5BA" />
+                                    <path d="M13.2674 17.4966C12.6608 17.8455 11.8845 17.6388 11.5338 17.0344C11.183 16.4311 11.3908 15.6588 11.9984 15.31C12.605 14.9611 13.3813 15.1677 13.7321 15.7722C14.0817 16.3766 13.8739 17.1488 13.2674 17.4966Z" fill="#A1A5BA" />
+                                    <path d="M16.35 11.2622C17.0508 11.2622 17.619 10.6971 17.619 10C17.619 9.30291 17.0508 8.73779 16.35 8.73779C15.6492 8.73779 15.0811 9.30291 15.0811 10C15.0811 10.6971 15.6492 11.2622 16.35 11.2622Z" fill="#A1A5BA" />
+                                    <path d="M13.852 3.94431C14.0454 3.27425 13.6561 2.57514 12.9824 2.38281C12.3088 2.19048 11.606 2.57775 11.4126 3.24781C11.2192 3.91787 11.6086 4.61698 12.2822 4.80931C12.9558 5.00164 13.6587 4.61436 13.852 3.94431Z" fill="#A1A5BA" />
+                                    <path d="M76.2486 5V12.9222C76.2486 13.9 75.2846 14.3811 74.534 14.1133H74.3105C74.4345 14.1133 74.534 14.0133 74.534 13.8911V6.26222C74.534 5.56444 75.1025 5 75.8029 5H76.2486Z" fill="#A1A5BA" />
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M70.3274 11.5723C70.5173 12.4245 69.7711 13.1667 68.9143 12.9778C68.4832 12.8823 68.1346 12.5356 68.0386 12.1067C67.8487 11.2545 68.596 10.5123 69.4516 10.7012C69.8839 10.7967 70.2324 11.1434 70.3274 11.5723Z" fill="#A1A5BA" />
+                                    <path d="M68.9693 7.42671C68.9693 7.42671 69.1949 6.9156 69.3033 6.67115C69.5747 6.0556 70.4494 6.05115 70.7286 6.66226L70.3131 5.75226C70.1411 5.37671 69.8026 5.09115 69.3938 5.01893C68.8296 4.92004 68.2857 5.21671 68.0567 5.71893L63.832 14.9989H64.7927C65.2953 14.9989 65.7511 14.7034 65.9544 14.2445L68.9693 7.42671Z" fill="#A1A5BA" />
+                                    <path d="M76.2506 12.9222V13.2945C76.2506 13.7656 76.0584 14.1922 75.7479 14.5C75.4385 14.8089 75.0095 15 74.5359 15V14.9989C73.4323 14.9989 72.4337 14.3511 71.9891 13.3456L69.3752 7.43446C69.297 7.26001 69.0513 7.25779 68.9697 7.42668C69.0837 7.1689 69.1954 6.91557 69.3037 6.67112C69.5752 6.05557 70.4498 6.05112 70.7291 6.66223L72.4013 10.3245L73.0335 11.7089L73.8255 13.4445C73.8277 13.45 73.8299 13.4556 73.8333 13.46C73.9919 13.7967 74.2477 14.01 74.5359 14.1133C75.2866 14.3811 76.2506 13.9 76.2506 12.9222Z" fill="#A1A5BA" />
+                                    <path d="M43.8545 12.6244V15H44.2991C44.9995 15 45.568 14.4344 45.568 13.7378V11.8478H44.6353C44.2041 11.8478 43.8545 12.1956 43.8545 12.6244Z" fill="#A1A5BA" />
+                                    <path d="M46.3399 5H45.1234C44.4231 5 43.8545 5.56556 43.8545 6.26222V6.52556V8.42444H44.2901C44.9905 8.42444 45.5591 7.85889 45.5591 7.16222V6.52556V5.77667C45.5591 5.34778 45.9087 5 46.3399 5Z" fill="#A1A5BA" />
+                                    <path d="M50.8875 5.93667C50.138 5.31556 49.1025 5 47.8101 5H46.3389C45.9077 5 45.5581 5.34778 45.5581 5.77667V6.52556H47.7676C48.6054 6.52556 49.2499 6.70222 49.6811 7.04889C50.1078 7.39333 50.3156 7.76778 50.3156 8.42333C50.3156 9.07778 50.1078 9.45333 49.6811 9.79667C49.2499 10.1444 48.6054 10.32 47.7676 10.32H45.1225C44.4221 10.32 43.8535 10.8856 43.8535 11.5822V12.6222C43.8535 12.1933 44.2031 11.8456 44.6343 11.8456H47.8101C49.1025 11.8456 50.138 11.53 50.8875 10.9089C51.6448 10.2811 52.0302 9.51778 52.0302 8.42222C52.0302 7.32889 51.646 6.56444 50.8875 5.93667Z" fill="#A1A5BA" />
+                                    <path d="M26.6413 12.2478C26.5631 12.4244 26.3106 12.4244 26.2324 12.2467L26.6055 13.0922C26.8781 13.7122 27.7628 13.7122 28.0353 13.0922L31.6031 5H30.686C30.1834 5 29.7287 5.29444 29.5254 5.75222L26.6413 12.2478Z" fill="#A1A5BA" />
+                                    <path d="M26.6046 13.0935L26.2315 12.2479L23.3719 5.75568C23.1697 5.29679 22.7139 5.00012 22.2102 5.00012H21.1836L25.2731 14.2446C25.4406 14.6235 25.7802 14.9112 26.1913 14.9812C26.7531 15.0768 27.2927 14.7779 27.5138 14.2757L28.0355 13.0935C27.7618 13.7135 26.8782 13.7135 26.6046 13.0935Z" fill="#A1A5BA" />
+                                    <path d="M35.6021 7.13115L34.179 5.37226C34.007 5.16004 33.7557 5.0156 33.482 5.00226C32.9436 4.97449 32.499 5.40004 32.499 5.92893V15H32.9447C33.6451 15 34.2137 14.4345 34.2137 13.7378V8.08004V7.61782C34.2137 6.8856 35.1408 6.56004 35.6021 7.13115Z" fill="#A1A5BA" />
+                                    <path d="M39.8014 12.3222L39.4764 11.9211L35.6025 7.13223C35.14 6.56112 34.2129 6.88667 34.2129 7.61889V8.08112L39.53 14.6544C39.7065 14.8733 39.9746 15.0011 40.2572 15.0011C40.7721 15.0011 41.1899 14.5856 41.1899 14.0733V11.8367C41.191 12.5678 40.2639 12.8933 39.8014 12.3222Z" fill="#A1A5BA" />
+                                    <path d="M39.4766 11.92L39.8016 12.3211C40.2641 12.8922 41.1912 12.5678 41.1912 11.8344V5H40.7455C40.0451 5 39.4766 5.56556 39.4766 6.26222V11.92Z" fill="#A1A5BA" />
+                                    <path d="M56.3643 5C56.7954 5 57.1451 5.34778 57.1451 5.77667V6.52556H60.4805V6.26222C60.4805 5.56556 59.912 5 59.2116 5H56.3643Z" fill="#A1A5BA" />
+                                    <path d="M56.3642 5H53.3861H52.1094V5.26333C52.1094 5.96 52.6779 6.52556 53.3783 6.52556H55.4448V15H55.876C56.5764 15 57.145 14.4344 57.145 13.7378V6.52556V5.77667C57.145 5.34778 56.7953 5 56.3642 5Z" fill="#A1A5BA" />
+                                    <path d="M631.081 -77.2211H-11.3164V212.57H631.081V-77.2211Z" stroke="#FF0B0B" stroke-width="5" stroke-miterlimit="10" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_3211_3162">
+                                        <rect width="76.25" height="20" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+
+                        </p>
+                        <div>
+                            <a class="text-14 text-white text-decoration-none" href="">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C9.87827 2 7.84344 2.84285 6.34315 4.34315C4.84285 5.84344 4 7.87827 4 10C4 15.4 11.05 21.5 11.35 21.76C11.5311 21.9149 11.7616 22.0001 12 22.0001C12.2384 22.0001 12.4689 21.9149 12.65 21.76C13 21.5 20 15.4 20 10C20 7.87827 19.1571 5.84344 17.6569 4.34315C16.1566 2.84285 14.1217 2 12 2ZM12 19.65C9.87 17.65 6 13.34 6 10C6 8.4087 6.63214 6.88258 7.75736 5.75736C8.88258 4.63214 10.4087 4 12 4C13.5913 4 15.1174 4.63214 16.2426 5.75736C17.3679 6.88258 18 8.4087 18 10C18 13.34 14.13 17.66 12 19.65ZM12 6C11.2089 6 10.4355 6.2346 9.77772 6.67412C9.11992 7.11365 8.60723 7.73836 8.30448 8.46927C8.00173 9.20017 7.92252 10.0044 8.07686 10.7804C8.2312 11.5563 8.61216 12.269 9.17157 12.8284C9.73098 13.3878 10.4437 13.7688 11.2196 13.9231C11.9956 14.0775 12.7998 13.9983 13.5307 13.6955C14.2616 13.3928 14.8864 12.8801 15.3259 12.2223C15.7654 11.5645 16 10.7911 16 10C16 8.93913 15.5786 7.92172 14.8284 7.17157C14.0783 6.42143 13.0609 6 12 6ZM12 12C11.6044 12 11.2178 11.8827 10.8889 11.6629C10.56 11.4432 10.3036 11.1308 10.1522 10.7654C10.0009 10.3999 9.96126 9.99778 10.0384 9.60982C10.1156 9.22186 10.3061 8.86549 10.5858 8.58579C10.8655 8.30608 11.2219 8.1156 11.6098 8.03843C11.9978 7.96126 12.3999 8.00087 12.7654 8.15224C13.1308 8.30362 13.4432 8.55996 13.6629 8.88886C13.8827 9.21776 14 9.60444 14 10C14 10.5304 13.7893 11.0391 13.4142 11.4142C13.0391 11.7893 12.5304 12 12 12Z" fill="white" />
+                                </svg>
+                                Tòa nhà VNPT, 57 Huỳnh Thúc Kháng, Đống Đa, Hà Nội
+                            </a>
+                        </div>
+                        <div class="mt-3">
+                            <a class="text-14 text-white text-decoration-none" href="tel:0889561166">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19.4401 13.0004C19.2201 13.0004 18.9901 12.9304 18.7701 12.8804C18.3246 12.7822 17.8868 12.6518 17.4601 12.4904C16.9962 12.3216 16.4862 12.3304 16.0284 12.515C15.5706 12.6996 15.1972 13.047 14.9801 13.4904L14.7601 13.9404C13.7861 13.3985 12.8911 12.7256 12.1001 11.9404C11.3149 11.1494 10.6419 10.2544 10.1001 9.28036L10.5201 9.00036C10.9635 8.78327 11.3109 8.40989 11.4955 7.95205C11.6801 7.49421 11.6889 6.98427 11.5201 6.52036C11.3613 6.09278 11.231 5.65515 11.1301 5.21036C11.0801 4.99036 11.0401 4.76036 11.0101 4.53036C10.8887 3.82598 10.5197 3.1881 9.96972 2.7316C9.41972 2.27509 8.7248 2.02997 8.0101 2.04036H5.0101C4.57913 2.03631 4.15235 2.12517 3.75881 2.30089C3.36527 2.4766 3.01421 2.73505 2.72953 3.05864C2.44485 3.38222 2.23324 3.76335 2.10909 4.17607C1.98494 4.58879 1.95118 5.02342 2.0101 5.45036C2.54284 9.63974 4.45613 13.5322 7.44775 16.513C10.4394 19.4938 14.3388 21.3929 18.5301 21.9104H18.9101C19.6475 21.9114 20.3595 21.6409 20.9101 21.1504C21.2265 20.8674 21.4792 20.5205 21.6516 20.1327C21.8239 19.7448 21.9121 19.3248 21.9101 18.9004V15.9004C21.8979 15.2057 21.6449 14.5369 21.1944 14.008C20.744 13.4791 20.1239 13.123 19.4401 13.0004ZM19.9401 19.0004C19.9399 19.1423 19.9095 19.2827 19.8509 19.412C19.7923 19.5413 19.7068 19.6566 19.6001 19.7504C19.4887 19.8474 19.3581 19.9198 19.2168 19.9629C19.0755 20.0059 18.9267 20.0187 18.7801 20.0004C15.035 19.5202 11.5563 17.8068 8.89282 15.1306C6.2293 12.4545 4.53251 8.96769 4.0701 5.22036C4.05419 5.07387 4.06813 4.92569 4.1111 4.78475C4.15407 4.64381 4.22517 4.51304 4.3201 4.40036C4.41381 4.29369 4.52916 4.2082 4.65848 4.14957C4.7878 4.09095 4.92812 4.06054 5.0701 4.06036H8.0701C8.30265 4.05518 8.52972 4.13124 8.71224 4.27543C8.89476 4.41962 9.02131 4.62293 9.0701 4.85036C9.1101 5.12369 9.1601 5.39369 9.2201 5.66036C9.33562 6.1875 9.48936 6.70554 9.6801 7.21036L8.2801 7.86036C8.1604 7.91528 8.05272 7.9933 7.96326 8.08995C7.87379 8.1866 7.8043 8.29997 7.75877 8.42355C7.71324 8.54713 7.69257 8.67849 7.69795 8.81008C7.70332 8.94167 7.73464 9.0709 7.7901 9.19036C9.2293 12.2731 11.7073 14.7512 14.7901 16.1904C15.0336 16.2904 15.3066 16.2904 15.5501 16.1904C15.6748 16.1457 15.7894 16.0768 15.8873 15.9875C15.9851 15.8983 16.0643 15.7905 16.1201 15.6704L16.7401 14.2704C17.2571 14.4552 17.7847 14.6088 18.3201 14.7304C18.5868 14.7904 18.8568 14.8404 19.1301 14.8804C19.3575 14.9291 19.5608 15.0557 19.705 15.2382C19.8492 15.4207 19.9253 15.6478 19.9201 15.8804L19.9401 19.0004Z" fill="white" />
+                                </svg>
+                                088.956.1166 </a>
+                        </div>
+                        <div class="mt-3">
+                            <a class="text-14 text-white text-decoration-none" href="mailto:contact_dx@vnpt.vn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 4H5C4.20435 4 3.44129 4.31607 2.87868 4.87868C2.31607 5.44129 2 6.20435 2 7V17C2 17.7956 2.31607 18.5587 2.87868 19.1213C3.44129 19.6839 4.20435 20 5 20H19C19.7956 20 20.5587 19.6839 21.1213 19.1213C21.6839 18.5587 22 17.7956 22 17V7C22 6.20435 21.6839 5.44129 21.1213 4.87868C20.5587 4.31607 19.7956 4 19 4ZM5 6H19C19.2652 6 19.5196 6.10536 19.7071 6.29289C19.8946 6.48043 20 6.73478 20 7L12 11.88L4 7C4 6.73478 4.10536 6.48043 4.29289 6.29289C4.48043 6.10536 4.73478 6 5 6ZM20 17C20 17.2652 19.8946 17.5196 19.7071 17.7071C19.5196 17.8946 19.2652 18 19 18H5C4.73478 18 4.48043 17.8946 4.29289 17.7071C4.10536 17.5196 4 17.2652 4 17V9.28L11.48 13.85C11.632 13.9378 11.8045 13.984 11.98 13.984C12.1555 13.984 12.328 13.9378 12.48 13.85L20 9.28V17Z" fill="white" />
+                                </svg>
+                                vnptai@vnpt.vn </a>
+                        </div>
+                        <div class="mt-3">
+                            <a class="text-14 text-white text-decoration-none" href="https://vnpt.com.vn/">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M21.41 8.63988C21.41 8.63988 21.41 8.63988 21.41 8.58988C20.7054 6.6661 19.4269 5.00516 17.7475 3.83174C16.0681 2.65832 14.0688 2.02905 12.02 2.02905C9.97126 2.02905 7.97195 2.65832 6.29252 3.83174C4.6131 5.00516 3.33461 6.6661 2.63001 8.58988C2.63001 8.58988 2.63001 8.58988 2.63001 8.63988C1.84314 10.8108 1.84314 13.189 2.63001 15.3599C2.63001 15.3599 2.63001 15.3599 2.63001 15.4099C3.33461 17.3337 4.6131 18.9946 6.29252 20.168C7.97195 21.3414 9.97126 21.9707 12.02 21.9707C14.0688 21.9707 16.0681 21.3414 17.7475 20.168C19.4269 18.9946 20.7054 17.3337 21.41 15.4099C21.41 15.4099 21.41 15.4099 21.41 15.3599C22.1969 13.189 22.1969 10.8108 21.41 8.63988ZM4.26001 13.9999C3.91324 12.6891 3.91324 11.3107 4.26001 9.99988H6.12001C5.96004 11.3284 5.96004 12.6713 6.12001 13.9999H4.26001ZM5.08001 15.9999H6.48001C6.71473 16.8917 7.05022 17.7539 7.48001 18.5699C6.49931 17.9018 5.67951 17.0239 5.08001 15.9999ZM6.48001 7.99988H5.08001C5.67088 6.97897 6.4802 6.10135 7.45001 5.42988C7.03057 6.24713 6.70515 7.1093 6.48001 7.99988ZM11 19.6999C9.77178 18.7986 8.90916 17.4851 8.57001 15.9999H11V19.6999ZM11 13.9999H8.14001C7.9534 12.6731 7.9534 11.3267 8.14001 9.99988H11V13.9999ZM11 7.99988H8.57001C8.90916 6.51465 9.77178 5.2012 11 4.29988V7.99988ZM18.92 7.99988H17.52C17.2853 7.10804 16.9498 6.24582 16.52 5.42988C17.5007 6.09795 18.3205 6.97582 18.92 7.99988ZM13 4.29988C14.2282 5.2012 15.0909 6.51465 15.43 7.99988H13V4.29988ZM13 19.6999V15.9999H15.43C15.0909 17.4851 14.2282 18.7986 13 19.6999ZM15.86 13.9999H13V9.99988H15.86C16.0466 11.3267 16.0466 12.6731 15.86 13.9999ZM16.55 18.5699C16.9798 17.7539 17.3153 16.8917 17.55 15.9999H18.95C18.3505 17.0239 17.5307 17.9018 16.55 18.5699ZM19.74 13.9999H17.88C17.9613 13.3363 18.0014 12.6684 18 11.9999C18.0011 11.3314 17.961 10.6635 17.88 9.99988H19.74C20.0868 11.3107 20.0868 12.6891 19.74 13.9999Z" fill="white" />
+                                </svg>
+                                https://icenter.ai/vi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 mt-md-0 mt-4">
+                    <h5 class="text-16 font-700 text-white">Menu</h5>
+                    <div style="margin-top: 32px;">
+                        <a class="text-14 font-500 text-decoration-none text-white" href="https://smartvision.vnpt.vn/en/feature">Tính năng</a>
+                    </div>
+                    <div class="mt-md-3 mt-2">
+                        <a class="text-14 font-500 text-decoration-none text-white" href="https://smartvision.vnpt.vn/en/success-story">Câu chuyện thành công</a>
+                    </div>
+                    <div class="mt-md-3 mt-2">
+                        <a class="text-14 font-500 text-decoration-none text-white" href="https://smartvision.vnpt.vn/en/contact">Liên hệ</a>
+                    </div>
+                    <div class="mt-md-3 mt-2">
+                        <a class="text-14 font-500 text-decoration-none text-white" href="">Tài liệu</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mt-md-0 mt-4">
+                    <h5 class="text-16 font-700 text-white">Kênh truyền thông</h5>
+                    <div class="d-flex align-items-start footer-copy-right" style="margin-top: 12px;">
+                        <a href="https://www.facebook.com/people/VNPT-AI/100093459037835/">
+                            <img src="https://smartvision.vnpt.vn/images/fb.svg" width="32px" height="32px" alt="fb">
+                        </a>
+                        <a href="https://www.youtube.com/@VNPTAI/about">
+                            <img src="https://smartvision.vnpt.vn/images/yb.svg" width="32px" height="32px" class="mx-3" alt="youtube">
+                        </a>
+                    </div>
+                    <div class="mt-4 d-flex">
+                        <img src="https://smartvision.vnpt.vn/images/ibeta.svg" width="57px" class="img-fluid" alt="">
+                        <div>
+                            <span class="text-12 text-white">ISO 30107-3: <br> Level 1 Spoof Detection
+                                <br>
+                                <a href="https://www.ibeta.com/wp-content/uploads/2023/02/230222-VNPT-PAD-Level-1-Confirmation-Letter.pdf" target="_blank">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M14 1.33374H10C9.82319 1.33374 9.65362 1.40398 9.5286 1.529C9.40357 1.65403 9.33334 1.8236 9.33334 2.00041C9.33334 2.17722 9.40357 2.34679 9.5286 2.47181C9.65362 2.59684 9.82319 2.66707 10 2.66707H12.3907L6.862 8.19574C6.79833 8.25724 6.74754 8.3308 6.7126 8.41214C6.67766 8.49347 6.65927 8.58095 6.6585 8.66947C6.65773 8.75799 6.6746 8.84578 6.70812 8.92771C6.74164 9.00964 6.79115 9.08407 6.85374 9.14667C6.91634 9.20927 6.99077 9.25877 7.0727 9.29229C7.15463 9.32581 7.24242 9.34268 7.33094 9.34191C7.41946 9.34114 7.50694 9.32275 7.58827 9.28781C7.66961 9.25287 7.74317 9.20208 7.80467 9.13841L13.3333 3.60974V6.00041C13.3333 6.17722 13.4036 6.34679 13.5286 6.47181C13.6536 6.59684 13.8232 6.66707 14 6.66707C14.1768 6.66707 14.3464 6.59684 14.4714 6.47181C14.5964 6.34679 14.6667 6.17722 14.6667 6.00041V2.00041C14.6667 1.8236 14.5964 1.65403 14.4714 1.529C14.3464 1.40398 14.1768 1.33374 14 1.33374Z" fill="#0A84FF" />
+                                        <path d="M12.6667 7.05924C12.4899 7.05924 12.3203 7.12947 12.1953 7.2545C12.0702 7.37952 12 7.54909 12 7.7259V12.5012C11.9998 12.722 11.9121 12.9337 11.7559 13.0898C11.5998 13.2459 11.3881 13.3337 11.1673 13.3339H3.49934C3.27856 13.3337 3.06687 13.2459 2.91075 13.0898C2.75464 12.9337 2.66685 12.722 2.66668 12.5012V4.83324C2.66685 4.61245 2.75464 4.40076 2.91075 4.24465C3.06687 4.08853 3.27856 4.00075 3.49934 4.00057H7.64734C7.82415 4.00057 7.99372 3.93033 8.11875 3.80531C8.24377 3.68028 8.31401 3.51071 8.31401 3.3339C8.31401 3.15709 8.24377 2.98752 8.11875 2.8625C7.99372 2.73747 7.82415 2.66724 7.64734 2.66724H3.49934C2.9251 2.66794 2.37458 2.89637 1.96853 3.30242C1.56248 3.70847 1.33405 4.25899 1.33334 4.83324V12.4999C1.3337 13.0744 1.56197 13.6252 1.96806 14.0316C2.37415 14.4379 2.92487 14.6665 3.49934 14.6672H11.166C11.7405 14.6669 12.2913 14.4386 12.6977 14.0325C13.104 13.6264 13.3326 13.0757 13.3333 12.5012V7.7259C13.3333 7.54909 13.2631 7.37952 13.1381 7.2545C13.0131 7.12947 12.8435 7.05924 12.6667 7.05924Z" fill="#0A84FF" />
+                                    </svg>
+
+                                </a>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex">
+                    <a class="text-16 font-700 text-decoration-none text-white" href="https://smartvision.vnpt.vn/en/policy">Chính sách bảo mật</a>
+                    </div>
+
+                    <!-- <div>
+                                <span class="text-12 text-white">EPCS-DEA: Biometric FAR Certification</span>
+                                <a href="https://www.ibeta.com/wp-content/uploads/2023/02/230222-VNPT-PAD-Level-1-Confirmation-Letter.pdf" target="_blank">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M14 1.33325H10C9.82319 1.33325 9.65362 1.40349 9.5286 1.52851C9.40357 1.65354 9.33334 1.82311 9.33334 1.99992C9.33334 2.17673 9.40357 2.3463 9.5286 2.47132C9.65362 2.59635 9.82319 2.66659 10 2.66659H12.3907L6.862 8.19525C6.79833 8.25675 6.74754 8.33031 6.7126 8.41165C6.67766 8.49299 6.65927 8.58047 6.6585 8.66898C6.65773 8.7575 6.6746 8.84529 6.70812 8.92722C6.74164 9.00915 6.79115 9.08359 6.85374 9.14618C6.91634 9.20878 6.99077 9.25828 7.0727 9.2918C7.15463 9.32532 7.24242 9.34219 7.33094 9.34142C7.41946 9.34065 7.50694 9.32226 7.58827 9.28732C7.66961 9.25238 7.74317 9.20159 7.80467 9.13792L13.3333 3.60925V5.99992C13.3333 6.17673 13.4036 6.3463 13.5286 6.47132C13.6536 6.59635 13.8232 6.66659 14 6.66659C14.1768 6.66659 14.3464 6.59635 14.4714 6.47132C14.5964 6.3463 14.6667 6.17673 14.6667 5.99992V1.99992C14.6667 1.82311 14.5964 1.65354 14.4714 1.52851C14.3464 1.40349 14.1768 1.33325 14 1.33325Z"
+                                            fill="#00CF89" />
+                                        <path
+                                            d="M12.6667 7.05875C12.4899 7.05875 12.3203 7.12899 12.1953 7.25401C12.0702 7.37903 12 7.5486 12 7.72542V12.5007C11.9998 12.7215 11.9121 12.9332 11.7559 13.0893C11.5998 13.2455 11.3881 13.3332 11.1673 13.3334H3.49934C3.27856 13.3332 3.06687 13.2455 2.91075 13.0893C2.75464 12.9332 2.66685 12.7215 2.66668 12.5007V4.83275C2.66685 4.61197 2.75464 4.40028 2.91075 4.24416C3.06687 4.08804 3.27856 4.00026 3.49934 4.00008H7.64734C7.82415 4.00008 7.99372 3.92984 8.11875 3.80482C8.24377 3.67979 8.31401 3.51023 8.31401 3.33341C8.31401 3.1566 8.24377 2.98703 8.11875 2.86201C7.99372 2.73699 7.82415 2.66675 7.64734 2.66675H3.49934C2.9251 2.66745 2.37458 2.89588 1.96853 3.30193C1.56248 3.70799 1.33405 4.25851 1.33334 4.83275V12.4994C1.3337 13.0739 1.56197 13.6248 1.96806 14.0311C2.37415 14.4374 2.92487 14.666 3.49934 14.6667H11.166C11.7405 14.6664 12.2913 14.4381 12.6977 14.032C13.104 13.6259 13.3326 13.0752 13.3333 12.5007V7.72542C13.3333 7.5486 13.2631 7.37903 13.1381 7.25401C13.0131 7.12899 12.8435 7.05875 12.6667 7.05875Z"
+                                            fill="#00CF89" />
+                                    </svg>
+                                </a>
+                            </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="mb-0" style="background: #3D4B8F">
+    <div class="container">
+        <div class="row d-flex align-items-start">
+            <div class="col-xl-5">
+                <div style="margin-left: 0px;" class="text-12 font-400 mb-0">
+                    <div style="color: #A1A5BA;" class="mb-0">Công ty công nghệ thông tin VNPT <br>Giấy phép / ĐKKD: 0108212803-002 do Sở KHDTHN cấp ngày 12/10/2018</div>
+                </div>
+            </div>
+            <div class="col-xl-3">
+                <div class=" text-12 font-400 mb-0">
+                    <div style="color: #A1A5BA;" class="mb-0">© 2020 VNPT. Đã đăng ký bản quyền.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- Footer End-->
+</footer>  <a href="javascript:void(0)" class="scroll-to-top" onclick="scrollToTop()" title="Go to top"></a>
+  <script>
+    function scrollToTop() {
+      var currentPosition = window.pageYOffset;
+      var scrollStep = -currentPosition / 10;
+
+      function scroll() {
+        currentPosition += scrollStep;
+        if (currentPosition <= 0) {
+          window.scrollTo(0, 0);
+        } else {
+          window.scrollTo(0, currentPosition);
+          requestAnimationFrame(scroll);
+        }
+      }
+
+      requestAnimationFrame(scroll);
+    }
+
+    function create_UUID() {
+      var sender = localStorage.getItem("sb_sender_name");
+      var uuid = "";
+      var dt = new Date().getTime();
+      if (sender) {
+        uuid = sender;
+      } else {
+        uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+          var r = (dt + Math.random() * 16) % 16 | 0;
+          dt = Math.floor(dt / 16);
+          return (c == "x" ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+        try {
+          localStorage.setItem("sb_sender_name", uuid);
+        } catch (err) {
+          console.log("error", err);
+        }
+      }
+      return uuid;
+    }
+    let __protocol = document.location.protocol;
+    let __baseUrl = __protocol + "//livechat.vnpt.vn";
+    let prefixNameLiveChat = "";
+    let objPreDefineLiveChat = {
+      appCode: '69fda801-2423-11ed-88cb-b93a97a40584',
+      themes: "",
+      appName: {
+        line1: 'VNPT Smart Vision',
+        line2: 'Trợ lý AI xử lý hình ảnh'
+      },
+      thumb: '',
+      typeIcon: 'dynamic',
+      logoDynamic: '/static/media/botgif.758c0cd9.gif',
+      icon_bot: 'https://ic-storage.vnpt.vn/smartbot-v2/chatbot_images/6232023/6c77add6-e8f1-46a1-aeb0-50db45b00f28.png',
+      icon_expand: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVHgB7ZbRDcMwCERRJ+gIjOARulGzWUfIKM4G7gY0lmIpolAIrZR+8CT/WOa4RNYZgCRhEFElmb5fHPW4rqZp8PMXQQMV7eu6nmDz6RyChfDVdpGuhcT+qKdo3zxsgjWvEQMYNSHVHjagCUWac11LoO1vKxOcHfWzZHjTbVb9aFiEvS48Oeqn7SwKGjdIkiSx6CGkhMjDGUR3JYiKJ8rHQNJY819EcfVG8emP0eDc55j+YCAJN1dMhAxwM99OxW8GpKl4UbSPTMUaCyQJ4wUiV5LyolNwSAAAAABJRU5ErkJggg==',
+      icon_close: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACaSURBVHgB7ZXLDYAgEEQnNqwdSAfaqSWMED1ggrB8ltO+xIvAziOwATAMwyhA8uDDXrFm9d8V1qKXtxClEmFONJ/oxdfY+GWXhnscRhAKlSTUwiUS6uE5iWnhGYl54QUJhwYWtEHhv/Ekzjx5MWeFOwpaVC08GtOVoKDV1CRY0ecJiQ29SMN/JC704oucfF5E8W4iiROGYRgFbtCK7uN9iOGVAAAAAElFTkSuQmCC',
+      logo_button: 'https://ic-storage.vnpt.vn/smartbot-v2/chatbot_images/6232023/6c77add6-e8f1-46a1-aeb0-50db45b00f28.png',
+      colorIcon: {
+        colorType: 'linear',
+        colorVoteIcon: '#FCB017',
+        colorExpand: '#FFFFFF',
+        colorClose: '#FFFFFF',
+        colorFrom: '#5365c0',
+        colorTo: '#5365c0',
+        colorSend: '#5365c0',
+        colorMic: '#5365c0',
+      },
+      greeting: 'Bạn cần trợ giúp? Trợ lý AI xử lý hình ảnh luôn sẵn sàng hỗ trợ!',
+      senderName: create_UUID(),
+      expireSession: true,
+      botMetadata: localStorage.getItem('bot_metadata'),
+      isSaveHistory: true,
+      timeOpenUrl: 2000,
+      autoOpen: false,
+      timeAutoOpen: 3000,
+      isTyping: true,
+      timeTyping: 3000,
+      isSuggestions: true,
+      isVoting: true,
+      styles: {
+        head: {
+          bgColor: '#53C088',
+          text: {
+            line: 2,
+            line1: {
+              color: '#fff',
+              fontSize: '24px',
+              fontWeight: 700
+            },
+            line2: {
+              color: '#fff',
+              fontSize: '16px',
+              fontWeight: 400
+            }
+          }
+        },
+        border: {},
+        floatButton: {
+          bgColor: '#fff',
+          icon: 'https://ic-storage.vnpt.vn/smartbot-v2/chatbot_images/6232023/6c77add6-e8f1-46a1-aeb0-50db45b00f28.png',
+          width: 62,
+          height: 120,
+          img: {
+            width: '51.6%'
+          }
+        },
+        chat: {
+          bg: '#ffffff',
+          button: {
+            bg: '#4a90e2',
+            color: '#fff'
+          },
+          answer: {
+            bg: '#dbf5f8',
+            color: '#545454',
+            fontSize: '14px',
+          },
+          question: {
+            bg: '#a8cbf5',
+            color: '#000000',
+            fontSize: '14px',
+          },
+          botIcon: 'https://ic-storage.vnpt.vn/smartbot-v2/chatbot_images/6232023/407a4d0a-675a-454a-98d7-d2295f6d9f13.png'
+        }
+      }
+    },
+      appCodeHash = window.location.hash.substr(1);
+    if (appCodeHash.length == 32) {
+      objPreDefineLiveChat.appCode = +appCodeHash;
+    }
+    let vnpt_ai_livechat_script = document.createElement("script");
+    vnpt_ai_livechat_script.id = "vnpt_ai_livechat_script";
+    vnpt_ai_livechat_script.src = __baseUrl + "/vnpt_smartbot_ver2.js";
+    document.body.appendChild(vnpt_ai_livechat_script);
+    let vnpt_ai_livechat_stylesheet = document.createElement("link");
+    vnpt_ai_livechat_stylesheet.id = "vnpt_ai_livechat_script";
+    vnpt_ai_livechat_stylesheet.rel = "stylesheet";
+    vnpt_ai_livechat_stylesheet.href = __baseUrl + "/vnpt_smartbot.css";
+    document.body.appendChild(vnpt_ai_livechat_stylesheet);
+    vnpt_ai_livechat_script.onload = function () {
+      vnpt_ai_render_chatbox(objPreDefineLiveChat, __baseUrl, "livechat.vnpt.ai:443")
+    }
+  </script>
+</body>
+<!-- Jquery, Popper, Bootstrap -->
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/jquery-migrate.min.js"></script>
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/jquery.easing.min.js"></script>
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/jquery.slicknav.min.js"></script>
+
+<!-- Jquery Slick , Owl-Carousel Plugins -->
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/owl.carousel.min.js"></script>
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/slick.min.js"></script>
+<!-- Jquery Plugins, main Jquery -->
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/plugins.min.js"></script>
+<script type="text/javascript" src="https://smartvision.vnpt.vn/js/main.min.js"></script>
+<script>
+  var lang = "en";
+  localStorage.setItem('lang', lang);
+</script>
+<script src="https://smartvision.vnpt.vn/js/slick.min.js"></script>
+<script src="https://smartvision.vnpt.vn/js/home.js"></script>
+<script src="https://smartvision.vnpt.vn/js/index.js"></script>
+
+<script>
+    var url = "https://www.youtube.com/embed/fzL-2k14SCc";
+    const video_link = "https://www.youtube.com/embed/fzL-2k14SCc";
+    const dot = "https://smartvision.vnpt.vn/images/dot.png";
+    const dotActive = "https://smartvision.vnpt.vn/images/dot-active.png";
+</script>
+<script type="text/javascript">
+    $('#exampleModalCenter').modal('hide');
+    $(document).ready(function() {
+        $('#exampleModalCenter').modal('hide');
+
+        function onCloseModal() {
+            $('#exampleModalCenter').modal('hide');
+        };
+    });
+</script>
+
+</html>
