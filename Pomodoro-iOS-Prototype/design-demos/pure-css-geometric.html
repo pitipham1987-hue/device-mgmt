@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TOMA — Pure-CSS Geometric Art</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #F3EEE2;
+    background-image: radial-gradient(circle, rgba(22,21,18,0.09) 1.4px, transparent 1.4px);
+    background-size: 26px 26px;
+    color: #161512;
+  }
+  button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  input { font-family: inherit; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  .toma-page { min-height: 100vh; padding: 52px 28px 100px; }
+  .toma-header { max-width: 1500px; margin: 0 auto 44px; }
+  .toma-kicker {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .toma-mark {
+    width: 16px; height: 16px; background: #FF4B3E; transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+  .toma-kicker span {
+    font-weight: 700; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #78766D;
+  }
+  .toma-title { font-size: 34px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.5px; }
+  .toma-sub { font-size: 15px; color: #55524A; max-width: 640px; line-height: 1.5; margin: 0; }
+
+  .toma-fleet {
+    display: flex; flex-wrap: wrap; gap: 56px; justify-content: center; align-items: flex-start;
+    max-width: 1900px; margin: 0 auto;
+  }
+  .toma-unit { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .toma-label {
+    font-style: italic; font-size: 14px; color: #78766D; letter-spacing: 0.2px;
+  }
+  .toma-label b { font-style: normal; color: #161512; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/plain" id="app-source">
+const { useState, useEffect, useRef, useMemo } = React;
+
+/* ============================================================
+   IosFrame — copied verbatim from assets/ios_frame.jsx
+   ============================================================ */
+const iosFrameStyles = {
+  wrapper: {
+    display: 'inline-block',
+    padding: 12,
+    background: '#000',
+    borderRadius: 60,
+    boxShadow: '0 0 0 2px #1f2937, 0 20px 60px rgba(0,0,0,0.3)',
+    position: 'relative',
+  },
+  screen: {
+    position: 'relative',
+    borderRadius: 48,
+    overflow: 'hidden',
+    background: '#fff',
+  },
+  statusBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 54,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0 32px 0 32px',
+    fontSize: 16,
+    fontWeight: 600,
+    fontFamily: '-apple-system, "SF Pro Text", sans-serif',
+    zIndex: 20,
+    pointerEvents: 'none',
+  },
+  dynamicIsland: {
+    position: 'absolute',
+    top: 12,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 124,
+    height: 36,
+    background: '#000',
+    borderRadius: 999,
+    zIndex: 30,
+  },
+  statusIcons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+  },
+  signalIcon: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: 2,
+    height: 12,
+  },
+  signalBar: {
+    width: 3,
+    background: 'currentColor',
+    borderRadius: 1,
+  },
+  wifiIcon: {
+    width: 16,
+    height: 12,
+    position: 'relative',
+  },
+  batteryIcon: {
+    width: 26,
+    height: 12,
+    border: '1.5px solid currentColor',
+    borderRadius: 3,
+    padding: 1,
+    position: 'relative',
+    opacity: 0.8,
+  },
+  batteryCap: {
+    position: 'absolute',
+    top: 3,
+    right: -3,
+    width: 2,
+    height: 6,
+    background: 'currentColor',
+    borderRadius: '0 1px 1px 0',
+  },
+  content: {
+    position: 'absolute',
+    top: 54,
+    left: 0,
+    right: 0,
+    bottom: 34,
+    overflow: 'auto',
+  },
+  homeIndicator: {
+    position: 'absolute',
+    bottom: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 140,
+    height: 5,
+    background: 'rgba(0,0,0,0.3)',
+    borderRadius: 999,
+    zIndex: 10,
+  },
+  homeIndicatorDark: {
+    background: 'rgba(255,255,255,0.5)',
+  },
+};
+
+function IosFrame({
+  children,
+  width = 393,
+  height = 852,
+  time = '9:41',
+  battery = 100,
+  darkMode = false,
+  showStatusBar = true,
+  showDynamicIsland = true,
+  showHomeIndicator = true,
+}) {
+  const textColor = darkMode ? '#fff' : '#000';
+
+  return (
+    <div style={iosFrameStyles.wrapper}>
+      <div style={{
+        ...iosFrameStyles.screen,
+        width,
+        height,
+        background: darkMode ? '#000' : '#fff',
+      }}>
+        {showStatusBar && (
+          <div style={{ ...iosFrameStyles.statusBar, color: textColor }}>
+            <span>{time}</span>
+            <div style={iosFrameStyles.statusIcons}>
+              <div style={iosFrameStyles.signalIcon}>
+                <div style={{ ...iosFrameStyles.signalBar, height: 4 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 6 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 9 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 11 }} />
+              </div>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style={{ color: textColor }}>
+                <path d="M8 11.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor" />
+                <path d="M3 7.5a7 7 0 0110 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+                <path d="M1 4.5a11 11 0 0114 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.7" />
+              </svg>
+              <div style={iosFrameStyles.batteryIcon}>
+                <div style={{
+                  width: `${battery}%`,
+                  height: '100%',
+                  background: 'currentColor',
+                  borderRadius: 1,
+                  opacity: 0.9,
+                }} />
+                <div style={iosFrameStyles.batteryCap} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showDynamicIsland && <div style={iosFrameStyles.dynamicIsland} />}
+
+        <div style={iosFrameStyles.content}>
+          {children}
+        </div>
+
+        {showHomeIndicator && (
+          <div style={{
+            ...iosFrameStyles.homeIndicator,
+            ...(darkMode ? iosFrameStyles.homeIndicatorDark : {}),
+          }} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   Design tokens — Pure-CSS Geometric Art
+   ============================================================ */
+const ACCENTS = {
+  focus: '#FF4B3E',   // tomato red
+  short: '#2455FF',   // cobalt blue
+  long:  '#1C9B57',   // grass green
+};
+
+const SESSION_LABELS = {
+  focus: 'Tập trung',
+  short: 'Nghỉ ngắn',
+  long:  'Nghỉ dài',
+};
+
+function getTheme(darkMode) {
+  return darkMode
+    ? {
+        bg: '#141310',
+        surface: '#1E1C18',
+        text: '#FAF6EC',
+        textMuted: '#9A968A',
+        border: '#FAF6EC',
+        track: '#39362E',
+      }
+    : {
+        bg: '#FAF6EC',
+        surface: '#FFFFFF',
+        text: '#161512',
+        textMuted: '#78766D',
+        border: '#161512',
+        track: '#E7E1D2',
+      };
+}
+
+function fmtTime(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+/* ============================================================
+   Geometric SVG icons — circle / square / triangle / line only
+   ============================================================ */
+function IconClockTab({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2" />
+      <line x1="12" y1="12" x2="12" y2="7" stroke={color} strokeWidth="2" strokeLinecap="square" />
+      <line x1="12" y1="12" x2="15.5" y2="12" stroke={color} strokeWidth="2" strokeLinecap="square" />
+    </svg>
+  );
+}
+function IconListTab({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="5" width="16" height="2.4" fill={color} />
+      <rect x="4" y="10.8" width="11" height="2.4" fill={color} />
+      <rect x="4" y="16.6" width="13.5" height="2.4" fill={color} />
+    </svg>
+  );
+}
+function IconBarsTab({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="13" width="4" height="7" fill={color} />
+      <rect x="10" y="7.5" width="4" height="12.5" fill={color} />
+      <rect x="16" y="3" width="4" height="17" fill={color} />
+    </svg>
+  );
+}
+function IconSlidersTab({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <line x1="4" y1="7" x2="20" y2="7" stroke={color} strokeWidth="2" />
+      <circle cx="9" cy="7" r="2.6" fill="var(--dot-bg,#fff)" stroke={color} strokeWidth="2" />
+      <line x1="4" y1="17" x2="20" y2="17" stroke={color} strokeWidth="2" />
+      <circle cx="15" cy="17" r="2.6" fill="var(--dot-bg,#fff)" stroke={color} strokeWidth="2" />
+    </svg>
+  );
+}
+function IconPlus({ color, size = 20, weight = 2.4 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <line x1="12" y1="4.5" x2="12" y2="19.5" stroke={color} strokeWidth={weight} strokeLinecap="square" />
+      <line x1="4.5" y1="12" x2="19.5" y2="12" stroke={color} strokeWidth={weight} strokeLinecap="square" />
+    </svg>
+  );
+}
+function IconMinus({ color, size = 20, weight = 2.4 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <line x1="4.5" y1="12" x2="19.5" y2="12" stroke={color} strokeWidth={weight} strokeLinecap="square" />
+    </svg>
+  );
+}
+function IconCheck({ color, size = 15 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <polyline points="4,13 9.5,18.5 20,6" stroke={color} strokeWidth="3.2" fill="none" strokeLinecap="square" strokeLinejoin="miter" />
+    </svg>
+  );
+}
+function IconPlay({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <polygon points="6,4 21,12 6,20" fill={color} />
+    </svg>
+  );
+}
+function IconPause({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="5.5" y="4" width="5" height="16" fill={color} />
+      <rect x="13.5" y="4" width="5" height="16" fill={color} />
+    </svg>
+  );
+}
+function IconReset({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="8" stroke={color} strokeWidth="2.2" fill="none"
+        strokeDasharray="38 13" strokeLinecap="butt" transform="rotate(-38 12 12)" />
+      <polygon points="17.4,4.4 21.6,6 18.6,9.2" fill={color} />
+    </svg>
+  );
+}
+
+/* ============================================================
+   Small reusable controls
+   ============================================================ */
+function ToggleSwitch({ on, onToggle, accent, theme }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-pressed={on}
+      style={{
+        width: 54, height: 30, padding: 3,
+        background: on ? accent : theme.surface,
+        border: `2px solid ${theme.text}`,
+        borderRadius: 3,
+        display: 'flex', alignItems: 'center',
+        position: 'relative',
+      }}
+    >
+      <div style={{
+        width: 20, height: 20,
+        background: on ? '#FFFFFF' : theme.text,
+        borderRadius: 1,
+        transform: `translateX(${on ? 22 : 0}px)`,
+        transition: 'transform 160ms ease',
+      }} />
+    </button>
+  );
+}
+
+function Stepper({ value, min, max, step, onChange, theme, accent }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: `2px solid ${theme.text}` }}>
+      <button
+        onClick={() => onChange(Math.max(min, value - step))}
+        style={{ width: 34, height: 34, background: theme.surface, border: 'none', borderRight: `2px solid ${theme.text}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <IconMinus color={theme.text} size={14} />
+      </button>
+      <div style={{ minWidth: 46, textAlign: 'center', fontWeight: 700, fontSize: 15, color: theme.text }}>
+        {value}
+      </div>
+      <button
+        onClick={() => onChange(Math.min(max, value + step))}
+        style={{ width: 34, height: 34, background: theme.surface, border: 'none', borderLeft: `2px solid ${theme.text}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <IconPlus color={theme.text} size={14} weight={2.2} />
+      </button>
+    </div>
+  );
+}
+
+function TabBar({ active, onChange, theme, accent }) {
+  const tabs = [
+    { key: 'timer', Icon: IconClockTab, label: 'Đồng hồ' },
+    { key: 'tasks', Icon: IconListTab, label: 'Việc' },
+    { key: 'stats', Icon: IconBarsTab, label: 'Thống kê' },
+    { key: 'settings', Icon: IconSlidersTab, label: 'Cài đặt' },
+  ];
+  return (
+    <div style={{
+      display: 'flex', flexShrink: 0, height: 72,
+      borderTop: `2px solid ${theme.text}`,
+      background: theme.surface,
+    }}>
+      {tabs.map(t => {
+        const isActive = active === t.key;
+        const color = isActive ? accent : theme.textMuted;
+        return (
+          <button
+            key={t.key}
+            onClick={() => onChange(t.key)}
+            style={{
+              flex: 1, background: 'transparent', border: 'none',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'center', gap: 4, padding: '8px 0',
+            }}
+          >
+            <t.Icon color={color} />
+            <span style={{ fontSize: 10.5, fontWeight: isActive ? 700 : 500, color, letterSpacing: 0.2 }}>{t.label}</span>
+            <div style={{ width: 5, height: 5, marginTop: 1, background: isActive ? accent : 'transparent' }} />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ============================================================
+   TIMER SCREEN
+   ============================================================ */
+function TimerScreen({ theme, accent, sessionType, onSetSessionType, remaining, total, isRunning, onStart, onPause, onReset, currentTask, dotsTotal, dotsFilled }) {
+  const progress = total > 0 ? 1 - remaining / total : 0;
+  const deg = Math.max(0, Math.min(360, progress * 360));
+
+  return (
+    <div style={{ padding: '22px 20px 20px', display: 'flex', flexDirection: 'column', gap: 18, minHeight: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 12, height: 12, background: accent, transform: 'rotate(45deg)', flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', color: theme.textMuted }}>TOMA</span>
+      </div>
+
+      <div style={{ display: 'flex', gap: 6 }}>
+        {['focus', 'short', 'long'].map(key => {
+          const isActive = sessionType === key;
+          return (
+            <button
+              key={key}
+              onClick={() => onSetSessionType(key)}
+              style={{
+                flex: 1, padding: '9px 4px',
+                border: `2px solid ${theme.text}`,
+                background: isActive ? ACCENTS[key] : theme.surface,
+                color: isActive ? '#FFFFFF' : theme.text,
+                fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.4,
+              }}
+            >
+              {SESSION_LABELS[key]}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ position: 'relative', width: 244, height: 244, margin: '6px auto 0' }}>
+        <div style={{
+          width: '100%', height: '100%', borderRadius: '50%',
+          background: `conic-gradient(${accent} ${deg}deg, ${theme.track} 0deg)`,
+        }} />
+        <div style={{
+          position: 'absolute', top: 16, left: 16, right: 16, bottom: 16,
+          borderRadius: '50%', background: theme.bg,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          border: `2px solid ${theme.text}`,
+        }}>
+          <div style={{ fontSize: 58, fontWeight: 700, color: theme.text, letterSpacing: -2, lineHeight: 1 }}>
+            {fmtTime(remaining)}
+          </div>
+          <div style={{ marginTop: 8, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: accent }}>
+            {SESSION_LABELS[sessionType]}
+          </div>
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        background: theme.surface, border: `2px solid ${theme.text}`,
+        borderLeft: `7px solid ${accent}`, padding: '11px 14px',
+      }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: theme.textMuted, marginBottom: 3 }}>
+            Đang làm
+          </div>
+          <div style={{
+            fontSize: 14.5, fontWeight: 600, color: theme.text,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            fontStyle: currentTask ? 'normal' : 'italic',
+          }}>
+            {currentTask ? currentTask.title : 'Chưa chọn công việc'}
+          </div>
+        </div>
+        {currentTask && (
+          <div style={{ fontSize: 12, fontWeight: 700, color: theme.textMuted, flexShrink: 0 }}>
+            {currentTask.completedPomodoros}/{currentTask.estimatedPomodoros}
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 9 }}>
+        {Array.from({ length: dotsTotal }).map((_, i) => (
+          <div key={i} style={{
+            width: 13, height: 13,
+            border: `2px solid ${theme.text}`,
+            background: i < dotsFilled ? accent : 'transparent',
+          }} />
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', marginTop: 4 }}>
+        <button
+          onClick={onReset}
+          style={{ width: 54, height: 54, background: theme.surface, border: `2px solid ${theme.text}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <IconReset color={theme.text} />
+        </button>
+        <button
+          onClick={isRunning ? onPause : onStart}
+          style={{
+            width: 148, height: 60, background: theme.text, border: `2px solid ${theme.text}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          }}
+        >
+          {isRunning ? <IconPause color={theme.bg} /> : <IconPlay color={theme.bg} />}
+          <span style={{ color: theme.bg, fontWeight: 700, fontSize: 15, textTransform: 'uppercase', letterSpacing: 1 }}>
+            {isRunning ? 'Tạm dừng' : 'Bắt đầu'}
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   TASK LIST SCREEN
+   ============================================================ */
+function TaskListScreen({ theme, accent, tasks, currentTaskId, onToggleDone, onSelectTask, showAdd, setShowAdd, newTitle, setNewTitle, newEstimate, setNewEstimate, onSubmitAdd }) {
+  return (
+    <div style={{ padding: '22px 20px 24px', display: 'flex', flexDirection: 'column', gap: 16, minHeight: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h1 style={{ fontSize: 23, fontWeight: 700, margin: 0, color: theme.text }}>Việc cần làm</h1>
+        <button
+          onClick={() => setShowAdd(!showAdd)}
+          style={{ width: 38, height: 38, background: accent, border: `2px solid ${theme.text}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <IconPlus color="#FFFFFF" />
+        </button>
+      </div>
+
+      {showAdd && (
+        <form
+          onSubmit={(e) => { e.preventDefault(); onSubmitAdd(); }}
+          style={{ display: 'flex', flexDirection: 'column', gap: 10, border: `2px solid ${theme.text}`, background: theme.surface, padding: 12 }}
+        >
+          <input
+            autoFocus
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+            placeholder="Tên công việc..."
+            style={{
+              border: 'none', borderBottom: `2px solid ${theme.text}`, background: 'transparent',
+              padding: '6px 2px', fontSize: 14.5, color: theme.text, outline: 'none',
+            }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: theme.textMuted, fontWeight: 600 }}>Số pomodoro dự kiến</span>
+            <Stepper value={newEstimate} min={1} max={8} step={1} onChange={setNewEstimate} theme={theme} accent={accent} />
+          </div>
+          <button
+            type="submit"
+            style={{ background: theme.text, color: theme.bg, border: 'none', padding: '10px 0', fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 }}
+          >
+            Thêm việc
+          </button>
+        </form>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {tasks.map(task => {
+          const isSelected = task.id === currentTaskId;
+          return (
+            <div
+              key={task.id}
+              onClick={() => onSelectTask(task.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: '12px 12px',
+                border: `2px solid ${theme.text}`,
+                borderLeft: isSelected ? `7px solid ${accent}` : `2px solid ${theme.text}`,
+                background: isSelected ? `${accent}17` : theme.surface,
+                cursor: 'pointer',
+              }}
+            >
+              <button
+                onClick={(e) => { e.stopPropagation(); onToggleDone(task.id); }}
+                style={{
+                  width: 24, height: 24, flexShrink: 0,
+                  border: `2px solid ${theme.text}`,
+                  background: task.done ? theme.text : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                {task.done && <IconCheck color={theme.bg} />}
+              </button>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: 15, fontWeight: 600, color: theme.text,
+                  textDecoration: task.done ? 'line-through' : 'none',
+                  opacity: task.done ? 0.42 : 1,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                  {task.title}
+                </div>
+                <div style={{ display: 'flex', gap: 3, marginTop: 6 }}>
+                  {Array.from({ length: task.estimatedPomodoros }).map((_, i) => (
+                    <div key={i} style={{
+                      width: 7, height: 7,
+                      border: `1.4px solid ${theme.textMuted}`,
+                      background: i < task.completedPomodoros ? accent : 'transparent',
+                    }} />
+                  ))}
+                </div>
+              </div>
+
+              {isSelected && (
+                <div style={{ fontSize: 9.5, fontWeight: 700, color: accent, textTransform: 'uppercase', letterSpacing: 0.5, flexShrink: 0 }}>
+                  Đang chọn
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {tasks.length === 0 && (
+          <div style={{ textAlign: 'center', color: theme.textMuted, fontSize: 13, fontStyle: 'italic', padding: '20px 0' }}>
+            Chưa có việc nào. Bấm + để thêm.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   STATS SCREEN
+   ============================================================ */
+function StatsScreen({ theme, accent, view, setView, weekData, monthData, todayMinutes, weekMinutes, streak, totalPomodoros }) {
+  const data = view === 'week' ? weekData : monthData;
+  const maxVal = Math.max(...data.map(d => d.minutes), 1);
+
+  function fmtHM(mins) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return h > 0 ? `${h}h${String(m).padStart(2, '0')}` : `${m}p`;
+  }
+
+  return (
+    <div style={{ padding: '22px 20px 24px', display: 'flex', flexDirection: 'column', gap: 18, minHeight: '100%' }}>
+      <h1 style={{ fontSize: 23, fontWeight: 700, margin: 0, color: theme.text }}>Thống kê</h1>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ flex: 1, border: `2px solid ${theme.text}`, background: theme.surface, padding: '12px 14px' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: theme.textMuted, marginBottom: 6 }}>Hôm nay</div>
+          <div style={{ fontSize: 27, fontWeight: 700, color: theme.text }}>{fmtHM(todayMinutes)}</div>
+        </div>
+        <div style={{ flex: 1, border: `2px solid ${theme.text}`, background: theme.surface, padding: '12px 14px' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: theme.textMuted, marginBottom: 6 }}>Tuần này</div>
+          <div style={{ fontSize: 27, fontWeight: 700, color: theme.text }}>{fmtHM(weekMinutes)}</div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 6 }}>
+        {['week', 'month'].map(key => {
+          const isActive = view === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setView(key)}
+              style={{
+                flex: 1, padding: '8px 4px',
+                border: `2px solid ${theme.text}`,
+                background: isActive ? theme.text : theme.surface,
+                color: isActive ? theme.bg : theme.text,
+                fontWeight: 700, fontSize: 11.5, textTransform: 'uppercase', letterSpacing: 0.5,
+              }}
+            >
+              {key === 'week' ? 'Tuần' : 'Tháng'}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ border: `2px solid ${theme.text}`, background: theme.surface, padding: '16px 12px 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6, height: 130 }}>
+          {data.map((d, i) => (
+            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', gap: 6 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: theme.textMuted }}>{d.minutes}</div>
+              <div style={{
+                width: '100%', maxWidth: 22,
+                height: `${Math.max(4, (d.minutes / maxVal) * 92)}px`,
+                background: d.isToday ? accent : theme.track,
+                border: `2px solid ${theme.text}`,
+              }} />
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, marginTop: 8 }}>
+          {data.map((d, i) => (
+            <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 10.5, fontWeight: d.isToday ? 700 : 500, color: d.isToday ? accent : theme.textMuted }}>
+              {d.label}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ flex: 1, border: `2px solid ${theme.text}`, background: theme.surface, padding: '14px 10px', textAlign: 'center' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: accent }}>{streak}</div>
+          <div style={{ fontSize: 10.5, color: theme.textMuted, fontWeight: 600, marginTop: 4 }}>ngày liên tiếp</div>
+        </div>
+        <div style={{ flex: 1, border: `2px solid ${theme.text}`, background: theme.surface, padding: '14px 10px', textAlign: 'center' }}>
+          <div style={{ fontSize: 24, fontWeight: 700, color: theme.text }}>{totalPomodoros}</div>
+          <div style={{ fontSize: 10.5, color: theme.textMuted, fontWeight: 600, marginTop: 4 }}>tổng pomodoro</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SETTINGS SCREEN
+   ============================================================ */
+function SettingsScreen({ theme, accent, focusMin, shortMin, longMin, sessionsBeforeLong, setFocusMin, setShortMin, setLongMin, setSessionsBeforeLong, soundOn, setSoundOn, autoStart, setAutoStart, darkMode, setDarkMode }) {
+  const Row = ({ label, children }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: `1.5px solid ${theme.track}` }}>
+      <span style={{ fontSize: 14.5, fontWeight: 500, color: theme.text }}>{label}</span>
+      {children}
+    </div>
+  );
+  const SectionTitle = ({ children }) => (
+    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: theme.textMuted, marginTop: 6 }}>{children}</div>
+  );
+
+  return (
+    <div style={{ padding: '22px 20px 30px', display: 'flex', flexDirection: 'column', gap: 4, minHeight: '100%' }}>
+      <h1 style={{ fontSize: 23, fontWeight: 700, margin: '0 0 8px', color: theme.text }}>Cài đặt</h1>
+
+      <SectionTitle>Thời lượng</SectionTitle>
+      <Row label="Tập trung (phút)"><Stepper value={focusMin} min={5} max={60} step={5} onChange={setFocusMin} theme={theme} accent={accent} /></Row>
+      <Row label="Nghỉ ngắn (phút)"><Stepper value={shortMin} min={1} max={30} step={1} onChange={setShortMin} theme={theme} accent={accent} /></Row>
+      <Row label="Nghỉ dài (phút)"><Stepper value={longMin} min={5} max={45} step={5} onChange={setLongMin} theme={theme} accent={accent} /></Row>
+      <Row label="Số phiên / nghỉ dài"><Stepper value={sessionsBeforeLong} min={2} max={8} step={1} onChange={setSessionsBeforeLong} theme={theme} accent={accent} /></Row>
+
+      <SectionTitle>Tuỳ chọn</SectionTitle>
+      <Row label="Âm thanh khi hết giờ"><ToggleSwitch on={soundOn} onToggle={() => setSoundOn(!soundOn)} accent={accent} theme={theme} /></Row>
+      <Row label="Tự động bắt đầu phiên tiếp"><ToggleSwitch on={autoStart} onToggle={() => setAutoStart(!autoStart)} accent={accent} theme={theme} /></Row>
+      <Row label="Chế độ tối"><ToggleSwitch on={darkMode} onToggle={() => setDarkMode(!darkMode)} accent={accent} theme={theme} /></Row>
+    </div>
+  );
+}
+
+/* ============================================================
+   Sample data factory (fresh per phone instance)
+   ============================================================ */
+function makeInitialTasks() {
+  return [
+    { id: 1, title: 'Viết báo cáo tuần', estimatedPomodoros: 4, completedPomodoros: 1, done: false },
+    { id: 2, title: 'Đọc tài liệu API thiết bị', estimatedPomodoros: 2, completedPomodoros: 2, done: true },
+    { id: 3, title: 'Chuẩn bị slide thuyết trình', estimatedPomodoros: 3, completedPomodoros: 0, done: false },
+    { id: 4, title: 'Trả lời email khách hàng', estimatedPomodoros: 1, completedPomodoros: 0, done: false },
+  ];
+}
+function makeWeekData() {
+  const raw = [
+    { label: 'T2', minutes: 120 },
+    { label: 'T3', minutes: 95 },
+    { label: 'T4', minutes: 150 },
+    { label: 'T5', minutes: 80 },
+    { label: 'T6', minutes: 200 },
+    { label: 'T7', minutes: 40 },
+    { label: 'CN', minutes: 60 },
+  ];
+  return raw.map((d, i) => ({ ...d, isToday: i === 4 }));
+}
+function makeMonthData() {
+  return [
+    { label: 'Tuần 1', minutes: 620, isToday: false },
+    { label: 'Tuần 2', minutes: 540, isToday: false },
+    { label: 'Tuần 3', minutes: 710, isToday: true },
+    { label: 'Tuần 4', minutes: 430, isToday: false },
+  ];
+}
+
+/* ============================================================
+   PhoneApp — one independent state machine
+   ============================================================ */
+function PhoneApp({ initialScreen }) {
+  const [screen, setScreen] = useState(initialScreen);
+
+  // durations & rules
+  const [focusMin, setFocusMin] = useState(25);
+  const [shortMin, setShortMin] = useState(5);
+  const [longMin, setLongMin] = useState(15);
+  const [sessionsBeforeLong, setSessionsBeforeLong] = useState(4);
+
+  // toggles
+  const [soundOn, setSoundOn] = useState(true);
+  const [autoStart, setAutoStart] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // timer engine
+  const [sessionType, setSessionType] = useState('focus');
+  const [cycleCount, setCycleCount] = useState(0);
+  const durationFor = (type) => ({ focus: focusMin, short: shortMin, long: longMin }[type]) * 60;
+  const [remaining, setRemaining] = useState(durationFor('focus'));
+  const [isRunning, setIsRunning] = useState(false);
+
+  // tasks
+  const [tasks, setTasks] = useState(makeInitialTasks());
+  const [currentTaskId, setCurrentTaskId] = useState(1);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newEstimate, setNewEstimate] = useState(2);
+
+  // stats
+  const [weekData, setWeekData] = useState(makeWeekData());
+  const [monthData] = useState(makeMonthData());
+  const [statsView, setStatsView] = useState('week');
+  const [todayMinutes, setTodayMinutes] = useState(200);
+  const [weekMinutes, setWeekMinutes] = useState(745);
+  const [totalPomodoros, setTotalPomodoros] = useState(47);
+  const [streak] = useState(5);
+
+  const audioCtxRef = useRef(null);
+  function ensureAudio() {
+    if (!audioCtxRef.current) {
+      try { audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    }
+    return audioCtxRef.current;
+  }
+  function playBeep() {
+    if (!soundOn) return;
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'square';
+      o.frequency.value = 880;
+      g.gain.value = 0.05;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + 0.16);
+    } catch (e) {}
+  }
+
+  // countdown tick
+  useEffect(() => {
+    if (!isRunning) return;
+    const id = setInterval(() => {
+      setRemaining(r => (r > 0 ? r - 1 : 0));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [isRunning]);
+
+  // keep remaining in sync with duration settings while idle
+  useEffect(() => {
+    if (!isRunning) setRemaining(durationFor(sessionType));
+  }, [focusMin, shortMin, longMin, sessionType]);
+
+  // handle session completion
+  useEffect(() => {
+    if (remaining !== 0 || !isRunning) return;
+    setIsRunning(false);
+    playBeep();
+
+    if (sessionType === 'focus') {
+      const nextCycle = cycleCount + 1;
+      setTotalPomodoros(p => p + 1);
+      setTodayMinutes(m => m + focusMin);
+      setWeekMinutes(m => m + focusMin);
+      setWeekData(wd => wd.map(d => d.isToday ? { ...d, minutes: d.minutes + focusMin } : d));
+      if (currentTaskId) {
+        setTasks(ts => ts.map(t => t.id === currentTaskId
+          ? { ...t, completedPomodoros: Math.min(t.estimatedPomodoros, t.completedPomodoros + 1) }
+          : t));
+      }
+      const goingLong = nextCycle >= sessionsBeforeLong;
+      const next = goingLong ? 'long' : 'short';
+      setCycleCount(goingLong ? 0 : nextCycle);
+      setSessionType(next);
+      setRemaining(durationFor(next));
+      if (autoStart) setIsRunning(true);
+    } else {
+      setSessionType('focus');
+      setRemaining(durationFor('focus'));
+      if (autoStart) setIsRunning(true);
+    }
+    // eslint-disable-next-line
+  }, [remaining]);
+
+  function handleSetSessionType(type) {
+    setIsRunning(false);
+    setSessionType(type);
+    setRemaining(durationFor(type));
+  }
+  function handleStart() {
+    ensureAudio();
+    setIsRunning(true);
+  }
+  function handlePause() { setIsRunning(false); }
+  function handleReset() {
+    setIsRunning(false);
+    setRemaining(durationFor(sessionType));
+  }
+
+  function handleToggleDone(id) {
+    setTasks(ts => ts.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  }
+  function handleSelectTask(id) {
+    setCurrentTaskId(id);
+  }
+  function handleSubmitAdd() {
+    const title = newTitle.trim();
+    if (!title) return;
+    setTasks(ts => [...ts, { id: Date.now(), title, estimatedPomodoros: newEstimate, completedPomodoros: 0, done: false }]);
+    setNewTitle('');
+    setNewEstimate(2);
+    setShowAdd(false);
+  }
+
+  const theme = getTheme(darkMode);
+  const accent = ACCENTS[sessionType];
+  const currentTask = tasks.find(t => t.id === currentTaskId) || null;
+
+  return (
+    <IosFrame darkMode={darkMode} time="9:41" battery={92}>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: theme.bg }}>
+        <div style={{ flex: 1, overflow: 'auto', background: theme.bg }}>
+          {screen === 'timer' && (
+            <TimerScreen
+              theme={theme} accent={accent}
+              sessionType={sessionType} onSetSessionType={handleSetSessionType}
+              remaining={remaining} total={durationFor(sessionType)}
+              isRunning={isRunning} onStart={handleStart} onPause={handlePause} onReset={handleReset}
+              currentTask={currentTask}
+              dotsTotal={sessionsBeforeLong} dotsFilled={cycleCount}
+            />
+          )}
+          {screen === 'tasks' && (
+            <TaskListScreen
+              theme={theme} accent={accent}
+              tasks={tasks} currentTaskId={currentTaskId}
+              onToggleDone={handleToggleDone} onSelectTask={handleSelectTask}
+              showAdd={showAdd} setShowAdd={setShowAdd}
+              newTitle={newTitle} setNewTitle={setNewTitle}
+              newEstimate={newEstimate} setNewEstimate={setNewEstimate}
+              onSubmitAdd={handleSubmitAdd}
+            />
+          )}
+          {screen === 'stats' && (
+            <StatsScreen
+              theme={theme} accent={accent}
+              view={statsView} setView={setStatsView}
+              weekData={weekData} monthData={monthData}
+              todayMinutes={todayMinutes} weekMinutes={weekMinutes}
+              streak={streak} totalPomodoros={totalPomodoros}
+            />
+          )}
+          {screen === 'settings' && (
+            <SettingsScreen
+              theme={theme} accent={accent}
+              focusMin={focusMin} shortMin={shortMin} longMin={longMin} sessionsBeforeLong={sessionsBeforeLong}
+              setFocusMin={setFocusMin} setShortMin={setShortMin} setLongMin={setLongMin} setSessionsBeforeLong={setSessionsBeforeLong}
+              soundOn={soundOn} setSoundOn={setSoundOn}
+              autoStart={autoStart} setAutoStart={setAutoStart}
+              darkMode={darkMode} setDarkMode={setDarkMode}
+            />
+          )}
+        </div>
+        <TabBar active={screen} onChange={setScreen} theme={theme} accent={accent} />
+      </div>
+    </IosFrame>
+  );
+}
+
+/* ============================================================
+   App — page shell + fleet of 4 phones
+   ============================================================ */
+function App() {
+  const units = [
+    { key: 'p1', screen: 'timer', label: 'Đồng hồ đếm giờ' },
+    { key: 'p2', screen: 'tasks', label: 'Việc cần làm' },
+    { key: 'p3', screen: 'stats', label: 'Thống kê' },
+    { key: 'p4', screen: 'settings', label: 'Cài đặt' },
+  ];
+  return (
+    <div className="toma-page">
+      <div className="toma-header">
+        <div className="toma-kicker">
+          <div className="toma-mark" />
+          <span>TOMA — Pure-CSS Geometric Art</span>
+        </div>
+        <h1 className="toma-title">Đếm giờ Pomodoro, dựng hoàn toàn bằng hình khối phẳng.</h1>
+        <p className="toma-sub">
+          Bốn thiết bị dưới đây là bốn state machine độc lập — mỗi máy bấm được tab bar để đi hết
+          cả 4 màn hình (Đồng hồ, Việc cần làm, Thống kê, Cài đặt). Không ảnh, không gradient, không icon font ngoài.
+        </p>
+      </div>
+      <div className="toma-fleet">
+        {units.map(u => (
+          <div className="toma-unit" key={u.key}>
+            <div className="toma-label">Mở mặc định: <b>{u.label}</b></div>
+            <PhoneApp initialScreen={u.screen} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<script>
+  // Manually compile the JSX source above with the CLASSIC (React.createElement)
+  // runtime — the automatic script-tag transform in current @babel/standalone
+  // defaults to the automatic runtime (which injects `import ... from "react/jsx-runtime"`),
+  // which breaks with a plain React UMD global. Compiling explicitly avoids that.
+  (function () {
+    var source = document.getElementById('app-source').textContent;
+    var output = Babel.transform(source, {
+      filename: 'app.jsx',
+      presets: [],
+      plugins: [
+        ['transform-react-jsx', { pragma: 'React.createElement', pragmaFrag: 'React.Fragment', runtime: 'classic' }],
+      ],
+    }).code;
+    var script = document.createElement('script');
+    script.text = output;
+    document.body.appendChild(script);
+  })();
+</script>
+</body>
+</html>

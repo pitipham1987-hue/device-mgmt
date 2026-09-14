@@ -1,0 +1,2336 @@
+{
+  ".agents/skills/huashu-design/assets/android_frame.jsx": {
+    "mtime": 1789369632.593999,
+    "seen": 1789371009.4776082,
+    "ast_hash": "bbd985975337987960bba269f95367b6",
+    "semantic_hash": "bbd985975337987960bba269f95367b6"
+  },
+  ".agents/skills/huashu-design/assets/animations.jsx": {
+    "mtime": 1789369632.5950038,
+    "seen": 1789371009.4776082,
+    "ast_hash": "cd8d8d7c21e3710f5136ace48d136245",
+    "semantic_hash": "cd8d8d7c21e3710f5136ace48d136245"
+  },
+  ".agents/skills/huashu-design/assets/browser_window.jsx": {
+    "mtime": 1789369632.7787156,
+    "seen": 1789371009.4776082,
+    "ast_hash": "f5976b2c884843db79acc8f3474bf3c7",
+    "semantic_hash": "f5976b2c884843db79acc8f3474bf3c7"
+  },
+  ".agents/skills/huashu-design/assets/cursor.jsx": {
+    "mtime": 1789369632.7787156,
+    "seen": 1789371009.4776082,
+    "ast_hash": "498406e6c1420d705353d26a90b45bb2",
+    "semantic_hash": "498406e6c1420d705353d26a90b45bb2"
+  },
+  ".agents/skills/huashu-design/assets/deck_stage.js": {
+    "mtime": 1789369632.780221,
+    "seen": 1789371009.4776082,
+    "ast_hash": "53c02f38c549e6a744c27c047ffbbb38",
+    "semantic_hash": "53c02f38c549e6a744c27c047ffbbb38"
+  },
+  ".agents/skills/huashu-design/assets/design_canvas.jsx": {
+    "mtime": 1789369632.7812254,
+    "seen": 1789371009.4776082,
+    "ast_hash": "6450e24df662a205f2fa1138db1980a8",
+    "semantic_hash": "6450e24df662a205f2fa1138db1980a8"
+  },
+  ".agents/skills/huashu-design/assets/ios_frame.jsx": {
+    "mtime": 1789369632.783247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "4b47e0bb1902ee6a0a4d5ffb09f2545c",
+    "semantic_hash": "4b47e0bb1902ee6a0a4d5ffb09f2545c"
+  },
+  ".agents/skills/huashu-design/assets/macos_window.jsx": {
+    "mtime": 1789369632.783247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "c2aeb1679497bc197e3b7c96c92c4241",
+    "semantic_hash": "c2aeb1679497bc197e3b7c96c92c4241"
+  },
+  ".agents/skills/huashu-design/assets/narration_stage.jsx": {
+    "mtime": 1789369632.784247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "254a77fd17df90ec1d8d1c7ad4972536",
+    "semantic_hash": "254a77fd17df90ec1d8d1c7ad4972536"
+  },
+  ".agents/skills/huashu-design/assets/personal-asset-index.example.json": {
+    "mtime": 1789369632.784247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "29ce13ad528a9e5ca65810c3c0dc27e5",
+    "semantic_hash": "29ce13ad528a9e5ca65810c3c0dc27e5"
+  },
+  ".agents/skills/huashu-design/package.json": {
+    "mtime": 1789369632.8702738,
+    "seen": 1789371009.4776082,
+    "ast_hash": "801b24033b8cb0ec6b1ec29cf16452eb",
+    "semantic_hash": "801b24033b8cb0ec6b1ec29cf16452eb"
+  },
+  ".agents/skills/huashu-design/scripts/add-music.sh": {
+    "mtime": 1789369632.8910925,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0429abe5a037c16c67ca4da2c1117123",
+    "semantic_hash": "0429abe5a037c16c67ca4da2c1117123"
+  },
+  ".agents/skills/huashu-design/scripts/cloud/ai-review-video.py": {
+    "mtime": 1789369632.8910925,
+    "seen": 1789371009.4776082,
+    "ast_hash": "a0b94621a76cc48a7903e129f4a6b393",
+    "semantic_hash": "a0b94621a76cc48a7903e129f4a6b393"
+  },
+  ".agents/skills/huashu-design/scripts/cloud/tts-doubao.mjs": {
+    "mtime": 1789369632.892092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "fa1e68bc4d820650288b6302e3833554",
+    "semantic_hash": "fa1e68bc4d820650288b6302e3833554"
+  },
+  ".agents/skills/huashu-design/scripts/convert-formats.sh": {
+    "mtime": 1789369632.892092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e23f208d056893e0e6d6ac737506dad6",
+    "semantic_hash": "e23f208d056893e0e6d6ac737506dad6"
+  },
+  ".agents/skills/huashu-design/scripts/design-gate-hook.sh": {
+    "mtime": 1789369632.8930943,
+    "seen": 1789371009.4776082,
+    "ast_hash": "cf6c310f65ab3e0772fc5e122a0e0815",
+    "semantic_hash": "cf6c310f65ab3e0772fc5e122a0e0815"
+  },
+  ".agents/skills/huashu-design/scripts/export_deck_pdf.mjs": {
+    "mtime": 1789369632.8930943,
+    "seen": 1789371009.4776082,
+    "ast_hash": "c71e62a3074ada6886dbee1dab343e81",
+    "semantic_hash": "c71e62a3074ada6886dbee1dab343e81"
+  },
+  ".agents/skills/huashu-design/scripts/export_deck_pptx.mjs": {
+    "mtime": 1789369632.8930943,
+    "seen": 1789371009.4776082,
+    "ast_hash": "230fb5f03d9ede813b51b0650454beef",
+    "semantic_hash": "230fb5f03d9ede813b51b0650454beef"
+  },
+  ".agents/skills/huashu-design/scripts/export_deck_stage_pdf.mjs": {
+    "mtime": 1789369632.894091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "b6cc480a6e63e2a51b05f9b47d0d202a",
+    "semantic_hash": "b6cc480a6e63e2a51b05f9b47d0d202a"
+  },
+  ".agents/skills/huashu-design/scripts/fetch_images.py": {
+    "mtime": 1789369632.894091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e63ad534c4b632567338d22e18b53a59",
+    "semantic_hash": "e63ad534c4b632567338d22e18b53a59"
+  },
+  ".agents/skills/huashu-design/scripts/gen_deck_thumbs.mjs": {
+    "mtime": 1789369632.895092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "dd4cd67b075e933da17537c25bcb93a1",
+    "semantic_hash": "dd4cd67b075e933da17537c25bcb93a1"
+  },
+  ".agents/skills/huashu-design/scripts/html2pptx.js": {
+    "mtime": 1789369632.895092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "9e9706a229f2843279f6036f62842c84",
+    "semantic_hash": "9e9706a229f2843279f6036f62842c84"
+  },
+  ".agents/skills/huashu-design/scripts/mix-voiceover.sh": {
+    "mtime": 1789369632.896091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d61e9773780beb55b1ab40a847a70b35",
+    "semantic_hash": "d61e9773780beb55b1ab40a847a70b35"
+  },
+  ".agents/skills/huashu-design/scripts/narrate-pipeline.mjs": {
+    "mtime": 1789369632.896091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "760ea097cebcb8b0e3e6459f21427ab7",
+    "semantic_hash": "760ea097cebcb8b0e3e6459f21427ab7"
+  },
+  ".agents/skills/huashu-design/scripts/render-narration.sh": {
+    "mtime": 1789369632.897092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "71b2b3fd0eee4a12bc0abc6f5b7636aa",
+    "semantic_hash": "71b2b3fd0eee4a12bc0abc6f5b7636aa"
+  },
+  ".agents/skills/huashu-design/scripts/render-video-seek.js": {
+    "mtime": 1789369632.8980908,
+    "seen": 1789371009.4776082,
+    "ast_hash": "00cc2a5c044d70b893c72d5a7e017afd",
+    "semantic_hash": "00cc2a5c044d70b893c72d5a7e017afd"
+  },
+  ".agents/skills/huashu-design/scripts/render-video.js": {
+    "mtime": 1789369632.8980908,
+    "seen": 1789371009.4776082,
+    "ast_hash": "632bf822d3bd94400b782241d7b40b47",
+    "semantic_hash": "632bf822d3bd94400b782241d7b40b47"
+  },
+  ".agents/skills/huashu-design/scripts/sfx-cues.sh": {
+    "mtime": 1789369632.8980908,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d0e372a6d47517ec11f847a46b4f0294",
+    "semantic_hash": "d0e372a6d47517ec11f847a46b4f0294"
+  },
+  ".agents/skills/huashu-design/scripts/verify-video.sh": {
+    "mtime": 1789369632.8990915,
+    "seen": 1789371009.4776082,
+    "ast_hash": "f69d39bf4eeb11ad89e5e5a7c52275fd",
+    "semantic_hash": "f69d39bf4eeb11ad89e5e5a7c52275fd"
+  },
+  ".agents/skills/huashu-design/scripts/verify.py": {
+    "mtime": 1789369632.8990915,
+    "seen": 1789371009.4776082,
+    "ast_hash": "87661bdc456261134d4156602dfa5cbf",
+    "semantic_hash": "87661bdc456261134d4156602dfa5cbf"
+  },
+  ".agents/skills/huashu-design/test-prompts.json": {
+    "mtime": 1789369632.900092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0bc41b893c3d30eb9f26fb9d24706fc4",
+    "semantic_hash": "0bc41b893c3d30eb9f26fb9d24706fc4"
+  },
+  ".claude/settings.json": {
+    "mtime": 1789370685.7819688,
+    "seen": 1789371009.4776082,
+    "ast_hash": "8d0b8cd2cddeeba6ace4d2fd1e77577b",
+    "semantic_hash": "8d0b8cd2cddeeba6ace4d2fd1e77577b"
+  },
+  ".claude/skills/huashu-design/assets/android_frame.jsx": {
+    "mtime": 1789369632.593999,
+    "seen": 1789371009.4776082,
+    "ast_hash": "bbd985975337987960bba269f95367b6",
+    "semantic_hash": "bbd985975337987960bba269f95367b6"
+  },
+  ".claude/skills/huashu-design/assets/animations.jsx": {
+    "mtime": 1789369632.5950038,
+    "seen": 1789371009.4776082,
+    "ast_hash": "cd8d8d7c21e3710f5136ace48d136245",
+    "semantic_hash": "cd8d8d7c21e3710f5136ace48d136245"
+  },
+  ".claude/skills/huashu-design/assets/browser_window.jsx": {
+    "mtime": 1789369632.7787156,
+    "seen": 1789371009.4776082,
+    "ast_hash": "f5976b2c884843db79acc8f3474bf3c7",
+    "semantic_hash": "f5976b2c884843db79acc8f3474bf3c7"
+  },
+  ".claude/skills/huashu-design/assets/cursor.jsx": {
+    "mtime": 1789369632.7787156,
+    "seen": 1789371009.4776082,
+    "ast_hash": "498406e6c1420d705353d26a90b45bb2",
+    "semantic_hash": "498406e6c1420d705353d26a90b45bb2"
+  },
+  ".claude/skills/huashu-design/assets/deck_stage.js": {
+    "mtime": 1789369632.780221,
+    "seen": 1789371009.4776082,
+    "ast_hash": "53c02f38c549e6a744c27c047ffbbb38",
+    "semantic_hash": "53c02f38c549e6a744c27c047ffbbb38"
+  },
+  ".claude/skills/huashu-design/assets/design_canvas.jsx": {
+    "mtime": 1789369632.7812254,
+    "seen": 1789371009.4776082,
+    "ast_hash": "6450e24df662a205f2fa1138db1980a8",
+    "semantic_hash": "6450e24df662a205f2fa1138db1980a8"
+  },
+  ".claude/skills/huashu-design/assets/ios_frame.jsx": {
+    "mtime": 1789369632.783247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "4b47e0bb1902ee6a0a4d5ffb09f2545c",
+    "semantic_hash": "4b47e0bb1902ee6a0a4d5ffb09f2545c"
+  },
+  ".claude/skills/huashu-design/assets/macos_window.jsx": {
+    "mtime": 1789369632.783247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "c2aeb1679497bc197e3b7c96c92c4241",
+    "semantic_hash": "c2aeb1679497bc197e3b7c96c92c4241"
+  },
+  ".claude/skills/huashu-design/assets/narration_stage.jsx": {
+    "mtime": 1789369632.784247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "254a77fd17df90ec1d8d1c7ad4972536",
+    "semantic_hash": "254a77fd17df90ec1d8d1c7ad4972536"
+  },
+  ".claude/skills/huashu-design/assets/personal-asset-index.example.json": {
+    "mtime": 1789369632.784247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "29ce13ad528a9e5ca65810c3c0dc27e5",
+    "semantic_hash": "29ce13ad528a9e5ca65810c3c0dc27e5"
+  },
+  ".claude/skills/huashu-design/package.json": {
+    "mtime": 1789369632.8702738,
+    "seen": 1789371009.4776082,
+    "ast_hash": "801b24033b8cb0ec6b1ec29cf16452eb",
+    "semantic_hash": "801b24033b8cb0ec6b1ec29cf16452eb"
+  },
+  ".claude/skills/huashu-design/scripts/add-music.sh": {
+    "mtime": 1789369632.8910925,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0429abe5a037c16c67ca4da2c1117123",
+    "semantic_hash": "0429abe5a037c16c67ca4da2c1117123"
+  },
+  ".claude/skills/huashu-design/scripts/cloud/ai-review-video.py": {
+    "mtime": 1789369632.8910925,
+    "seen": 1789371009.4776082,
+    "ast_hash": "a0b94621a76cc48a7903e129f4a6b393",
+    "semantic_hash": "a0b94621a76cc48a7903e129f4a6b393"
+  },
+  ".claude/skills/huashu-design/scripts/cloud/tts-doubao.mjs": {
+    "mtime": 1789369632.892092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "fa1e68bc4d820650288b6302e3833554",
+    "semantic_hash": "fa1e68bc4d820650288b6302e3833554"
+  },
+  ".claude/skills/huashu-design/scripts/convert-formats.sh": {
+    "mtime": 1789369632.892092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e23f208d056893e0e6d6ac737506dad6",
+    "semantic_hash": "e23f208d056893e0e6d6ac737506dad6"
+  },
+  ".claude/skills/huashu-design/scripts/design-gate-hook.sh": {
+    "mtime": 1789369632.8930943,
+    "seen": 1789371009.4776082,
+    "ast_hash": "cf6c310f65ab3e0772fc5e122a0e0815",
+    "semantic_hash": "cf6c310f65ab3e0772fc5e122a0e0815"
+  },
+  ".claude/skills/huashu-design/scripts/export_deck_pdf.mjs": {
+    "mtime": 1789369632.8930943,
+    "seen": 1789371009.4776082,
+    "ast_hash": "c71e62a3074ada6886dbee1dab343e81",
+    "semantic_hash": "c71e62a3074ada6886dbee1dab343e81"
+  },
+  ".claude/skills/huashu-design/scripts/export_deck_pptx.mjs": {
+    "mtime": 1789369632.8930943,
+    "seen": 1789371009.4776082,
+    "ast_hash": "230fb5f03d9ede813b51b0650454beef",
+    "semantic_hash": "230fb5f03d9ede813b51b0650454beef"
+  },
+  ".claude/skills/huashu-design/scripts/export_deck_stage_pdf.mjs": {
+    "mtime": 1789369632.894091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "b6cc480a6e63e2a51b05f9b47d0d202a",
+    "semantic_hash": "b6cc480a6e63e2a51b05f9b47d0d202a"
+  },
+  ".claude/skills/huashu-design/scripts/fetch_images.py": {
+    "mtime": 1789369632.894091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e63ad534c4b632567338d22e18b53a59",
+    "semantic_hash": "e63ad534c4b632567338d22e18b53a59"
+  },
+  ".claude/skills/huashu-design/scripts/gen_deck_thumbs.mjs": {
+    "mtime": 1789369632.895092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "dd4cd67b075e933da17537c25bcb93a1",
+    "semantic_hash": "dd4cd67b075e933da17537c25bcb93a1"
+  },
+  ".claude/skills/huashu-design/scripts/html2pptx.js": {
+    "mtime": 1789369632.895092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "9e9706a229f2843279f6036f62842c84",
+    "semantic_hash": "9e9706a229f2843279f6036f62842c84"
+  },
+  ".claude/skills/huashu-design/scripts/mix-voiceover.sh": {
+    "mtime": 1789369632.896091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d61e9773780beb55b1ab40a847a70b35",
+    "semantic_hash": "d61e9773780beb55b1ab40a847a70b35"
+  },
+  ".claude/skills/huashu-design/scripts/narrate-pipeline.mjs": {
+    "mtime": 1789369632.896091,
+    "seen": 1789371009.4776082,
+    "ast_hash": "760ea097cebcb8b0e3e6459f21427ab7",
+    "semantic_hash": "760ea097cebcb8b0e3e6459f21427ab7"
+  },
+  ".claude/skills/huashu-design/scripts/render-narration.sh": {
+    "mtime": 1789369632.897092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "71b2b3fd0eee4a12bc0abc6f5b7636aa",
+    "semantic_hash": "71b2b3fd0eee4a12bc0abc6f5b7636aa"
+  },
+  ".claude/skills/huashu-design/scripts/render-video-seek.js": {
+    "mtime": 1789369632.8980908,
+    "seen": 1789371009.4776082,
+    "ast_hash": "00cc2a5c044d70b893c72d5a7e017afd",
+    "semantic_hash": "00cc2a5c044d70b893c72d5a7e017afd"
+  },
+  ".claude/skills/huashu-design/scripts/render-video.js": {
+    "mtime": 1789369632.8980908,
+    "seen": 1789371009.4776082,
+    "ast_hash": "632bf822d3bd94400b782241d7b40b47",
+    "semantic_hash": "632bf822d3bd94400b782241d7b40b47"
+  },
+  ".claude/skills/huashu-design/scripts/sfx-cues.sh": {
+    "mtime": 1789369632.8980908,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d0e372a6d47517ec11f847a46b4f0294",
+    "semantic_hash": "d0e372a6d47517ec11f847a46b4f0294"
+  },
+  ".claude/skills/huashu-design/scripts/verify-video.sh": {
+    "mtime": 1789369632.8990915,
+    "seen": 1789371009.4776082,
+    "ast_hash": "f69d39bf4eeb11ad89e5e5a7c52275fd",
+    "semantic_hash": "f69d39bf4eeb11ad89e5e5a7c52275fd"
+  },
+  ".claude/skills/huashu-design/scripts/verify.py": {
+    "mtime": 1789369632.8990915,
+    "seen": 1789371009.4776082,
+    "ast_hash": "87661bdc456261134d4156602dfa5cbf",
+    "semantic_hash": "87661bdc456261134d4156602dfa5cbf"
+  },
+  ".claude/skills/huashu-design/test-prompts.json": {
+    "mtime": 1789369632.900092,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0bc41b893c3d30eb9f26fb9d24706fc4",
+    "semantic_hash": "0bc41b893c3d30eb9f26fb9d24706fc4"
+  },
+  "skills-lock.json": {
+    "mtime": 1789369665.280578,
+    "seen": 1789371009.4776082,
+    "ast_hash": "335a61f24c6de56238f5b521c8413d6b",
+    "semantic_hash": "335a61f24c6de56238f5b521c8413d6b"
+  },
+  ".agents/skills/huashu-design/assets/bgm-ad.mp3": {
+    "mtime": 1789369632.6287658,
+    "seen": 1789371009.4776082,
+    "ast_hash": "6db2ace059c7ae6a739ed10493e09fc0",
+    "semantic_hash": "6db2ace059c7ae6a739ed10493e09fc0"
+  },
+  ".agents/skills/huashu-design/assets/bgm-educational-alt.mp3": {
+    "mtime": 1789369632.6578095,
+    "seen": 1789371009.4776082,
+    "ast_hash": "8048d4ba32c8453f7f3863b806b4ad8d",
+    "semantic_hash": "8048d4ba32c8453f7f3863b806b4ad8d"
+  },
+  ".agents/skills/huashu-design/assets/bgm-educational.mp3": {
+    "mtime": 1789369632.6804347,
+    "seen": 1789371009.4776082,
+    "ast_hash": "547191cfbb3002093ccb7640463b979a",
+    "semantic_hash": "547191cfbb3002093ccb7640463b979a"
+  },
+  ".agents/skills/huashu-design/assets/bgm-tech.mp3": {
+    "mtime": 1789369632.7140975,
+    "seen": 1789371009.4776082,
+    "ast_hash": "c8481c0ac994dcdcae9b471bbb5038ee",
+    "semantic_hash": "c8481c0ac994dcdcae9b471bbb5038ee"
+  },
+  ".agents/skills/huashu-design/assets/bgm-tutorial-alt.mp3": {
+    "mtime": 1789369632.74159,
+    "seen": 1789371009.4776082,
+    "ast_hash": "3c62ebec1779c548e299a8b10b8cfc1a",
+    "semantic_hash": "3c62ebec1779c548e299a8b10b8cfc1a"
+  },
+  ".agents/skills/huashu-design/assets/bgm-tutorial.mp3": {
+    "mtime": 1789369632.7777162,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d633d7ff98b807f890999e5a2fcfe96d",
+    "semantic_hash": "d633d7ff98b807f890999e5a2fcfe96d"
+  },
+  ".agents/skills/huashu-design/assets/sfx/container/card-flip.mp3": {
+    "mtime": 1789369632.785249,
+    "seen": 1789371009.4776082,
+    "ast_hash": "12420c52972f5be6a923456c9626b37d",
+    "semantic_hash": "12420c52972f5be6a923456c9626b37d"
+  },
+  ".agents/skills/huashu-design/assets/sfx/container/card-snap.mp3": {
+    "mtime": 1789369632.785249,
+    "seen": 1789371009.4776082,
+    "ast_hash": "27cbb5dc45241726030e4f456ab971bd",
+    "semantic_hash": "27cbb5dc45241726030e4f456ab971bd"
+  },
+  ".agents/skills/huashu-design/assets/sfx/container/modal-open.mp3": {
+    "mtime": 1789369632.7862477,
+    "seen": 1789371009.4776082,
+    "ast_hash": "69c787d7e53958fb7baa33c484e8c070",
+    "semantic_hash": "69c787d7e53958fb7baa33c484e8c070"
+  },
+  ".agents/skills/huashu-design/assets/sfx/container/stack-collapse.mp3": {
+    "mtime": 1789369632.7862477,
+    "seen": 1789371009.4776082,
+    "ast_hash": "ade954877ca28a147f7e08b5872d4333",
+    "semantic_hash": "ade954877ca28a147f7e08b5872d4333"
+  },
+  ".agents/skills/huashu-design/assets/sfx/feedback/achievement.mp3": {
+    "mtime": 1789369632.7872477,
+    "seen": 1789371009.4776082,
+    "ast_hash": "b82bf318379ec749a47dd81b8a240cf6",
+    "semantic_hash": "b82bf318379ec749a47dd81b8a240cf6"
+  },
+  ".agents/skills/huashu-design/assets/sfx/feedback/error-tone.mp3": {
+    "mtime": 1789369632.788247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "cd09a9a9339fcd9ba2278899b8395ca1",
+    "semantic_hash": "cd09a9a9339fcd9ba2278899b8395ca1"
+  },
+  ".agents/skills/huashu-design/assets/sfx/feedback/notification-pop.mp3": {
+    "mtime": 1789369632.7892468,
+    "seen": 1789371009.4776082,
+    "ast_hash": "69dddfc3ccade268b7d8a290cfbb2448",
+    "semantic_hash": "69dddfc3ccade268b7d8a290cfbb2448"
+  },
+  ".agents/skills/huashu-design/assets/sfx/feedback/success-chime.mp3": {
+    "mtime": 1789369632.7892468,
+    "seen": 1789371009.4776082,
+    "ast_hash": "ad039e7abfc5ecb0c32161d63cb61b8d",
+    "semantic_hash": "ad039e7abfc5ecb0c32161d63cb61b8d"
+  },
+  ".agents/skills/huashu-design/assets/sfx/impact/brand-stamp.mp3": {
+    "mtime": 1789369632.7902482,
+    "seen": 1789371009.4776082,
+    "ast_hash": "2b3fac49505d4d364bcccf2a00c04fa4",
+    "semantic_hash": "2b3fac49505d4d364bcccf2a00c04fa4"
+  },
+  ".agents/skills/huashu-design/assets/sfx/impact/drop-thud.mp3": {
+    "mtime": 1789369632.791537,
+    "seen": 1789371009.4776082,
+    "ast_hash": "90183edd34ab5e2ea35671b8f8b045b8",
+    "semantic_hash": "90183edd34ab5e2ea35671b8f8b045b8"
+  },
+  ".agents/skills/huashu-design/assets/sfx/impact/logo-reveal-v2.mp3": {
+    "mtime": 1789369632.791537,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e91971d6df642ff5af76627931e13591",
+    "semantic_hash": "e91971d6df642ff5af76627931e13591"
+  },
+  ".agents/skills/huashu-design/assets/sfx/impact/logo-reveal.mp3": {
+    "mtime": 1789369632.7925313,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e91971d6df642ff5af76627931e13591",
+    "semantic_hash": "e91971d6df642ff5af76627931e13591"
+  },
+  ".agents/skills/huashu-design/assets/sfx/keyboard/delete-key.mp3": {
+    "mtime": 1789369632.793531,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0939ebdf0e1439aaf79834d3fc6c8c99",
+    "semantic_hash": "0939ebdf0e1439aaf79834d3fc6c8c99"
+  },
+  ".agents/skills/huashu-design/assets/sfx/keyboard/enter.mp3": {
+    "mtime": 1789369632.7945316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "ac50d42d8fa0f0d3135404b86e617811",
+    "semantic_hash": "ac50d42d8fa0f0d3135404b86e617811"
+  },
+  ".agents/skills/huashu-design/assets/sfx/keyboard/space-tap.mp3": {
+    "mtime": 1789369632.7945316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "10d6886cc07c03a517c6c698f0eb3948",
+    "semantic_hash": "10d6886cc07c03a517c6c698f0eb3948"
+  },
+  ".agents/skills/huashu-design/assets/sfx/keyboard/type-fast.mp3": {
+    "mtime": 1789369632.795534,
+    "seen": 1789371009.4776082,
+    "ast_hash": "87d1d6a344185ebc7bb9a80d042817a8",
+    "semantic_hash": "87d1d6a344185ebc7bb9a80d042817a8"
+  },
+  ".agents/skills/huashu-design/assets/sfx/keyboard/type.mp3": {
+    "mtime": 1789369632.795534,
+    "seen": 1789371009.4776082,
+    "ast_hash": "5aedc785ce284cf288b5d71333c80ac2",
+    "semantic_hash": "5aedc785ce284cf288b5d71333c80ac2"
+  },
+  ".agents/skills/huashu-design/assets/sfx/magic/ai-process.mp3": {
+    "mtime": 1789369632.7965312,
+    "seen": 1789371009.4776082,
+    "ast_hash": "bc334cc7dd339a1a4c2aefff86138a3c",
+    "semantic_hash": "bc334cc7dd339a1a4c2aefff86138a3c"
+  },
+  ".agents/skills/huashu-design/assets/sfx/magic/sparkle.mp3": {
+    "mtime": 1789369632.7975316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "31243a92b82602b0050857409628c2fe",
+    "semantic_hash": "31243a92b82602b0050857409628c2fe"
+  },
+  ".agents/skills/huashu-design/assets/sfx/magic/transform.mp3": {
+    "mtime": 1789369632.7975316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "87220625825742167c114052d2e49dd4",
+    "semantic_hash": "87220625825742167c114052d2e49dd4"
+  },
+  ".agents/skills/huashu-design/assets/sfx/progress/complete-done.mp3": {
+    "mtime": 1789369632.7985306,
+    "seen": 1789371009.4776082,
+    "ast_hash": "3ae5c57cfac31125c6a263b5caf8b6fa",
+    "semantic_hash": "3ae5c57cfac31125c6a263b5caf8b6fa"
+  },
+  ".agents/skills/huashu-design/assets/sfx/progress/generate-start.mp3": {
+    "mtime": 1789369632.7985306,
+    "seen": 1789371009.4776082,
+    "ast_hash": "f23ce491954affbdcd21271fe5a283d5",
+    "semantic_hash": "f23ce491954affbdcd21271fe5a283d5"
+  },
+  ".agents/skills/huashu-design/assets/sfx/progress/loading-tick.mp3": {
+    "mtime": 1789369632.8000338,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d1917482e87574e310884715055602c1",
+    "semantic_hash": "d1917482e87574e310884715055602c1"
+  },
+  ".agents/skills/huashu-design/assets/sfx/terminal/command-execute.mp3": {
+    "mtime": 1789369632.8000338,
+    "seen": 1789371009.4776082,
+    "ast_hash": "7fa8abe4514edfd5c995617616925aa8",
+    "semantic_hash": "7fa8abe4514edfd5c995617616925aa8"
+  },
+  ".agents/skills/huashu-design/assets/sfx/terminal/cursor-blink.mp3": {
+    "mtime": 1789369632.801039,
+    "seen": 1789371009.4776082,
+    "ast_hash": "7dddbe25a97e615062eeeed791b9978a",
+    "semantic_hash": "7dddbe25a97e615062eeeed791b9978a"
+  },
+  ".agents/skills/huashu-design/assets/sfx/terminal/output-appear.mp3": {
+    "mtime": 1789369632.801039,
+    "seen": 1789371009.4776082,
+    "ast_hash": "b07a34e2f8ab66b632f5e2f1f2da949e",
+    "semantic_hash": "b07a34e2f8ab66b632f5e2f1f2da949e"
+  },
+  ".agents/skills/huashu-design/assets/sfx/transition/dissolve.mp3": {
+    "mtime": 1789369632.8020387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "2106f172b63ba890a05fb506165dff27",
+    "semantic_hash": "2106f172b63ba890a05fb506165dff27"
+  },
+  ".agents/skills/huashu-design/assets/sfx/transition/slide-in.mp3": {
+    "mtime": 1789369632.8020387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "1b87f9f84ee32d16fd722fd7730befac",
+    "semantic_hash": "1b87f9f84ee32d16fd722fd7730befac"
+  },
+  ".agents/skills/huashu-design/assets/sfx/transition/swipe-horizontal.mp3": {
+    "mtime": 1789369632.8030386,
+    "seen": 1789371009.4776082,
+    "ast_hash": "297fc5858d395356cbade6d1162b6f74",
+    "semantic_hash": "297fc5858d395356cbade6d1162b6f74"
+  },
+  ".agents/skills/huashu-design/assets/sfx/transition/whoosh-fast.mp3": {
+    "mtime": 1789369632.8030386,
+    "seen": 1789371009.4776082,
+    "ast_hash": "3434664911e67dbda96a0c16ca79d6ac",
+    "semantic_hash": "3434664911e67dbda96a0c16ca79d6ac"
+  },
+  ".agents/skills/huashu-design/assets/sfx/transition/whoosh.mp3": {
+    "mtime": 1789369632.804039,
+    "seen": 1789371009.4776082,
+    "ast_hash": "a93a2121d83a84c727b2fee04c2a38eb",
+    "semantic_hash": "a93a2121d83a84c727b2fee04c2a38eb"
+  },
+  ".agents/skills/huashu-design/assets/sfx/ui/click-soft.mp3": {
+    "mtime": 1789369632.8050387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0b227527dde3315d0bdabca9e5d84dd1",
+    "semantic_hash": "0b227527dde3315d0bdabca9e5d84dd1"
+  },
+  ".agents/skills/huashu-design/assets/sfx/ui/click.mp3": {
+    "mtime": 1789369632.8050387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "1bcbd3c0d93b863fd26a87f1235bcc7a",
+    "semantic_hash": "1bcbd3c0d93b863fd26a87f1235bcc7a"
+  },
+  ".agents/skills/huashu-design/assets/sfx/ui/focus.mp3": {
+    "mtime": 1789369632.8050387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "61d1fac081d1e99cc65d183d6f712267",
+    "semantic_hash": "61d1fac081d1e99cc65d183d6f712267"
+  },
+  ".agents/skills/huashu-design/assets/sfx/ui/hover-subtle.mp3": {
+    "mtime": 1789369632.8060386,
+    "seen": 1789371009.4776082,
+    "ast_hash": "a2e38b1f2c869cfb233e612ddce5c3d4",
+    "semantic_hash": "a2e38b1f2c869cfb233e612ddce5c3d4"
+  },
+  ".agents/skills/huashu-design/assets/sfx/ui/tap-finger.mp3": {
+    "mtime": 1789369632.8070428,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e7b650aac8a5ce893dc3249aee340154",
+    "semantic_hash": "e7b650aac8a5ce893dc3249aee340154"
+  },
+  ".agents/skills/huashu-design/assets/sfx/ui/toggle-on.mp3": {
+    "mtime": 1789369632.8070428,
+    "seen": 1789371009.4776082,
+    "ast_hash": "48df5d46fda59d547ce347fad4a7a204",
+    "semantic_hash": "48df5d46fda59d547ce347fad4a7a204"
+  },
+  ".claude/skills/huashu-design/assets/bgm-ad.mp3": {
+    "mtime": 1789369632.6287658,
+    "seen": 1789371009.4776082,
+    "ast_hash": "6db2ace059c7ae6a739ed10493e09fc0",
+    "semantic_hash": "6db2ace059c7ae6a739ed10493e09fc0"
+  },
+  ".claude/skills/huashu-design/assets/bgm-educational-alt.mp3": {
+    "mtime": 1789369632.6578095,
+    "seen": 1789371009.4776082,
+    "ast_hash": "8048d4ba32c8453f7f3863b806b4ad8d",
+    "semantic_hash": "8048d4ba32c8453f7f3863b806b4ad8d"
+  },
+  ".claude/skills/huashu-design/assets/bgm-educational.mp3": {
+    "mtime": 1789369632.6804347,
+    "seen": 1789371009.4776082,
+    "ast_hash": "547191cfbb3002093ccb7640463b979a",
+    "semantic_hash": "547191cfbb3002093ccb7640463b979a"
+  },
+  ".claude/skills/huashu-design/assets/bgm-tech.mp3": {
+    "mtime": 1789369632.7140975,
+    "seen": 1789371009.4776082,
+    "ast_hash": "c8481c0ac994dcdcae9b471bbb5038ee",
+    "semantic_hash": "c8481c0ac994dcdcae9b471bbb5038ee"
+  },
+  ".claude/skills/huashu-design/assets/bgm-tutorial-alt.mp3": {
+    "mtime": 1789369632.74159,
+    "seen": 1789371009.4776082,
+    "ast_hash": "3c62ebec1779c548e299a8b10b8cfc1a",
+    "semantic_hash": "3c62ebec1779c548e299a8b10b8cfc1a"
+  },
+  ".claude/skills/huashu-design/assets/bgm-tutorial.mp3": {
+    "mtime": 1789369632.7777162,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d633d7ff98b807f890999e5a2fcfe96d",
+    "semantic_hash": "d633d7ff98b807f890999e5a2fcfe96d"
+  },
+  ".claude/skills/huashu-design/assets/sfx/container/card-flip.mp3": {
+    "mtime": 1789369632.785249,
+    "seen": 1789371009.4776082,
+    "ast_hash": "12420c52972f5be6a923456c9626b37d",
+    "semantic_hash": "12420c52972f5be6a923456c9626b37d"
+  },
+  ".claude/skills/huashu-design/assets/sfx/container/card-snap.mp3": {
+    "mtime": 1789369632.785249,
+    "seen": 1789371009.4776082,
+    "ast_hash": "27cbb5dc45241726030e4f456ab971bd",
+    "semantic_hash": "27cbb5dc45241726030e4f456ab971bd"
+  },
+  ".claude/skills/huashu-design/assets/sfx/container/modal-open.mp3": {
+    "mtime": 1789369632.7862477,
+    "seen": 1789371009.4776082,
+    "ast_hash": "69c787d7e53958fb7baa33c484e8c070",
+    "semantic_hash": "69c787d7e53958fb7baa33c484e8c070"
+  },
+  ".claude/skills/huashu-design/assets/sfx/container/stack-collapse.mp3": {
+    "mtime": 1789369632.7862477,
+    "seen": 1789371009.4776082,
+    "ast_hash": "ade954877ca28a147f7e08b5872d4333",
+    "semantic_hash": "ade954877ca28a147f7e08b5872d4333"
+  },
+  ".claude/skills/huashu-design/assets/sfx/feedback/achievement.mp3": {
+    "mtime": 1789369632.7872477,
+    "seen": 1789371009.4776082,
+    "ast_hash": "b82bf318379ec749a47dd81b8a240cf6",
+    "semantic_hash": "b82bf318379ec749a47dd81b8a240cf6"
+  },
+  ".claude/skills/huashu-design/assets/sfx/feedback/error-tone.mp3": {
+    "mtime": 1789369632.788247,
+    "seen": 1789371009.4776082,
+    "ast_hash": "cd09a9a9339fcd9ba2278899b8395ca1",
+    "semantic_hash": "cd09a9a9339fcd9ba2278899b8395ca1"
+  },
+  ".claude/skills/huashu-design/assets/sfx/feedback/notification-pop.mp3": {
+    "mtime": 1789369632.7892468,
+    "seen": 1789371009.4776082,
+    "ast_hash": "69dddfc3ccade268b7d8a290cfbb2448",
+    "semantic_hash": "69dddfc3ccade268b7d8a290cfbb2448"
+  },
+  ".claude/skills/huashu-design/assets/sfx/feedback/success-chime.mp3": {
+    "mtime": 1789369632.7892468,
+    "seen": 1789371009.4776082,
+    "ast_hash": "ad039e7abfc5ecb0c32161d63cb61b8d",
+    "semantic_hash": "ad039e7abfc5ecb0c32161d63cb61b8d"
+  },
+  ".claude/skills/huashu-design/assets/sfx/impact/brand-stamp.mp3": {
+    "mtime": 1789369632.7902482,
+    "seen": 1789371009.4776082,
+    "ast_hash": "2b3fac49505d4d364bcccf2a00c04fa4",
+    "semantic_hash": "2b3fac49505d4d364bcccf2a00c04fa4"
+  },
+  ".claude/skills/huashu-design/assets/sfx/impact/drop-thud.mp3": {
+    "mtime": 1789369632.791537,
+    "seen": 1789371009.4776082,
+    "ast_hash": "90183edd34ab5e2ea35671b8f8b045b8",
+    "semantic_hash": "90183edd34ab5e2ea35671b8f8b045b8"
+  },
+  ".claude/skills/huashu-design/assets/sfx/impact/logo-reveal-v2.mp3": {
+    "mtime": 1789369632.791537,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e91971d6df642ff5af76627931e13591",
+    "semantic_hash": "e91971d6df642ff5af76627931e13591"
+  },
+  ".claude/skills/huashu-design/assets/sfx/impact/logo-reveal.mp3": {
+    "mtime": 1789369632.7925313,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e91971d6df642ff5af76627931e13591",
+    "semantic_hash": "e91971d6df642ff5af76627931e13591"
+  },
+  ".claude/skills/huashu-design/assets/sfx/keyboard/delete-key.mp3": {
+    "mtime": 1789369632.793531,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0939ebdf0e1439aaf79834d3fc6c8c99",
+    "semantic_hash": "0939ebdf0e1439aaf79834d3fc6c8c99"
+  },
+  ".claude/skills/huashu-design/assets/sfx/keyboard/enter.mp3": {
+    "mtime": 1789369632.7945316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "ac50d42d8fa0f0d3135404b86e617811",
+    "semantic_hash": "ac50d42d8fa0f0d3135404b86e617811"
+  },
+  ".claude/skills/huashu-design/assets/sfx/keyboard/space-tap.mp3": {
+    "mtime": 1789369632.7945316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "10d6886cc07c03a517c6c698f0eb3948",
+    "semantic_hash": "10d6886cc07c03a517c6c698f0eb3948"
+  },
+  ".claude/skills/huashu-design/assets/sfx/keyboard/type-fast.mp3": {
+    "mtime": 1789369632.795534,
+    "seen": 1789371009.4776082,
+    "ast_hash": "87d1d6a344185ebc7bb9a80d042817a8",
+    "semantic_hash": "87d1d6a344185ebc7bb9a80d042817a8"
+  },
+  ".claude/skills/huashu-design/assets/sfx/keyboard/type.mp3": {
+    "mtime": 1789369632.795534,
+    "seen": 1789371009.4776082,
+    "ast_hash": "5aedc785ce284cf288b5d71333c80ac2",
+    "semantic_hash": "5aedc785ce284cf288b5d71333c80ac2"
+  },
+  ".claude/skills/huashu-design/assets/sfx/magic/ai-process.mp3": {
+    "mtime": 1789369632.7965312,
+    "seen": 1789371009.4776082,
+    "ast_hash": "bc334cc7dd339a1a4c2aefff86138a3c",
+    "semantic_hash": "bc334cc7dd339a1a4c2aefff86138a3c"
+  },
+  ".claude/skills/huashu-design/assets/sfx/magic/sparkle.mp3": {
+    "mtime": 1789369632.7975316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "31243a92b82602b0050857409628c2fe",
+    "semantic_hash": "31243a92b82602b0050857409628c2fe"
+  },
+  ".claude/skills/huashu-design/assets/sfx/magic/transform.mp3": {
+    "mtime": 1789369632.7975316,
+    "seen": 1789371009.4776082,
+    "ast_hash": "87220625825742167c114052d2e49dd4",
+    "semantic_hash": "87220625825742167c114052d2e49dd4"
+  },
+  ".claude/skills/huashu-design/assets/sfx/progress/complete-done.mp3": {
+    "mtime": 1789369632.7985306,
+    "seen": 1789371009.4776082,
+    "ast_hash": "3ae5c57cfac31125c6a263b5caf8b6fa",
+    "semantic_hash": "3ae5c57cfac31125c6a263b5caf8b6fa"
+  },
+  ".claude/skills/huashu-design/assets/sfx/progress/generate-start.mp3": {
+    "mtime": 1789369632.7985306,
+    "seen": 1789371009.4776082,
+    "ast_hash": "f23ce491954affbdcd21271fe5a283d5",
+    "semantic_hash": "f23ce491954affbdcd21271fe5a283d5"
+  },
+  ".claude/skills/huashu-design/assets/sfx/progress/loading-tick.mp3": {
+    "mtime": 1789369632.8000338,
+    "seen": 1789371009.4776082,
+    "ast_hash": "d1917482e87574e310884715055602c1",
+    "semantic_hash": "d1917482e87574e310884715055602c1"
+  },
+  ".claude/skills/huashu-design/assets/sfx/terminal/command-execute.mp3": {
+    "mtime": 1789369632.8000338,
+    "seen": 1789371009.4776082,
+    "ast_hash": "7fa8abe4514edfd5c995617616925aa8",
+    "semantic_hash": "7fa8abe4514edfd5c995617616925aa8"
+  },
+  ".claude/skills/huashu-design/assets/sfx/terminal/cursor-blink.mp3": {
+    "mtime": 1789369632.801039,
+    "seen": 1789371009.4776082,
+    "ast_hash": "7dddbe25a97e615062eeeed791b9978a",
+    "semantic_hash": "7dddbe25a97e615062eeeed791b9978a"
+  },
+  ".claude/skills/huashu-design/assets/sfx/terminal/output-appear.mp3": {
+    "mtime": 1789369632.801039,
+    "seen": 1789371009.4776082,
+    "ast_hash": "b07a34e2f8ab66b632f5e2f1f2da949e",
+    "semantic_hash": "b07a34e2f8ab66b632f5e2f1f2da949e"
+  },
+  ".claude/skills/huashu-design/assets/sfx/transition/dissolve.mp3": {
+    "mtime": 1789369632.8020387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "2106f172b63ba890a05fb506165dff27",
+    "semantic_hash": "2106f172b63ba890a05fb506165dff27"
+  },
+  ".claude/skills/huashu-design/assets/sfx/transition/slide-in.mp3": {
+    "mtime": 1789369632.8020387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "1b87f9f84ee32d16fd722fd7730befac",
+    "semantic_hash": "1b87f9f84ee32d16fd722fd7730befac"
+  },
+  ".claude/skills/huashu-design/assets/sfx/transition/swipe-horizontal.mp3": {
+    "mtime": 1789369632.8030386,
+    "seen": 1789371009.4776082,
+    "ast_hash": "297fc5858d395356cbade6d1162b6f74",
+    "semantic_hash": "297fc5858d395356cbade6d1162b6f74"
+  },
+  ".claude/skills/huashu-design/assets/sfx/transition/whoosh-fast.mp3": {
+    "mtime": 1789369632.8030386,
+    "seen": 1789371009.4776082,
+    "ast_hash": "3434664911e67dbda96a0c16ca79d6ac",
+    "semantic_hash": "3434664911e67dbda96a0c16ca79d6ac"
+  },
+  ".claude/skills/huashu-design/assets/sfx/transition/whoosh.mp3": {
+    "mtime": 1789369632.804039,
+    "seen": 1789371009.4776082,
+    "ast_hash": "a93a2121d83a84c727b2fee04c2a38eb",
+    "semantic_hash": "a93a2121d83a84c727b2fee04c2a38eb"
+  },
+  ".claude/skills/huashu-design/assets/sfx/ui/click-soft.mp3": {
+    "mtime": 1789369632.8050387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "0b227527dde3315d0bdabca9e5d84dd1",
+    "semantic_hash": "0b227527dde3315d0bdabca9e5d84dd1"
+  },
+  ".claude/skills/huashu-design/assets/sfx/ui/click.mp3": {
+    "mtime": 1789369632.8050387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "1bcbd3c0d93b863fd26a87f1235bcc7a",
+    "semantic_hash": "1bcbd3c0d93b863fd26a87f1235bcc7a"
+  },
+  ".claude/skills/huashu-design/assets/sfx/ui/focus.mp3": {
+    "mtime": 1789369632.8050387,
+    "seen": 1789371009.4776082,
+    "ast_hash": "61d1fac081d1e99cc65d183d6f712267",
+    "semantic_hash": "61d1fac081d1e99cc65d183d6f712267"
+  },
+  ".claude/skills/huashu-design/assets/sfx/ui/hover-subtle.mp3": {
+    "mtime": 1789369632.8060386,
+    "seen": 1789371009.4776082,
+    "ast_hash": "a2e38b1f2c869cfb233e612ddce5c3d4",
+    "semantic_hash": "a2e38b1f2c869cfb233e612ddce5c3d4"
+  },
+  ".claude/skills/huashu-design/assets/sfx/ui/tap-finger.mp3": {
+    "mtime": 1789369632.8070428,
+    "seen": 1789371009.4776082,
+    "ast_hash": "e7b650aac8a5ce893dc3249aee340154",
+    "semantic_hash": "e7b650aac8a5ce893dc3249aee340154"
+  },
+  ".claude/skills/huashu-design/assets/sfx/ui/toggle-on.mp3": {
+    "mtime": 1789369632.8070428,
+    "seen": 1789371009.4776082,
+    "ast_hash": "48df5d46fda59d547ce347fad4a7a204",
+    "semantic_hash": "48df5d46fda59d547ce347fad4a7a204"
+  },
+  "Pomodoro-iOS-Prototype/assets/ios_frame.jsx": {
+    "mtime": 1789373952.5277357,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4b47e0bb1902ee6a0a4d5ffb09f2545c",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/README.en.md": {
+    "mtime": 1789369632.5919938,
+    "seen": 1789374924.7345698,
+    "ast_hash": "a2740119cd8bc7d60b65b7ed6e0760bd",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/README.md": {
+    "mtime": 1789369965.2108388,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4bb545b115dd026fcd8117f8552b0a2e",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/SECURITY.md": {
+    "mtime": 1789369974.245917,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6d46e0b9b6b9132152017a3985cf96ef",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/SKILL.md": {
+    "mtime": 1789369897.018939,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c888a73fb4bdf9c21b501172e72a5840",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/deck_index.html": {
+    "mtime": 1789369632.7787156,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5d95c097ef8ad5a5ef9c44ba079d8c4a",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/director-notes-samples/launch-film-30s-sample.md": {
+    "mtime": 1789369632.782247,
+    "seen": 1789374924.7345698,
+    "ast_hash": "28f53c03c1ecfcdfba519a7ba69bc8ea",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/INDEX.md": {
+    "mtime": 1789369632.8080387,
+    "seen": 1789374924.7345698,
+    "ast_hash": "cb0a69523055d739fa4f60c0dcb6e931",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/cover/cover-build.html": {
+    "mtime": 1789369632.8090396,
+    "seen": 1789374924.7345698,
+    "ast_hash": "35dcda22d92952ac0f3dc1bae85ce42d",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/cover/cover-pentagram.html": {
+    "mtime": 1789369632.8100398,
+    "seen": 1789374924.7345698,
+    "ast_hash": "154d9e333de67b7a86e5b1e555e43fe2",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/cover/cover-takram.html": {
+    "mtime": 1789369632.8113284,
+    "seen": 1789374924.7345698,
+    "ast_hash": "bccb60369e1c959892a9973cd39e3126",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/infographic/infographic-build.html": {
+    "mtime": 1789369632.8133318,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4c21375bc00cf461e97260c9b7d2ab24",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/infographic/infographic-pentagram.html": {
+    "mtime": 1789369632.8153317,
+    "seen": 1789374924.7345698,
+    "ast_hash": "930d906dc7e5534758da2dfb0df5dfda",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/infographic/infographic-takram.html": {
+    "mtime": 1789369632.8173418,
+    "seen": 1789374924.7345698,
+    "ast_hash": "088ddf4305a248a58b43773c312a74d6",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/ppt/ppt-build.html": {
+    "mtime": 1789369632.8203506,
+    "seen": 1789374924.7345698,
+    "ast_hash": "db2e3304a0500b3e81ccd3b1631f1dda",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/ppt/ppt-pentagram.html": {
+    "mtime": 1789369632.821599,
+    "seen": 1789374924.7345698,
+    "ast_hash": "afd3e9025a881b38d56429ab6a906f43",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/ppt/ppt-takram.html": {
+    "mtime": 1789369632.8237963,
+    "seen": 1789374924.7345698,
+    "ast_hash": "db1cfa0e9f0ec867ffe1db1a186dc122",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-nav/ainav-build.html": {
+    "mtime": 1789369632.828795,
+    "seen": 1789374924.7345698,
+    "ast_hash": "70e65d62f1cdd5ed98d8153c4799fc69",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-nav/ainav-pentagram.html": {
+    "mtime": 1789369632.8302977,
+    "seen": 1789374924.7345698,
+    "ast_hash": "07e7d37c1065e7c6b83efd0749f27c91",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-nav/ainav-takram.html": {
+    "mtime": 1789369632.8313024,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6dc3f668bfc0991d6e5013427aa0230c",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-build.html": {
+    "mtime": 1789369632.8333025,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c35517c0bd4312d45ef1827d43c4cedf",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-pentagram.html": {
+    "mtime": 1789369632.8353312,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e4a4068940fd1e6d633f7368f43a72cb",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-takram.html": {
+    "mtime": 1789369632.8375926,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d029d5e00cac427a21a8db64f305f3c7",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-devdocs/devdocs-build.html": {
+    "mtime": 1789369632.8401012,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e4ed7f187dec94767e51a4d2018c9d6c",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-devdocs/devdocs-pentagram.html": {
+    "mtime": 1789369632.8421054,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f95c8e86c926b660baf965744ad88135",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-devdocs/devdocs-takram.html": {
+    "mtime": 1789369632.8441055,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4429a610ff8abadbd2c0b53bb8a42f0d",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-homepage/homepage-build.html": {
+    "mtime": 1789369632.8451045,
+    "seen": 1789374924.7345698,
+    "ast_hash": "20032640278d12539375fb7ea21e3437",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-homepage/homepage-pentagram.html": {
+    "mtime": 1789369632.8466072,
+    "seen": 1789374924.7345698,
+    "ast_hash": "587add041e60960792abe802f5512174",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-homepage/homepage-takram.html": {
+    "mtime": 1789369632.8486123,
+    "seen": 1789374924.7345698,
+    "ast_hash": "ab4ea0d855499febf36c060125d831c4",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-saas/saas-build.html": {
+    "mtime": 1789369632.8501158,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d9f1e94d76da9d4afad85951c4c8fb97",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-saas/saas-pentagram.html": {
+    "mtime": 1789369632.8517396,
+    "seen": 1789374924.7345698,
+    "ast_hash": "effe4dbb5ccac838747b6afaf41fb1cb",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-saas/saas-takram.html": {
+    "mtime": 1789369632.8537436,
+    "seen": 1789374924.7345698,
+    "ast_hash": "88159053a1ab3c0d2e0a5bcba25cf041",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c1-ios-prototype-en.html": {
+    "mtime": 1789369632.855744,
+    "seen": 1789374924.7345698,
+    "ast_hash": "699fef77da4f7a71583ba5099b74d0a5",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c1-ios-prototype.html": {
+    "mtime": 1789369632.8572483,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c3a056526e12d9eb8c11f8a276ce0fb0",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c2-slides-pptx-en.html": {
+    "mtime": 1789369632.8582535,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c576e5abb11b39c6ace147d30ffa40b6",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c2-slides-pptx.html": {
+    "mtime": 1789369632.8582535,
+    "seen": 1789374924.7345698,
+    "ast_hash": "7e446e27735ee1a70a3268e89935afd6",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c3-motion-design-en.html": {
+    "mtime": 1789369632.8592525,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c0249b700c748ae0d70a254c047fe867",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c3-motion-design.html": {
+    "mtime": 1789369632.8602526,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f69cb98d6c05a2dce700880da288ca35",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c4-tweaks-en.html": {
+    "mtime": 1789369632.8602526,
+    "seen": 1789374924.7345698,
+    "ast_hash": "724a57dbe03d061f80396191cde5cf78",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c4-tweaks.html": {
+    "mtime": 1789369632.8612692,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3e32ab7cce68aafce611b44f2212a784",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c5-infographic-en.html": {
+    "mtime": 1789369632.8612692,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5fcc59fa6c458506c410fcec73a37845",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c5-infographic.html": {
+    "mtime": 1789369632.8622751,
+    "seen": 1789374924.7345698,
+    "ast_hash": "32886660668388cd9b0b143afc1c543b",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c6-expert-review-en.html": {
+    "mtime": 1789369632.8622751,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f71cd836012cfd28c28030e7dcd4fd3d",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/c6-expert-review.html": {
+    "mtime": 1789369632.8632734,
+    "seen": 1789374924.7345698,
+    "ast_hash": "62c7db3402c5199b0f66a0284e3e5fe1",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/hero-animation-v10-en.html": {
+    "mtime": 1789369632.8632734,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6b568aaa5dd91d4137f19aa8424c3207",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/md-html-narration/md-html-demo.html": {
+    "mtime": 1789369632.8642735,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f0df44b74e37d67b110e63ff1c34d6c9",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/md-html-narration/script.md": {
+    "mtime": 1789369632.865274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "2f1a2c29a3cebc28daa13767654cc4c1",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/voiceover-demo/script.md": {
+    "mtime": 1789369632.865274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "219df18a0c57e254b94944b4dbc70883",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/w1-brand-protocol-en.html": {
+    "mtime": 1789369632.866274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b18c14a2b5c25543709f615dd6d0f977",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/w1-brand-protocol.html": {
+    "mtime": 1789369632.867274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "49f5407ab8b0e32d4081bd6e59d74ad6",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/w2-junior-designer-en.html": {
+    "mtime": 1789369632.868274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "edba62ad6bbcf33e1571ac371d5fca6c",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/w2-junior-designer.html": {
+    "mtime": 1789369632.868274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "17d7ac772e2579719939980b831746e1",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/w3-fallback-advisor-en.html": {
+    "mtime": 1789369632.8692741,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c7aed3c18eef928b2cc79d44284eb8f3",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/demos/w3-fallback-advisor.html": {
+    "mtime": 1789369632.8692741,
+    "seen": 1789374924.7345698,
+    "ast_hash": "626ba9b1e39fe58a46303781bcf81081",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/ai-video-review.md": {
+    "mtime": 1789370224.3282447,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6efb30038fa2e066ece64366d4161ad7",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/animation-best-practices.md": {
+    "mtime": 1789369993.0823696,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5e8e0202657fe77eaf159d06608fa6d4",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/animation-pitfalls.md": {
+    "mtime": 1789370015.044099,
+    "seen": 1789374924.7345698,
+    "ast_hash": "a309f5dc94b574460e0c727fcb1df925",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/animations.md": {
+    "mtime": 1789370024.665779,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d2acfb69899875ccadd4a3e8a0fd50e5",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/app-prototype.md": {
+    "mtime": 1789370369.6672597,
+    "seen": 1789374924.7345698,
+    "ast_hash": "1650a3d16b48b3087a01839948fee2aa",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/apple-gallery-showcase.md": {
+    "mtime": 1789370355.338549,
+    "seen": 1789374924.7345698,
+    "ast_hash": "557e36c5636cc5d9cd5bd0f777fd598d",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/audio-design-rules.md": {
+    "mtime": 1789370181.8124034,
+    "seen": 1789374924.7345698,
+    "ast_hash": "43eae88436726c6248bb9d7c9d8c0384",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/brand-asset-protocol.md": {
+    "mtime": 1789370238.7755964,
+    "seen": 1789374924.7345698,
+    "ast_hash": "39e55e0f126bf617aac8c2fc66e18fae",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/camera-language.md": {
+    "mtime": 1789370046.2065117,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c40552551373452a02b290771a4c0f92",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/cinematic-patterns.md": {
+    "mtime": 1789370058.4285767,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3763d99eff20a66623cf56a7e34200a1",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/content-guidelines.md": {
+    "mtime": 1789370249.0073206,
+    "seen": 1789374924.7345698,
+    "ast_hash": "782c2394e910e7e4089cac87e762cecb",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/critique-guide.md": {
+    "mtime": 1789370437.3848376,
+    "seen": 1789374924.7345698,
+    "ast_hash": "33ad232db1923d1fc6736760b16817c9",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/design-context.md": {
+    "mtime": 1789370259.5271578,
+    "seen": 1789374924.7345698,
+    "ast_hash": "aa863958bc8827f9780c85372a6e3fd8",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/design-styles.md": {
+    "mtime": 1789370315.8655758,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5a47e4d3a2b320fc62172f0a0836af42",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/editable-pptx.md": {
+    "mtime": 1789370410.889929,
+    "seen": 1789374924.7345698,
+    "ast_hash": "37c006bed97e18e45bffcadbbc2d69fb",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/gsap-recipes.md": {
+    "mtime": 1789370083.1472545,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b2390dc7c08065dc76c76db3579f5fe7",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/hero-animation-case-study.md": {
+    "mtime": 1789370146.7544627,
+    "seen": 1789374924.7345698,
+    "ast_hash": "34539e025bf18cb50ee979a8c06cdf35",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/hyperframes-backend.md": {
+    "mtime": 1789370171.5066266,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d6a741402848b5d904b80a497169a174",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/launch-film-director-notes.md": {
+    "mtime": 1789370162.3307185,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e22a1ef527a2f6c3eca4fd7137e2fd15",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/multi-perspective-parallel-case-study.md": {
+    "mtime": 1789370466.601528,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d88194211ec767a4eec5773be4b11efd",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/react-setup.md": {
+    "mtime": 1789370418.7920284,
+    "seen": 1789374924.7345698,
+    "ast_hash": "2c2f8babd5c3971095350e311df27051",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/scene-templates.md": {
+    "mtime": 1789370342.660915,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f2f37d8c3e3704493e366c3b4683b692",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/sfx-library.md": {
+    "mtime": 1789370190.113376,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e9100530b69455651d9439f18b607904",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/slide-decks.md": {
+    "mtime": 1789370399.116192,
+    "seen": 1789374924.7345698,
+    "ast_hash": "93d1d68a6db76df523f601d105310c96",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/storyboard-basics.md": {
+    "mtime": 1789370105.6895943,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c4a043dfd35e52eb6f3c6ee4c19fd585",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/tweaks-system.md": {
+    "mtime": 1789370427.3193257,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b6ac760d415948ea09d685f268efb7e7",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/typography.md": {
+    "mtime": 1789370334.0971358,
+    "seen": 1789374924.7345698,
+    "ast_hash": "acb2a6a4f6bc44d2159e2a98a1280ecc",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/ui-demo-animation.md": {
+    "mtime": 1789370135.7334247,
+    "seen": 1789374924.7345698,
+    "ast_hash": "68219375548e082fe700dab014bcc37b",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/verification.md": {
+    "mtime": 1789370445.268197,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c6cc704079dd81a7f0a655fb6a8914b9",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/video-export.md": {
+    "mtime": 1789370201.408275,
+    "seen": 1789374924.7345698,
+    "ast_hash": "0b126c9b2c5c60355cec92a7ed53cc2c",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/voiceover-pipeline.md": {
+    "mtime": 1789370215.9829347,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d925a760177a1a534eada46aae8d4d8f",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/references/workflow.md": {
+    "mtime": 1789370455.112609,
+    "seen": 1789374924.7345698,
+    "ast_hash": "a3039f5090d2aa5f55fceed7d5cee551",
+    "semantic_hash": ""
+  },
+  ".claude/CLAUDE.md": {
+    "mtime": 1789370685.771971,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c232166e6492ba1ed955030b16979b05",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/SKILL.md": {
+    "mtime": 1789370685.7699778,
+    "seen": 1789374924.7345698,
+    "ast_hash": "2e223eed9c5bb9ec3999615806cf0681",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/add-watch.md": {
+    "mtime": 1788863776.6886046,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d59d027fe449f06aa03905a01184e779",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/exports.md": {
+    "mtime": 1788863776.6886046,
+    "seen": 1789374924.7345698,
+    "ast_hash": "9da2a2152e60a22f07f05fed5158f287",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1788863776.6886046,
+    "seen": 1789374924.7345698,
+    "ast_hash": "42fef56a01698118f7fd722acdadea34",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1788863776.6901088,
+    "seen": 1789374924.7345698,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/hooks.md": {
+    "mtime": 1788863776.6901088,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/query.md": {
+    "mtime": 1788863776.6911142,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3c46f8ad006874260614ed8657d02307",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/transcribe.md": {
+    "mtime": 1788863776.6911142,
+    "seen": 1789374924.7345698,
+    "ast_hash": "67b6a5fa6c0974e18f60db9f8932fbd8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/update.md": {
+    "mtime": 1788863776.6921136,
+    "seen": 1789374924.7345698,
+    "ast_hash": "9378bd03d56baaf78bd738ab3848f142",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/README.en.md": {
+    "mtime": 1789369632.5919938,
+    "seen": 1789374924.7345698,
+    "ast_hash": "a2740119cd8bc7d60b65b7ed6e0760bd",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/README.md": {
+    "mtime": 1789369965.2108388,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4bb545b115dd026fcd8117f8552b0a2e",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/SECURITY.md": {
+    "mtime": 1789369974.245917,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6d46e0b9b6b9132152017a3985cf96ef",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/SKILL.md": {
+    "mtime": 1789369897.018939,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c888a73fb4bdf9c21b501172e72a5840",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/deck_index.html": {
+    "mtime": 1789369632.7787156,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5d95c097ef8ad5a5ef9c44ba079d8c4a",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/director-notes-samples/launch-film-30s-sample.md": {
+    "mtime": 1789369632.782247,
+    "seen": 1789374924.7345698,
+    "ast_hash": "28f53c03c1ecfcdfba519a7ba69bc8ea",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/INDEX.md": {
+    "mtime": 1789369632.8080387,
+    "seen": 1789374924.7345698,
+    "ast_hash": "cb0a69523055d739fa4f60c0dcb6e931",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/cover/cover-build.html": {
+    "mtime": 1789369632.8090396,
+    "seen": 1789374924.7345698,
+    "ast_hash": "35dcda22d92952ac0f3dc1bae85ce42d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/cover/cover-pentagram.html": {
+    "mtime": 1789369632.8100398,
+    "seen": 1789374924.7345698,
+    "ast_hash": "154d9e333de67b7a86e5b1e555e43fe2",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/cover/cover-takram.html": {
+    "mtime": 1789369632.8113284,
+    "seen": 1789374924.7345698,
+    "ast_hash": "bccb60369e1c959892a9973cd39e3126",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/infographic/infographic-build.html": {
+    "mtime": 1789369632.8133318,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4c21375bc00cf461e97260c9b7d2ab24",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/infographic/infographic-pentagram.html": {
+    "mtime": 1789369632.8153317,
+    "seen": 1789374924.7345698,
+    "ast_hash": "930d906dc7e5534758da2dfb0df5dfda",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/infographic/infographic-takram.html": {
+    "mtime": 1789369632.8173418,
+    "seen": 1789374924.7345698,
+    "ast_hash": "088ddf4305a248a58b43773c312a74d6",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/ppt/ppt-build.html": {
+    "mtime": 1789369632.8203506,
+    "seen": 1789374924.7345698,
+    "ast_hash": "db2e3304a0500b3e81ccd3b1631f1dda",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/ppt/ppt-pentagram.html": {
+    "mtime": 1789369632.821599,
+    "seen": 1789374924.7345698,
+    "ast_hash": "afd3e9025a881b38d56429ab6a906f43",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/ppt/ppt-takram.html": {
+    "mtime": 1789369632.8237963,
+    "seen": 1789374924.7345698,
+    "ast_hash": "db1cfa0e9f0ec867ffe1db1a186dc122",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-nav/ainav-build.html": {
+    "mtime": 1789369632.828795,
+    "seen": 1789374924.7345698,
+    "ast_hash": "70e65d62f1cdd5ed98d8153c4799fc69",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-nav/ainav-pentagram.html": {
+    "mtime": 1789369632.8302977,
+    "seen": 1789374924.7345698,
+    "ast_hash": "07e7d37c1065e7c6b83efd0749f27c91",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-nav/ainav-takram.html": {
+    "mtime": 1789369632.8313024,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6dc3f668bfc0991d6e5013427aa0230c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-build.html": {
+    "mtime": 1789369632.8333025,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c35517c0bd4312d45ef1827d43c4cedf",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-pentagram.html": {
+    "mtime": 1789369632.8353312,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e4a4068940fd1e6d633f7368f43a72cb",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-takram.html": {
+    "mtime": 1789369632.8375926,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d029d5e00cac427a21a8db64f305f3c7",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-devdocs/devdocs-build.html": {
+    "mtime": 1789369632.8401012,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e4ed7f187dec94767e51a4d2018c9d6c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-devdocs/devdocs-pentagram.html": {
+    "mtime": 1789369632.8421054,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f95c8e86c926b660baf965744ad88135",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-devdocs/devdocs-takram.html": {
+    "mtime": 1789369632.8441055,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4429a610ff8abadbd2c0b53bb8a42f0d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-homepage/homepage-build.html": {
+    "mtime": 1789369632.8451045,
+    "seen": 1789374924.7345698,
+    "ast_hash": "20032640278d12539375fb7ea21e3437",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-homepage/homepage-pentagram.html": {
+    "mtime": 1789369632.8466072,
+    "seen": 1789374924.7345698,
+    "ast_hash": "587add041e60960792abe802f5512174",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-homepage/homepage-takram.html": {
+    "mtime": 1789369632.8486123,
+    "seen": 1789374924.7345698,
+    "ast_hash": "ab4ea0d855499febf36c060125d831c4",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-saas/saas-build.html": {
+    "mtime": 1789369632.8501158,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d9f1e94d76da9d4afad85951c4c8fb97",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-saas/saas-pentagram.html": {
+    "mtime": 1789369632.8517396,
+    "seen": 1789374924.7345698,
+    "ast_hash": "effe4dbb5ccac838747b6afaf41fb1cb",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-saas/saas-takram.html": {
+    "mtime": 1789369632.8537436,
+    "seen": 1789374924.7345698,
+    "ast_hash": "88159053a1ab3c0d2e0a5bcba25cf041",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c1-ios-prototype-en.html": {
+    "mtime": 1789369632.855744,
+    "seen": 1789374924.7345698,
+    "ast_hash": "699fef77da4f7a71583ba5099b74d0a5",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c1-ios-prototype.html": {
+    "mtime": 1789369632.8572483,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c3a056526e12d9eb8c11f8a276ce0fb0",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c2-slides-pptx-en.html": {
+    "mtime": 1789369632.8582535,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c576e5abb11b39c6ace147d30ffa40b6",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c2-slides-pptx.html": {
+    "mtime": 1789369632.8582535,
+    "seen": 1789374924.7345698,
+    "ast_hash": "7e446e27735ee1a70a3268e89935afd6",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c3-motion-design-en.html": {
+    "mtime": 1789369632.8592525,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c0249b700c748ae0d70a254c047fe867",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c3-motion-design.html": {
+    "mtime": 1789369632.8602526,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f69cb98d6c05a2dce700880da288ca35",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c4-tweaks-en.html": {
+    "mtime": 1789369632.8602526,
+    "seen": 1789374924.7345698,
+    "ast_hash": "724a57dbe03d061f80396191cde5cf78",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c4-tweaks.html": {
+    "mtime": 1789369632.8612692,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3e32ab7cce68aafce611b44f2212a784",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c5-infographic-en.html": {
+    "mtime": 1789369632.8612692,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5fcc59fa6c458506c410fcec73a37845",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c5-infographic.html": {
+    "mtime": 1789369632.8622751,
+    "seen": 1789374924.7345698,
+    "ast_hash": "32886660668388cd9b0b143afc1c543b",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c6-expert-review-en.html": {
+    "mtime": 1789369632.8622751,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f71cd836012cfd28c28030e7dcd4fd3d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/c6-expert-review.html": {
+    "mtime": 1789369632.8632734,
+    "seen": 1789374924.7345698,
+    "ast_hash": "62c7db3402c5199b0f66a0284e3e5fe1",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/hero-animation-v10-en.html": {
+    "mtime": 1789369632.8632734,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6b568aaa5dd91d4137f19aa8424c3207",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/md-html-narration/md-html-demo.html": {
+    "mtime": 1789369632.8642735,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f0df44b74e37d67b110e63ff1c34d6c9",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/md-html-narration/script.md": {
+    "mtime": 1789369632.865274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "2f1a2c29a3cebc28daa13767654cc4c1",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/voiceover-demo/script.md": {
+    "mtime": 1789369632.865274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "219df18a0c57e254b94944b4dbc70883",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/w1-brand-protocol-en.html": {
+    "mtime": 1789369632.866274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b18c14a2b5c25543709f615dd6d0f977",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/w1-brand-protocol.html": {
+    "mtime": 1789369632.867274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "49f5407ab8b0e32d4081bd6e59d74ad6",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/w2-junior-designer-en.html": {
+    "mtime": 1789369632.868274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "edba62ad6bbcf33e1571ac371d5fca6c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/w2-junior-designer.html": {
+    "mtime": 1789369632.868274,
+    "seen": 1789374924.7345698,
+    "ast_hash": "17d7ac772e2579719939980b831746e1",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/w3-fallback-advisor-en.html": {
+    "mtime": 1789369632.8692741,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c7aed3c18eef928b2cc79d44284eb8f3",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/demos/w3-fallback-advisor.html": {
+    "mtime": 1789369632.8692741,
+    "seen": 1789374924.7345698,
+    "ast_hash": "626ba9b1e39fe58a46303781bcf81081",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/ai-video-review.md": {
+    "mtime": 1789370224.3282447,
+    "seen": 1789374924.7345698,
+    "ast_hash": "6efb30038fa2e066ece64366d4161ad7",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/animation-best-practices.md": {
+    "mtime": 1789369993.0823696,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5e8e0202657fe77eaf159d06608fa6d4",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/animation-pitfalls.md": {
+    "mtime": 1789370015.044099,
+    "seen": 1789374924.7345698,
+    "ast_hash": "a309f5dc94b574460e0c727fcb1df925",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/animations.md": {
+    "mtime": 1789370024.665779,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d2acfb69899875ccadd4a3e8a0fd50e5",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/app-prototype.md": {
+    "mtime": 1789370369.6672597,
+    "seen": 1789374924.7345698,
+    "ast_hash": "1650a3d16b48b3087a01839948fee2aa",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/apple-gallery-showcase.md": {
+    "mtime": 1789370355.338549,
+    "seen": 1789374924.7345698,
+    "ast_hash": "557e36c5636cc5d9cd5bd0f777fd598d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/audio-design-rules.md": {
+    "mtime": 1789370181.8124034,
+    "seen": 1789374924.7345698,
+    "ast_hash": "43eae88436726c6248bb9d7c9d8c0384",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/brand-asset-protocol.md": {
+    "mtime": 1789370238.7755964,
+    "seen": 1789374924.7345698,
+    "ast_hash": "39e55e0f126bf617aac8c2fc66e18fae",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/camera-language.md": {
+    "mtime": 1789370046.2065117,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c40552551373452a02b290771a4c0f92",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/cinematic-patterns.md": {
+    "mtime": 1789370058.4285767,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3763d99eff20a66623cf56a7e34200a1",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/content-guidelines.md": {
+    "mtime": 1789370249.0073206,
+    "seen": 1789374924.7345698,
+    "ast_hash": "782c2394e910e7e4089cac87e762cecb",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/critique-guide.md": {
+    "mtime": 1789370437.3848376,
+    "seen": 1789374924.7345698,
+    "ast_hash": "33ad232db1923d1fc6736760b16817c9",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/design-context.md": {
+    "mtime": 1789370259.5271578,
+    "seen": 1789374924.7345698,
+    "ast_hash": "aa863958bc8827f9780c85372a6e3fd8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/design-styles.md": {
+    "mtime": 1789370315.8655758,
+    "seen": 1789374924.7345698,
+    "ast_hash": "5a47e4d3a2b320fc62172f0a0836af42",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/editable-pptx.md": {
+    "mtime": 1789370410.889929,
+    "seen": 1789374924.7345698,
+    "ast_hash": "37c006bed97e18e45bffcadbbc2d69fb",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/gsap-recipes.md": {
+    "mtime": 1789370083.1472545,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b2390dc7c08065dc76c76db3579f5fe7",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/hero-animation-case-study.md": {
+    "mtime": 1789370146.7544627,
+    "seen": 1789374924.7345698,
+    "ast_hash": "34539e025bf18cb50ee979a8c06cdf35",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/hyperframes-backend.md": {
+    "mtime": 1789370171.5066266,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d6a741402848b5d904b80a497169a174",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/launch-film-director-notes.md": {
+    "mtime": 1789370162.3307185,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e22a1ef527a2f6c3eca4fd7137e2fd15",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/multi-perspective-parallel-case-study.md": {
+    "mtime": 1789370466.601528,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d88194211ec767a4eec5773be4b11efd",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/react-setup.md": {
+    "mtime": 1789370418.7920284,
+    "seen": 1789374924.7345698,
+    "ast_hash": "2c2f8babd5c3971095350e311df27051",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/scene-templates.md": {
+    "mtime": 1789370342.660915,
+    "seen": 1789374924.7345698,
+    "ast_hash": "f2f37d8c3e3704493e366c3b4683b692",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/sfx-library.md": {
+    "mtime": 1789370190.113376,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e9100530b69455651d9439f18b607904",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/slide-decks.md": {
+    "mtime": 1789370399.116192,
+    "seen": 1789374924.7345698,
+    "ast_hash": "93d1d68a6db76df523f601d105310c96",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/storyboard-basics.md": {
+    "mtime": 1789370105.6895943,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c4a043dfd35e52eb6f3c6ee4c19fd585",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/tweaks-system.md": {
+    "mtime": 1789370427.3193257,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b6ac760d415948ea09d685f268efb7e7",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/typography.md": {
+    "mtime": 1789370334.0971358,
+    "seen": 1789374924.7345698,
+    "ast_hash": "acb2a6a4f6bc44d2159e2a98a1280ecc",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/ui-demo-animation.md": {
+    "mtime": 1789370135.7334247,
+    "seen": 1789374924.7345698,
+    "ast_hash": "68219375548e082fe700dab014bcc37b",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/verification.md": {
+    "mtime": 1789370445.268197,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c6cc704079dd81a7f0a655fb6a8914b9",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/video-export.md": {
+    "mtime": 1789370201.408275,
+    "seen": 1789374924.7345698,
+    "ast_hash": "0b126c9b2c5c60355cec92a7ed53cc2c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/voiceover-pipeline.md": {
+    "mtime": 1789370215.9829347,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d925a760177a1a534eada46aae8d4d8f",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/references/workflow.md": {
+    "mtime": 1789370455.112609,
+    "seen": 1789374924.7345698,
+    "ast_hash": "a3039f5090d2aa5f55fceed7d5cee551",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1789370685.7819688,
+    "seen": 1789374924.7345698,
+    "ast_hash": "8a6643a420fdad6bfb583523bc6cef16",
+    "semantic_hash": ""
+  },
+  "Pomodoro-iOS-Prototype/design-demos/dieter-rams.html": {
+    "mtime": 1789374854.0399916,
+    "seen": 1789374924.7345698,
+    "ast_hash": "eb3f41d8471c457304ccaf8098fc0f21",
+    "semantic_hash": ""
+  },
+  "Pomodoro-iOS-Prototype/design-demos/pure-css-geometric.html": {
+    "mtime": 1789374785.2635672,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b1f9cb3a8e75d53da5027b07dc2c4cfc",
+    "semantic_hash": ""
+  },
+  "Pomodoro-iOS-Prototype/design-demos/warm-editorial.html": {
+    "mtime": 1789374424.8301854,
+    "seen": 1789374924.7345698,
+    "ast_hash": "cce1fe5dfbad36aeebb8e14f16bf2c32",
+    "semantic_hash": ""
+  },
+  "Pomodoro-iOS-Prototype/spec.md": {
+    "mtime": 1789373943.791526,
+    "seen": 1789374924.7345698,
+    "ast_hash": "080b4986ab1dfdc16125f08b37314a8a",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/banner.svg": {
+    "mtime": 1789369632.5950038,
+    "seen": 1789374924.7345698,
+    "ast_hash": "61169c32172958056592ddf4c1e820a0",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/cover/cover-build.png": {
+    "mtime": 1789369632.8100398,
+    "seen": 1789374924.7345698,
+    "ast_hash": "cb0a3b41927550e94eeb3e05a08971b1",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/cover/cover-pentagram.png": {
+    "mtime": 1789369632.8113284,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4921a9314c3c567e8db08215939700d3",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/cover/cover-takram.png": {
+    "mtime": 1789369632.8133318,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c984f4ab9d009665fabc67155eac79e8",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/infographic/infographic-build.png": {
+    "mtime": 1789369632.814332,
+    "seen": 1789374924.7345698,
+    "ast_hash": "600a4d66abe0908e6729aca0e4a8423e",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/infographic/infographic-pentagram.png": {
+    "mtime": 1789369632.8173418,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d8c50ec78de25784536bc576220260e9",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/infographic/infographic-takram.png": {
+    "mtime": 1789369632.8193493,
+    "seen": 1789374924.7345698,
+    "ast_hash": "966445dfbaba171d4bdf1b5b0facb27d",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/ppt/ppt-build.png": {
+    "mtime": 1789369632.821599,
+    "seen": 1789374924.7345698,
+    "ast_hash": "9aa4c6ec6ab8ccb587143e6889cf9a77",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/ppt/ppt-pentagram.png": {
+    "mtime": 1789369632.822604,
+    "seen": 1789374924.7345698,
+    "ast_hash": "dd14ee64b5e95ba3a49d91c78a1da6bc",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/ppt/ppt-takram.png": {
+    "mtime": 1789369632.8277943,
+    "seen": 1789374924.7345698,
+    "ast_hash": "77ab8dfb27b8254340959b8a64c9b545",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-nav/ainav-build.png": {
+    "mtime": 1789369632.828795,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b0cb0b3b3782add5fd24b5c61c80fc95",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-nav/ainav-pentagram.png": {
+    "mtime": 1789369632.8313024,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3005caf3282345fb0937c4d12de5b325",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-nav/ainav-takram.png": {
+    "mtime": 1789369632.8333025,
+    "seen": 1789374924.7345698,
+    "ast_hash": "906e49f442e550fa252728c078f50181",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-build.png": {
+    "mtime": 1789369632.8353312,
+    "seen": 1789374924.7345698,
+    "ast_hash": "7c1b5be09669620616e80c573166168c",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-pentagram.png": {
+    "mtime": 1789369632.8370872,
+    "seen": 1789374924.7345698,
+    "ast_hash": "8bb3c93f0f6be4e0dd6b1e344678ec67",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-takram.png": {
+    "mtime": 1789369632.838598,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b8b1f732d966fd6133ed24cdcbcf0d20",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-devdocs/devdocs-build.png": {
+    "mtime": 1789369632.841106,
+    "seen": 1789374924.7345698,
+    "ast_hash": "ff8da4c2850b4510e943a00af3b57ddc",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-devdocs/devdocs-pentagram.png": {
+    "mtime": 1789369632.8431056,
+    "seen": 1789374924.7345698,
+    "ast_hash": "ec6f1ada3d4663fdad02496f8e900423",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-devdocs/devdocs-takram.png": {
+    "mtime": 1789369632.8451045,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4b3f0188e9fc8ed12f051e90792c3fb8",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-homepage/homepage-build.png": {
+    "mtime": 1789369632.8466072,
+    "seen": 1789374924.7345698,
+    "ast_hash": "28eaea9117c0776e1fcd7f2747888147",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-homepage/homepage-pentagram.png": {
+    "mtime": 1789369632.847612,
+    "seen": 1789374924.7345698,
+    "ast_hash": "9e81f7c4f4ecbf71ee218a1613b369a4",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-homepage/homepage-takram.png": {
+    "mtime": 1789369632.8486123,
+    "seen": 1789374924.7345698,
+    "ast_hash": "0a478ef275a12c62153d7e9f7c5ece34",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-saas/saas-build.png": {
+    "mtime": 1789369632.8517396,
+    "seen": 1789374924.7345698,
+    "ast_hash": "78c9ed4589cf7af36634e7945e9e9707",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-saas/saas-pentagram.png": {
+    "mtime": 1789369632.8537436,
+    "seen": 1789374924.7345698,
+    "ast_hash": "238beb8a2cfa02c8c80a476e3556625a",
+    "semantic_hash": ""
+  },
+  ".agents/skills/huashu-design/assets/showcases/website-saas/saas-takram.png": {
+    "mtime": 1789369632.8547442,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e60cf91fe1c4077745ca51f89f89d82e",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/banner.svg": {
+    "mtime": 1789369632.5950038,
+    "seen": 1789374924.7345698,
+    "ast_hash": "61169c32172958056592ddf4c1e820a0",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/cover/cover-build.png": {
+    "mtime": 1789369632.8100398,
+    "seen": 1789374924.7345698,
+    "ast_hash": "cb0a3b41927550e94eeb3e05a08971b1",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/cover/cover-pentagram.png": {
+    "mtime": 1789369632.8113284,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4921a9314c3c567e8db08215939700d3",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/cover/cover-takram.png": {
+    "mtime": 1789369632.8133318,
+    "seen": 1789374924.7345698,
+    "ast_hash": "c984f4ab9d009665fabc67155eac79e8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/infographic/infographic-build.png": {
+    "mtime": 1789369632.814332,
+    "seen": 1789374924.7345698,
+    "ast_hash": "600a4d66abe0908e6729aca0e4a8423e",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/infographic/infographic-pentagram.png": {
+    "mtime": 1789369632.8173418,
+    "seen": 1789374924.7345698,
+    "ast_hash": "d8c50ec78de25784536bc576220260e9",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/infographic/infographic-takram.png": {
+    "mtime": 1789369632.8193493,
+    "seen": 1789374924.7345698,
+    "ast_hash": "966445dfbaba171d4bdf1b5b0facb27d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/ppt/ppt-build.png": {
+    "mtime": 1789369632.821599,
+    "seen": 1789374924.7345698,
+    "ast_hash": "9aa4c6ec6ab8ccb587143e6889cf9a77",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/ppt/ppt-pentagram.png": {
+    "mtime": 1789369632.822604,
+    "seen": 1789374924.7345698,
+    "ast_hash": "dd14ee64b5e95ba3a49d91c78a1da6bc",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/ppt/ppt-takram.png": {
+    "mtime": 1789369632.8277943,
+    "seen": 1789374924.7345698,
+    "ast_hash": "77ab8dfb27b8254340959b8a64c9b545",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-nav/ainav-build.png": {
+    "mtime": 1789369632.828795,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b0cb0b3b3782add5fd24b5c61c80fc95",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-nav/ainav-pentagram.png": {
+    "mtime": 1789369632.8313024,
+    "seen": 1789374924.7345698,
+    "ast_hash": "3005caf3282345fb0937c4d12de5b325",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-nav/ainav-takram.png": {
+    "mtime": 1789369632.8333025,
+    "seen": 1789374924.7345698,
+    "ast_hash": "906e49f442e550fa252728c078f50181",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-build.png": {
+    "mtime": 1789369632.8353312,
+    "seen": 1789374924.7345698,
+    "ast_hash": "7c1b5be09669620616e80c573166168c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-pentagram.png": {
+    "mtime": 1789369632.8370872,
+    "seen": 1789374924.7345698,
+    "ast_hash": "8bb3c93f0f6be4e0dd6b1e344678ec67",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-ai-writing/aiwriting-takram.png": {
+    "mtime": 1789369632.838598,
+    "seen": 1789374924.7345698,
+    "ast_hash": "b8b1f732d966fd6133ed24cdcbcf0d20",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-devdocs/devdocs-build.png": {
+    "mtime": 1789369632.841106,
+    "seen": 1789374924.7345698,
+    "ast_hash": "ff8da4c2850b4510e943a00af3b57ddc",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-devdocs/devdocs-pentagram.png": {
+    "mtime": 1789369632.8431056,
+    "seen": 1789374924.7345698,
+    "ast_hash": "ec6f1ada3d4663fdad02496f8e900423",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-devdocs/devdocs-takram.png": {
+    "mtime": 1789369632.8451045,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4b3f0188e9fc8ed12f051e90792c3fb8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-homepage/homepage-build.png": {
+    "mtime": 1789369632.8466072,
+    "seen": 1789374924.7345698,
+    "ast_hash": "28eaea9117c0776e1fcd7f2747888147",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-homepage/homepage-pentagram.png": {
+    "mtime": 1789369632.847612,
+    "seen": 1789374924.7345698,
+    "ast_hash": "9e81f7c4f4ecbf71ee218a1613b369a4",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-homepage/homepage-takram.png": {
+    "mtime": 1789369632.8486123,
+    "seen": 1789374924.7345698,
+    "ast_hash": "0a478ef275a12c62153d7e9f7c5ece34",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-saas/saas-build.png": {
+    "mtime": 1789369632.8517396,
+    "seen": 1789374924.7345698,
+    "ast_hash": "78c9ed4589cf7af36634e7945e9e9707",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-saas/saas-pentagram.png": {
+    "mtime": 1789369632.8537436,
+    "seen": 1789374924.7345698,
+    "ast_hash": "238beb8a2cfa02c8c80a476e3556625a",
+    "semantic_hash": ""
+  },
+  ".claude/skills/huashu-design/assets/showcases/website-saas/saas-takram.png": {
+    "mtime": 1789369632.8547442,
+    "seen": 1789374924.7345698,
+    "ast_hash": "e60cf91fe1c4077745ca51f89f89d82e",
+    "semantic_hash": ""
+  },
+  "Pomodoro-iOS-Prototype/design-demos/dieter-rams.png": {
+    "mtime": 1789374876.744732,
+    "seen": 1789374924.7345698,
+    "ast_hash": "49d29339d69eee30003432967a4779cc",
+    "semantic_hash": ""
+  },
+  "Pomodoro-iOS-Prototype/design-demos/pure-css-geometric.png": {
+    "mtime": 1789374795.7218182,
+    "seen": 1789374924.7345698,
+    "ast_hash": "4793d07b3c4a98f8c9f6c865f54043fc",
+    "semantic_hash": ""
+  },
+  "Pomodoro-iOS-Prototype/design-demos/warm-editorial.png": {
+    "mtime": 1789374444.657839,
+    "seen": 1789374924.7345698,
+    "ast_hash": "63ae6a829e51e18589f8ed5ffa26bf10",
+    "semantic_hash": ""
+  }
+}

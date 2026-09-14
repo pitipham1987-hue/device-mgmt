@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TOMA — Warm Editorial Focus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #EDE6D8;
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+  #page {
+    min-height: 100vh;
+    padding: 48px 40px 80px;
+  }
+  .page-header {
+    max-width: 1400px;
+    margin: 0 auto 44px;
+  }
+  .page-kicker {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9A6B4C;
+    margin: 0 0 10px;
+  }
+  .page-title {
+    font-family: 'Newsreader', serif;
+    font-size: 40px;
+    font-weight: 500;
+    font-style: italic;
+    color: #2B2420;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .page-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #6E6153;
+    max-width: 640px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .fleet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: flex-start;
+    max-width: 1720px;
+    margin: 0 auto;
+  }
+  .phone-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .phone-label {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 19px;
+    color: #6B4A34;
+    margin-bottom: 14px;
+    letter-spacing: 0.01em;
+  }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</head>
+<body>
+<div id="page">
+  <div id="root"></div>
+</div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+/* =========================================================================
+   IosFrame — copied verbatim from assets/ios_frame.jsx (do not hand-draw
+   the dynamic island / status bar / home indicator).
+   ========================================================================= */
+const iosFrameStyles = {
+  wrapper: {
+    display: 'inline-block',
+    padding: 12,
+    background: '#000',
+    borderRadius: 60,
+    boxShadow: '0 0 0 2px #1f2937, 0 20px 60px rgba(0,0,0,0.3)',
+    position: 'relative',
+  },
+  screen: {
+    position: 'relative',
+    borderRadius: 48,
+    overflow: 'hidden',
+    background: '#fff',
+  },
+  statusBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 54,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0 32px 0 32px',
+    fontSize: 16,
+    fontWeight: 600,
+    fontFamily: '-apple-system, "SF Pro Text", sans-serif',
+    zIndex: 20,
+    pointerEvents: 'none',
+  },
+  dynamicIsland: {
+    position: 'absolute',
+    top: 12,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 124,
+    height: 36,
+    background: '#000',
+    borderRadius: 999,
+    zIndex: 30,
+  },
+  statusIcons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+  },
+  signalIcon: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: 2,
+    height: 12,
+  },
+  signalBar: {
+    width: 3,
+    background: 'currentColor',
+    borderRadius: 1,
+  },
+  wifiIcon: {
+    width: 16,
+    height: 12,
+    position: 'relative',
+  },
+  batteryIcon: {
+    width: 26,
+    height: 12,
+    border: '1.5px solid currentColor',
+    borderRadius: 3,
+    padding: 1,
+    position: 'relative',
+    opacity: 0.8,
+  },
+  batteryCap: {
+    position: 'absolute',
+    top: 3,
+    right: -3,
+    width: 2,
+    height: 6,
+    background: 'currentColor',
+    borderRadius: '0 1px 1px 0',
+  },
+  content: {
+    position: 'absolute',
+    top: 54,
+    left: 0,
+    right: 0,
+    bottom: 34,
+    overflow: 'auto',
+  },
+  homeIndicator: {
+    position: 'absolute',
+    bottom: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 140,
+    height: 5,
+    background: 'rgba(0,0,0,0.3)',
+    borderRadius: 999,
+    zIndex: 10,
+  },
+  homeIndicatorDark: {
+    background: 'rgba(255,255,255,0.5)',
+  },
+};
+
+function IosFrame({
+  children,
+  width = 393,
+  height = 852,
+  time = '9:41',
+  battery = 100,
+  darkMode = false,
+  showStatusBar = true,
+  showDynamicIsland = true,
+  showHomeIndicator = true,
+}) {
+  const textColor = darkMode ? '#fff' : '#000';
+
+  return (
+    <div style={iosFrameStyles.wrapper}>
+      <div style={{
+        ...iosFrameStyles.screen,
+        width,
+        height,
+        background: darkMode ? '#000' : '#fff',
+      }}>
+        {showStatusBar && (
+          <div style={{ ...iosFrameStyles.statusBar, color: textColor }}>
+            <span>{time}</span>
+            <div style={iosFrameStyles.statusIcons}>
+              <div style={iosFrameStyles.signalIcon}>
+                <div style={{ ...iosFrameStyles.signalBar, height: 4 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 6 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 9 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 11 }} />
+              </div>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style={{ color: textColor }}>
+                <path d="M8 11.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor" />
+                <path d="M3 7.5a7 7 0 0110 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+                <path d="M1 4.5a11 11 0 0114 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.7" />
+              </svg>
+              <div style={iosFrameStyles.batteryIcon}>
+                <div style={{
+                  width: `${battery}%`,
+                  height: '100%',
+                  background: 'currentColor',
+                  borderRadius: 1,
+                  opacity: 0.9,
+                }} />
+                <div style={iosFrameStyles.batteryCap} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showDynamicIsland && <div style={iosFrameStyles.dynamicIsland} />}
+
+        <div style={iosFrameStyles.content}>
+          {children}
+        </div>
+
+        {showHomeIndicator && (
+          <div style={{
+            ...iosFrameStyles.homeIndicator,
+            ...(darkMode ? iosFrameStyles.homeIndicatorDark : {}),
+          }} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   TOMA — "Warm Editorial Focus" design language
+   ========================================================================= */
+
+const PALETTE = {
+  light: {
+    bg: '#F5F0E8',
+    bgElevated: '#FBF7F0',
+    bgSunken: '#EDE4D3',
+    text: '#2B2420',
+    textMuted: '#8B7C6B',
+    textFaint: '#B2A490',
+    divider: 'rgba(43,36,32,0.09)',
+    trackRing: 'rgba(43,36,32,0.09)',
+    onAccent: '#FBF7F0',
+    accentFocus: '#C1502E',
+    accentShort: '#A98A4C',
+    accentLong: '#8B3B26',
+  },
+  dark: {
+    bg: '#1E1811',
+    bgElevated: '#28211A',
+    bgSunken: '#241E16',
+    text: '#F1E9DC',
+    textMuted: '#A8987F',
+    textFaint: '#7A6C58',
+    divider: 'rgba(241,233,220,0.09)',
+    trackRing: 'rgba(241,233,220,0.10)',
+    onAccent: '#1E1811',
+    accentFocus: '#E2793F',
+    accentShort: '#D2AD73',
+    accentLong: '#C46B3D',
+  },
+};
+
+const SESSION_META = {
+  focus: { label: 'Tập trung', short: 'FOCUS', accentKey: 'accentFocus' },
+  short: { label: 'Nghỉ ngắn', short: 'SHORT BREAK', accentKey: 'accentShort' },
+  long: { label: 'Nghỉ dài', short: 'LONG BREAK', accentKey: 'accentLong' },
+};
+
+function fmtTime(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+  const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function fmtHM(mins) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h <= 0) return `${m}p`;
+  return `${h}g ${m}p`;
+}
+
+/* ---------- icons (thin stroke, hand-drawn geometric, no emoji) --------- */
+
+const IconTimer = ({ color, active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <line x1="9" y1="2.4" x2="15" y2="2.4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="12" y1="2.4" x2="12" y2="5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="12" cy="13.5" r="8.4" stroke={color} strokeWidth={active ? 1.8 : 1.5} />
+    <path d="M12 8.6V13.5L15.2 15.6" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconTasks = ({ color, active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <rect x="3.6" y="4.4" width="5.2" height="5.2" rx="1.4" stroke={color} strokeWidth={active ? 1.8 : 1.5} />
+    <path d="M4.9 7 6 8.1 8 6" stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    <line x1="11.4" y1="6.6" x2="20.2" y2="6.6" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <rect x="3.6" y="13.4" width="5.2" height="5.2" rx="1.4" stroke={color} strokeWidth={active ? 1.8 : 1.5} />
+    <line x1="11.4" y1="16" x2="20.2" y2="16" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+const IconStats = ({ color, active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <line x1="3.6" y1="20.4" x2="20.4" y2="20.4" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+    <rect x="5.4" y="13" width="3.6" height="7.4" rx="1" stroke={color} strokeWidth={active ? 1.8 : 1.5} />
+    <rect x="10.6" y="8.4" width="3.6" height="12" rx="1" stroke={color} strokeWidth={active ? 1.8 : 1.5} />
+    <rect x="15.8" y="4" width="3.6" height="16.4" rx="1" stroke={color} strokeWidth={active ? 1.8 : 1.5} />
+  </svg>
+);
+
+const IconSettings = ({ color, active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <line x1="3.4" y1="7" x2="20.6" y2="7" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="14.6" cy="7" r="2.1" fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" />
+    <line x1="3.4" y1="13" x2="20.6" y2="13" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="8.8" cy="13" r="2.1" fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" />
+    <line x1="3.4" y1="19" x2="20.6" y2="19" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="16.4" cy="19" r="2.1" fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" />
+  </svg>
+);
+
+const IconPlus = ({ color }) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <line x1="8" y1="2.5" x2="8" y2="13.5" stroke={color} strokeWidth="1.7" strokeLinecap="round" />
+    <line x1="2.5" y1="8" x2="13.5" y2="8" stroke={color} strokeWidth="1.7" strokeLinecap="round" />
+  </svg>
+);
+
+const IconCheck = ({ color }) => (
+  <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+    <path d="M1.2 5.2 4.3 8.3 10.6 1.6" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconFlame = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2.6c1 2.4-.4 3.7-1.6 5-1.3 1.4-2.4 2.9-2.4 5a4 4 0 108 0c0-1-.3-1.7-.8-2.4-.2 1.1-.8 1.7-1.4 1.7-.9 0-1.3-.8-1-1.7.5-1.5 1.6-2.3 1.6-4.2 0-1.2-.6-2.4-2.4-3.4Z"
+      stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconGrid = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" stroke={color} strokeWidth="1.5" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" stroke={color} strokeWidth="1.5" />
+    <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" stroke={color} strokeWidth="1.5" />
+    <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" stroke={color} strokeWidth="1.5" />
+  </svg>
+);
+
+const IconMinus = ({ color }) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <line x1="2.5" y1="7" x2="11.5" y2="7" stroke={color} strokeWidth="1.7" strokeLinecap="round" />
+  </svg>
+);
+
+/* ------------------------------ small UI atoms ------------------------- */
+
+function ToggleSwitch({ on, onToggle, accent, theme }) {
+  return (
+    <button
+      onClick={onToggle}
+      style={{
+        width: 46, height: 27, borderRadius: 999, border: 'none', cursor: 'pointer',
+        background: on ? accent : theme.bgSunken,
+        position: 'relative', padding: 0, flexShrink: 0,
+        transition: 'background 0.2s ease',
+      }}
+    >
+      <span style={{
+        position: 'absolute', top: 2.5, left: on ? 22 : 2.5,
+        width: 22, height: 22, borderRadius: '50%',
+        background: theme.bgElevated,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+        transition: 'left 0.2s ease',
+        display: 'block',
+      }} />
+    </button>
+  );
+}
+
+function Stepper({ value, onDec, onInc, theme, accent, suffix }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <button onClick={onDec} style={{
+        width: 28, height: 28, borderRadius: '50%', border: `1px solid ${theme.divider}`,
+        background: theme.bgElevated, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+      }}>
+        <IconMinus color={theme.text} />
+      </button>
+      <div style={{
+        fontFamily: 'Newsreader, serif', fontSize: 19, fontWeight: 500, color: theme.text,
+        minWidth: 54, textAlign: 'center',
+      }}>{value}{suffix}</div>
+      <button onClick={onInc} style={{
+        width: 28, height: 28, borderRadius: '50%', border: `1px solid ${theme.divider}`,
+        background: theme.bgElevated, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+      }}>
+        <IconPlus color={theme.text} />
+      </button>
+    </div>
+  );
+}
+
+/* -------------------------------- Screens ------------------------------ */
+
+function TimerScreen({ theme, sessionType, setSessionType, timeLeft, running, toggleRunning, resetTimer,
+                       durations, pomodorosToday, sessionsBeforeLong, currentTask }) {
+  const meta = SESSION_META[sessionType];
+  const accent = theme[meta.accentKey];
+  const total = durations[sessionType] * 60;
+  const remainingFraction = total > 0 ? timeLeft / total : 0;
+  const R = 104;
+  const C = 2 * Math.PI * R;
+  const offset = C * (1 - remainingFraction);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ padding: '22px 28px 0' }}>
+        <div style={{
+          fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '0.14em',
+          color: theme.textMuted, textTransform: 'uppercase', marginBottom: 4,
+        }}>TOMA</div>
+        <div style={{ display: 'flex', gap: 22, marginTop: 14 }}>
+          {Object.keys(SESSION_META).map((key) => {
+            const isActive = key === sessionType;
+            return (
+              <button
+                key={key}
+                onClick={() => setSessionType(key)}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 8px',
+                  fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: isActive ? 600 : 500,
+                  color: isActive ? theme[SESSION_META[key].accentKey] : theme.textMuted,
+                  borderBottom: isActive ? `2px solid ${theme[SESSION_META[key].accentKey]}` : '2px solid transparent',
+                  transition: 'color 0.2s ease',
+                }}
+              >{SESSION_META[key].label}</button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 26 }}>
+        <div style={{ position: 'relative', width: 236, height: 236 }}>
+          <svg width="236" height="236" viewBox="0 0 236 236">
+            <circle cx="118" cy="118" r={R} fill="none" stroke={theme.trackRing} strokeWidth="3" />
+            <circle
+              cx="118" cy="118" r={R} fill="none" stroke={accent} strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={C}
+              strokeDashoffset={offset}
+              transform="rotate(-90 118 118)"
+              style={{ transition: 'stroke-dashoffset 0.9s linear, stroke 0.3s ease' }}
+            />
+          </svg>
+          <div style={{
+            position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+          }}>
+            <div style={{
+              fontFamily: 'Newsreader, serif', fontWeight: 500, fontSize: 62, color: theme.text,
+              letterSpacing: '-0.01em', lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+            }}>{fmtTime(timeLeft)}</div>
+            <div style={{
+              marginTop: 8, fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 600,
+              letterSpacing: '0.12em', color: accent, textTransform: 'uppercase',
+            }}>{meta.short}</div>
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center', minHeight: 20, padding: '0 34px' }}>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: theme.textMuted, fontStyle: 'italic' }}>
+            {currentTask ? <>Đang làm: <span style={{ color: theme.text, fontStyle: 'normal' }}>{currentTask.title}</span></> : 'Chưa chọn việc cần làm'}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 9 }}>
+          {Array.from({ length: sessionsBeforeLong }).map((_, i) => (
+            <div key={i} style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: i < pomodorosToday ? accent : 'transparent',
+              border: `1.4px solid ${i < pomodorosToday ? accent : theme.textFaint}`,
+              transition: 'background 0.2s ease',
+            }} />
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 14, marginTop: 6 }}>
+          <button onClick={resetTimer} style={{
+            fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, color: theme.textMuted,
+            background: 'none', border: `1px solid ${theme.divider}`, borderRadius: 999,
+            padding: '13px 22px', cursor: 'pointer',
+          }}>Reset</button>
+          <button onClick={toggleRunning} style={{
+            fontFamily: 'Inter, sans-serif', fontSize: 14.5, fontWeight: 700, color: theme.onAccent,
+            background: accent, border: 'none', borderRadius: 999,
+            padding: '13px 40px', cursor: 'pointer', boxShadow: `0 8px 20px -8px ${accent}`,
+            letterSpacing: '0.01em',
+          }}>{running ? 'Pause' : 'Start'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TaskListScreen({ theme, tasks, currentTaskId, selectTask, toggleDone, addTask,
+                          showAddTask, setShowAddTask, newTaskTitle, setNewTaskTitle, accent }) {
+  const inputRef = useRef(null);
+  useEffect(() => { if (showAddTask && inputRef.current) inputRef.current.focus(); }, [showAddTask]);
+
+  return (
+    <div style={{ padding: '22px 26px 30px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+        <div style={{ fontFamily: 'Newsreader, serif', fontSize: 30, fontWeight: 500, color: theme.text }}>Việc cần làm</div>
+        <button
+          onClick={() => setShowAddTask((s) => !s)}
+          style={{
+            width: 34, height: 34, borderRadius: '50%', border: 'none', cursor: 'pointer',
+            background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transform: showAddTask ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s ease',
+          }}
+        ><IconPlus color={theme.onAccent} /></button>
+      </div>
+
+      {showAddTask && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+          <input
+            ref={inputRef}
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') addTask(); }}
+            placeholder="Tên việc cần làm…"
+            style={{
+              flex: 1, fontFamily: 'Inter, sans-serif', fontSize: 14, color: theme.text,
+              background: theme.bgElevated, border: `1px solid ${theme.divider}`, borderRadius: 12,
+              padding: '11px 14px', outline: 'none',
+            }}
+          />
+          <button onClick={addTask} style={{
+            fontFamily: 'Inter, sans-serif', fontSize: 13.5, fontWeight: 600, color: theme.onAccent,
+            background: accent, border: 'none', borderRadius: 12, padding: '0 18px', cursor: 'pointer',
+          }}>Thêm</button>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {tasks.map((t) => {
+          const isCurrent = t.id === currentTaskId;
+          return (
+            <div
+              key={t.id}
+              onClick={() => selectTask(t.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 13, padding: '13px 14px',
+                borderRadius: 14, cursor: 'pointer',
+                background: isCurrent ? theme.bgElevated : 'transparent',
+                borderLeft: isCurrent ? `3px solid ${accent}` : '3px solid transparent',
+                transition: 'background 0.15s ease',
+              }}
+            >
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleDone(t.id); }}
+                style={{
+                  width: 21, height: 21, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
+                  border: `1.5px solid ${t.done ? accent : theme.textFaint}`,
+                  background: t.done ? accent : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.15s ease',
+                }}
+              >{t.done && <IconCheck color={theme.onAccent} />}</button>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontFamily: 'Inter, sans-serif', fontSize: 14.5, fontWeight: 500,
+                  color: t.done ? theme.textFaint : theme.text,
+                  textDecoration: t.done ? 'line-through' : 'none',
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>{t.title}</div>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: theme.textMuted, marginTop: 2 }}>
+                  {t.done ? t.est : t.est}× pomodoro ước tính
+                </div>
+              </div>
+
+              {isCurrent && (
+                <div style={{
+                  fontFamily: 'Inter, sans-serif', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.08em',
+                  color: accent, textTransform: 'uppercase', flexShrink: 0,
+                }}>Đang chọn</div>
+              )}
+            </div>
+          );
+        })}
+        {tasks.length === 0 && (
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13.5, color: theme.textMuted, padding: '20px 4px' }}>
+            Chưa có việc nào — bấm dấu + để thêm.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StatsScreen({ theme, statsView, setStatsView, accent }) {
+  const weekData = [45, 90, 60, 0, 120, 30, 75];
+  const weekLabels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  const monthData = [320, 410, 275, 390];
+  const monthLabels = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'];
+
+  const data = statsView === 'week' ? weekData : monthData;
+  const labels = statsView === 'week' ? weekLabels : monthLabels;
+  const max = Math.max(...data, 1);
+
+  const todayMinutes = weekData[weekData.length - 1];
+  const weekMinutes = weekData.reduce((a, b) => a + b, 0);
+  const streakDays = 6;
+  const totalPomodoros = 128;
+
+  return (
+    <div style={{ padding: '22px 26px 30px' }}>
+      <div style={{ fontFamily: 'Newsreader, serif', fontSize: 30, fontWeight: 500, color: theme.text, marginBottom: 22 }}>Thống kê</div>
+
+      <div style={{ display: 'flex', gap: 28, marginBottom: 28 }}>
+        <div>
+          <div style={{ fontFamily: 'Newsreader, serif', fontSize: 34, fontWeight: 500, color: theme.text, lineHeight: 1 }}>{fmtHM(todayMinutes)}</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: theme.textMuted, marginTop: 6 }}>Hôm nay</div>
+        </div>
+        <div style={{ width: 1, background: theme.divider }} />
+        <div>
+          <div style={{ fontFamily: 'Newsreader, serif', fontSize: 34, fontWeight: 500, color: theme.text, lineHeight: 1 }}>{fmtHM(weekMinutes)}</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: theme.textMuted, marginTop: 6 }}>Tuần này</div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12.5, fontWeight: 600, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          Phút tập trung
+        </div>
+        <div style={{ display: 'flex', background: theme.bgSunken, borderRadius: 999, padding: 3 }}>
+          {['week', 'month'].map((v) => (
+            <button key={v} onClick={() => setStatsView(v)} style={{
+              fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              border: 'none', borderRadius: 999, padding: '6px 14px',
+              background: statsView === v ? accent : 'transparent',
+              color: statsView === v ? theme.onAccent : theme.textMuted,
+              transition: 'all 0.15s ease',
+            }}>{v === 'week' ? 'Tuần' : 'Tháng'}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex', alignItems: 'flex-end', gap: statsView === 'week' ? 10 : 20,
+        height: 120, marginBottom: 10, padding: '0 2px',
+      }}>
+        {data.map((v, i) => (
+          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, height: '100%', justifyContent: 'flex-end' }}>
+            <div style={{
+              width: '100%', maxWidth: 30, borderRadius: 5,
+              height: `${Math.max((v / max) * 100, 4)}%`,
+              background: v === Math.max(...data) ? accent : theme.trackRing,
+              transition: 'height 0.4s ease',
+            }} />
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 10.5, color: theme.textMuted }}>{labels[i]}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+        <div style={{ flex: 1, background: theme.bgElevated, borderRadius: 16, padding: '16px 16px' }}>
+          <IconFlame color={accent} />
+          <div style={{ fontFamily: 'Newsreader, serif', fontSize: 24, fontWeight: 500, color: theme.text, marginTop: 10 }}>{streakDays} ngày</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: theme.textMuted, marginTop: 2 }}>Chuỗi liên tục</div>
+        </div>
+        <div style={{ flex: 1, background: theme.bgElevated, borderRadius: 16, padding: '16px 16px' }}>
+          <IconGrid color={accent} />
+          <div style={{ fontFamily: 'Newsreader, serif', fontSize: 24, fontWeight: 500, color: theme.text, marginTop: 10 }}>{totalPomodoros}</div>
+          <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 11.5, color: theme.textMuted, marginTop: 2 }}>Tổng pomodoro</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsScreen({ theme, durations, changeDuration, sessionsBeforeLong, changeSessions,
+                          soundEnabled, setSoundEnabled, autoStart, setAutoStart, darkMode, setDarkMode, accent }) {
+  const SectionLabel = ({ children }) => (
+    <div style={{
+      fontFamily: 'Inter, sans-serif', fontSize: 11.5, fontWeight: 700, letterSpacing: '0.08em',
+      color: theme.textMuted, textTransform: 'uppercase', margin: '26px 0 12px',
+    }}>{children}</div>
+  );
+  const Row = ({ label, children }) => (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '13px 0', borderBottom: `1px solid ${theme.divider}`,
+    }}>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: theme.text }}>{label}</div>
+      {children}
+    </div>
+  );
+
+  return (
+    <div style={{ padding: '22px 26px 34px' }}>
+      <div style={{ fontFamily: 'Newsreader, serif', fontSize: 30, fontWeight: 500, color: theme.text, marginBottom: 6 }}>Cài đặt</div>
+
+      <SectionLabel>Thời lượng phiên</SectionLabel>
+      <Row label="Tập trung">
+        <Stepper value={durations.focus} suffix="p" theme={theme} accent={accent}
+          onDec={() => changeDuration('focus', -5)} onInc={() => changeDuration('focus', 5)} />
+      </Row>
+      <Row label="Nghỉ ngắn">
+        <Stepper value={durations.short} suffix="p" theme={theme} accent={accent}
+          onDec={() => changeDuration('short', -1)} onInc={() => changeDuration('short', 1)} />
+      </Row>
+      <Row label="Nghỉ dài">
+        <Stepper value={durations.long} suffix="p" theme={theme} accent={accent}
+          onDec={() => changeDuration('long', -5)} onInc={() => changeDuration('long', 5)} />
+      </Row>
+      <Row label="Số phiên trước nghỉ dài">
+        <Stepper value={sessionsBeforeLong} suffix="" theme={theme} accent={accent}
+          onDec={() => changeSessions(-1)} onInc={() => changeSessions(1)} />
+      </Row>
+
+      <SectionLabel>Chung</SectionLabel>
+      <Row label="Âm thanh khi hết giờ">
+        <ToggleSwitch on={soundEnabled} onToggle={() => setSoundEnabled((s) => !s)} accent={accent} theme={theme} />
+      </Row>
+      <Row label="Tự động bắt đầu phiên tiếp theo">
+        <ToggleSwitch on={autoStart} onToggle={() => setAutoStart((s) => !s)} accent={accent} theme={theme} />
+      </Row>
+      <Row label="Chế độ tối">
+        <ToggleSwitch on={darkMode} onToggle={() => setDarkMode((s) => !s)} accent={accent} theme={theme} />
+      </Row>
+    </div>
+  );
+}
+
+function TabBar({ theme, screen, setScreen, accent }) {
+  const items = [
+    { key: 'timer', label: 'Timer', Icon: IconTimer },
+    { key: 'tasks', label: 'Việc', Icon: IconTasks },
+    { key: 'stats', label: 'Thống kê', Icon: IconStats },
+    { key: 'settings', label: 'Cài đặt', Icon: IconSettings },
+  ];
+  return (
+    <div style={{
+      display: 'flex', flexShrink: 0, borderTop: `1px solid ${theme.divider}`,
+      background: theme.bg, padding: '10px 6px 8px',
+    }}>
+      {items.map(({ key, label, Icon }) => {
+        const active = screen === key;
+        const color = active ? accent : theme.textFaint;
+        return (
+          <button key={key} onClick={() => setScreen(key)} style={{
+            flex: 1, background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '4px 0',
+          }}>
+            <Icon color={color} active={active} />
+            <span style={{
+              fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: active ? 700 : 500, color,
+            }}>{label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ------------------------------- Root app ------------------------------- */
+
+function initialTasks() {
+  return [
+    { id: 1, title: 'Thiết kế màn hình Onboarding', est: 4, done: false },
+    { id: 2, title: 'Viết báo cáo tuần cho quản lý', est: 2, done: false },
+    { id: 3, title: 'Đọc tài liệu API thanh toán', est: 3, done: true },
+    { id: 4, title: 'Chuẩn bị họp 1:1 chiều nay', est: 1, done: false },
+  ];
+}
+
+function PomodoroApp({ initialScreen, darkMode, setDarkMode }) {
+  const [screen, setScreen] = useState(initialScreen);
+  const [sessionType, setSessionTypeRaw] = useState('focus');
+  const [durations, setDurations] = useState({ focus: 25, short: 5, long: 15 });
+  const [sessionsBeforeLong, setSessionsBeforeLong] = useState(4);
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [running, setRunning] = useState(false);
+  const [pomodorosToday, setPomodorosToday] = useState(3);
+
+  const [tasks, setTasks] = useState(initialTasks);
+  const [currentTaskId, setCurrentTaskId] = useState(1);
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+
+  const [statsView, setStatsView] = useState('week');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [autoStart, setAutoStart] = useState(false);
+
+  const theme = darkMode ? PALETTE.dark : PALETTE.light;
+  const accent = theme[SESSION_META[sessionType].accentKey];
+
+  // countdown tick
+  useEffect(() => {
+    if (!running) return undefined;
+    const id = setInterval(() => {
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [running]);
+
+  // handle session completion
+  useEffect(() => {
+    if (!running || timeLeft !== 0) return;
+    setRunning(false);
+    let nextType = sessionType;
+    let nextPomodoros = pomodorosToday;
+    if (sessionType === 'focus') {
+      nextPomodoros = Math.min(sessionsBeforeLong, pomodorosToday + 1);
+      setPomodorosToday(nextPomodoros);
+      nextType = nextPomodoros % sessionsBeforeLong === 0 ? 'long' : 'short';
+    } else {
+      nextType = 'focus';
+    }
+    setSessionTypeRaw(nextType);
+    setTimeLeft(durations[nextType] * 60);
+    if (autoStart) setRunning(true);
+    // eslint-disable-next-line
+  }, [timeLeft, running]);
+
+  function setSessionType(type) {
+    setSessionTypeRaw(type);
+    setRunning(false);
+    setTimeLeft(durations[type] * 60);
+  }
+
+  function toggleRunning() {
+    setRunning((r) => !r);
+  }
+
+  function resetTimer() {
+    setRunning(false);
+    setTimeLeft(durations[sessionType] * 60);
+  }
+
+  function changeDuration(type, delta) {
+    setDurations((prev) => {
+      const bounds = type === 'short' ? [3, 20] : type === 'long' ? [10, 40] : [5, 90];
+      const val = Math.max(bounds[0], Math.min(bounds[1], prev[type] + delta));
+      const next = { ...prev, [type]: val };
+      if (!running && sessionType === type) setTimeLeft(val * 60);
+      return next;
+    });
+  }
+
+  function changeSessions(delta) {
+    setSessionsBeforeLong((v) => Math.max(2, Math.min(8, v + delta)));
+  }
+
+  function addTask() {
+    const title = newTaskTitle.trim();
+    if (!title) return;
+    setTasks((t) => [...t, { id: Date.now(), title, est: 1, done: false }]);
+    setNewTaskTitle('');
+    setShowAddTask(false);
+  }
+
+  function toggleDone(id) {
+    setTasks((t) => t.map((x) => (x.id === id ? { ...x, done: !x.done } : x)));
+  }
+
+  function selectTask(id) {
+    setCurrentTaskId(id);
+  }
+
+  const currentTask = tasks.find((t) => t.id === currentTaskId) || null;
+
+  return (
+    <div style={{
+      height: '100%', display: 'flex', flexDirection: 'column',
+      background: theme.bg, color: theme.text, fontFamily: 'Inter, sans-serif',
+      transition: 'background 0.25s ease, color 0.25s ease',
+    }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        {screen === 'timer' && (
+          <TimerScreen
+            theme={theme} sessionType={sessionType} setSessionType={setSessionType}
+            timeLeft={timeLeft} running={running} toggleRunning={toggleRunning} resetTimer={resetTimer}
+            durations={durations} pomodorosToday={pomodorosToday} sessionsBeforeLong={sessionsBeforeLong}
+            currentTask={currentTask}
+          />
+        )}
+        {screen === 'tasks' && (
+          <TaskListScreen
+            theme={theme} tasks={tasks} currentTaskId={currentTaskId} selectTask={selectTask}
+            toggleDone={toggleDone} addTask={addTask} showAddTask={showAddTask} setShowAddTask={setShowAddTask}
+            newTaskTitle={newTaskTitle} setNewTaskTitle={setNewTaskTitle} accent={theme.accentFocus}
+          />
+        )}
+        {screen === 'stats' && (
+          <StatsScreen theme={theme} statsView={statsView} setStatsView={setStatsView} accent={theme.accentFocus} />
+        )}
+        {screen === 'settings' && (
+          <SettingsScreen
+            theme={theme} durations={durations} changeDuration={changeDuration}
+            sessionsBeforeLong={sessionsBeforeLong} changeSessions={changeSessions}
+            soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled}
+            autoStart={autoStart} setAutoStart={setAutoStart}
+            darkMode={darkMode} setDarkMode={setDarkMode} accent={theme.accentFocus}
+          />
+        )}
+      </div>
+      <TabBar theme={theme} screen={screen} setScreen={setScreen} accent={accent} />
+    </div>
+  );
+}
+
+function PhoneSlot({ label, initialScreen }) {
+  // darkMode lives here (not inside PomodoroApp) so that toggling "Chế độ
+  // tối" in Settings also updates the IosFrame chrome (status bar icon
+  // color + home indicator), not just the content area.
+  const [darkMode, setDarkMode] = useState(false);
+  return (
+    <div className="phone-slot">
+      <div className="phone-label">{label}</div>
+      <IosFrame darkMode={darkMode}>
+        <PomodoroApp initialScreen={initialScreen} darkMode={darkMode} setDarkMode={setDarkMode} />
+      </IosFrame>
+    </div>
+  );
+}
+
+function DemoPage() {
+  return (
+    <div>
+      <div className="page-header">
+        <p className="page-kicker">TOMA · Pomodoro prototype — hướng thiết kế</p>
+        <h1 className="page-title">Warm Editorial Focus</h1>
+        <p className="page-sub">
+          Nền giấy ấm, một accent đất nung xuyên suốt, số đếm giờ serif cỡ lớn — lấy chất liệu từ ngôn ngữ
+          thiết kế của các app tập trung cao cấp (Session, Structured): tối giản, ít khung viền, khoảng trắng
+          có chủ đích. Mỗi iPhone dưới đây là một state machine độc lập — bấm tab bar để đi hết 4 màn hình.
+        </p>
+      </div>
+      <div className="fleet">
+        <PhoneSlot label="Timer" initialScreen="timer" />
+        <PhoneSlot label="Task List" initialScreen="tasks" />
+        <PhoneSlot label="Thống kê" initialScreen="stats" />
+        <PhoneSlot label="Cài đặt" initialScreen="settings" />
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<DemoPage />);
+</script>
+</body>
+</html>

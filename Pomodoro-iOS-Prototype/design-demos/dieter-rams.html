@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TOMA — Dieter Rams direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #DAD6CB;
+    font-family: 'Archivo', -apple-system, sans-serif;
+  }
+  body {
+    min-height: 100vh;
+    padding: 0 0 80px 0;
+  }
+  .page-head {
+    text-align: center;
+    padding: 48px 20px 8px;
+  }
+  .page-head h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #1C1B18;
+  }
+  .page-head p {
+    margin: 8px auto 0;
+    max-width: 560px;
+    font-size: 13px;
+    font-style: italic;
+    color: #6E6A60;
+    line-height: 1.5;
+  }
+  .fleet {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 56px;
+    padding: 36px 56px 40px;
+    width: max-content;
+  }
+  .phone-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    flex: 0 0 auto;
+  }
+  .phone-label {
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #57544B;
+  }
+
+  /* ---- interactive press feedback (cannot be done via inline style) ---- */
+  .toma-press { transition: transform .1s ease, opacity .1s ease; }
+  .toma-press:active { transform: scale(0.94); }
+
+  .toma-press-opacity { transition: opacity .12s ease; }
+  .toma-press-opacity:active { opacity: 0.55; }
+
+  .toma-start-btn { transition: transform .12s cubic-bezier(.4,0,.2,1), box-shadow .12s ease; }
+  .toma-start-btn:active {
+    transform: translateY(3px) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.25) inset !important;
+  }
+
+  .toma-row { transition: background .15s ease; cursor: pointer; }
+
+  input.toma-input { font-family: 'Archivo', sans-serif; }
+  input.toma-input:focus { outline: none; }
+
+  @keyframes tomaPulse {
+    0%   { transform: scale(1);   opacity: 1;   }
+    50%  { transform: scale(1.4); opacity: 0.4; }
+    100% { transform: scale(1);   opacity: 1;   }
+  }
+  .toma-pulse-dot { animation: tomaPulse 1.4s ease-in-out infinite; }
+
+  ::-webkit-scrollbar { width: 0px; height: 0px; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>TOMA</h1>
+  <p>Design direction: Dieter Rams — "less, but better". One neutral palette, one signal colour reserved
+  for the Start control and the running state, one geometric type family, physical affordance instead of decoration.
+  Every phone below is a fully independent, clickable prototype — try the tab bar.</p>
+</div>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js" crossorigin></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+/* =========================================================================
+   IosFrame — copied verbatim from assets/ios_frame.jsx (do not hand-draw
+   the dynamic island / status bar / home indicator).
+   ========================================================================= */
+const iosFrameStyles = {
+  wrapper: {
+    display: 'inline-block',
+    padding: 12,
+    background: '#000',
+    borderRadius: 60,
+    boxShadow: '0 0 0 2px #1f2937, 0 20px 60px rgba(0,0,0,0.3)',
+    position: 'relative',
+  },
+  screen: {
+    position: 'relative',
+    borderRadius: 48,
+    overflow: 'hidden',
+    background: '#fff',
+  },
+  statusBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 54,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0 32px 0 32px',
+    fontSize: 16,
+    fontWeight: 600,
+    fontFamily: '-apple-system, "SF Pro Text", sans-serif',
+    zIndex: 20,
+    pointerEvents: 'none',
+  },
+  dynamicIsland: {
+    position: 'absolute',
+    top: 12,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 124,
+    height: 36,
+    background: '#000',
+    borderRadius: 999,
+    zIndex: 30,
+  },
+  statusIcons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+  },
+  signalIcon: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: 2,
+    height: 12,
+  },
+  signalBar: {
+    width: 3,
+    background: 'currentColor',
+    borderRadius: 1,
+  },
+  wifiIcon: {
+    width: 16,
+    height: 12,
+    position: 'relative',
+  },
+  batteryIcon: {
+    width: 26,
+    height: 12,
+    border: '1.5px solid currentColor',
+    borderRadius: 3,
+    padding: 1,
+    position: 'relative',
+    opacity: 0.8,
+  },
+  batteryCap: {
+    position: 'absolute',
+    top: 3,
+    right: -3,
+    width: 2,
+    height: 6,
+    background: 'currentColor',
+    borderRadius: '0 1px 1px 0',
+  },
+  content: {
+    position: 'absolute',
+    top: 54,
+    left: 0,
+    right: 0,
+    bottom: 34,
+    overflow: 'auto',
+  },
+  homeIndicator: {
+    position: 'absolute',
+    bottom: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 140,
+    height: 5,
+    background: 'rgba(0,0,0,0.3)',
+    borderRadius: 999,
+    zIndex: 10,
+  },
+  homeIndicatorDark: {
+    background: 'rgba(255,255,255,0.5)',
+  },
+};
+
+function IosFrame({
+  children,
+  width = 393,
+  height = 852,
+  time = '9:41',
+  battery = 100,
+  darkMode = false,
+  showStatusBar = true,
+  showDynamicIsland = true,
+  showHomeIndicator = true,
+}) {
+  const textColor = darkMode ? '#fff' : '#000';
+
+  return (
+    <div style={iosFrameStyles.wrapper}>
+      <div style={{
+        ...iosFrameStyles.screen,
+        width,
+        height,
+        background: darkMode ? '#000' : '#fff',
+      }}>
+        {showStatusBar && (
+          <div style={{ ...iosFrameStyles.statusBar, color: textColor }}>
+            <span>{time}</span>
+            <div style={iosFrameStyles.statusIcons}>
+              <div style={iosFrameStyles.signalIcon}>
+                <div style={{ ...iosFrameStyles.signalBar, height: 4 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 6 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 9 }} />
+                <div style={{ ...iosFrameStyles.signalBar, height: 11 }} />
+              </div>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style={{ color: textColor }}>
+                <path d="M8 11.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor" />
+                <path d="M3 7.5a7 7 0 0110 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+                <path d="M1 4.5a11 11 0 0114 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.7" />
+              </svg>
+              <div style={iosFrameStyles.batteryIcon}>
+                <div style={{
+                  width: `${battery}%`,
+                  height: '100%',
+                  background: 'currentColor',
+                  borderRadius: 1,
+                  opacity: 0.9,
+                }} />
+                <div style={iosFrameStyles.batteryCap} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showDynamicIsland && <div style={iosFrameStyles.dynamicIsland} />}
+
+        <div style={iosFrameStyles.content}>
+          {children}
+        </div>
+
+        {showHomeIndicator && (
+          <div style={{
+            ...iosFrameStyles.homeIndicator,
+            ...(darkMode ? iosFrameStyles.homeIndicatorDark : {}),
+          }} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   Theme — one neutral palette, one signal colour (Braun-esque orange-red)
+   reserved strictly for the Start control and the "running" state.
+   ========================================================================= */
+function getTheme(dark) {
+  return dark ? {
+    bg: '#141412', surface: '#1D1D1B', surfaceAlt: '#242320',
+    text: '#F1EEE6', textSecondary: '#8D897D',
+    divider: '#332F29', track: '#38352E',
+    accent: '#FF6A2E', shadowDark: 'rgba(0,0,0,0.6)', shadowLight: 'rgba(255,255,255,0.05)',
+  } : {
+    bg: '#F3F0E8', surface: '#FFFFFF', surfaceAlt: '#EBE7DB',
+    text: '#1C1B17', textSecondary: '#8B8779',
+    divider: '#E0DBCC', track: '#DEDACB',
+    accent: '#DE500F', shadowDark: 'rgba(0,0,0,0.16)', shadowLight: 'rgba(255,255,255,0.7)',
+  };
+}
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+function formatClock(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${pad2(m)}:${pad2(s)}`;
+}
+function formatMinutes(mins) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h <= 0) return `${m}m`;
+  return `${h}h ${pad2(m)}m`;
+}
+function durationFor(type, settings) {
+  if (type === 'focus') return settings.focusMin;
+  if (type === 'short') return settings.shortMin;
+  return settings.longMin;
+}
+
+/* =========================================================================
+   Minimal geometric icon set (SVG, stroke based, no icon fonts / emoji)
+   ========================================================================= */
+function IconTimer({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <line x1="12" y1="3" x2="12" y2="4.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="13" r="8" stroke={color} strokeWidth="1.8" />
+      <line x1="12" y1="13" x2="12" y2="8.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="12" y1="13" x2="15" y2="14.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconTasks({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="3.5" y="4" width="4" height="4" rx="1" stroke={color} strokeWidth="1.6" />
+      <line x1="10.5" y1="6" x2="20.5" y2="6" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <rect x="3.5" y="10.5" width="4" height="4" rx="1" stroke={color} strokeWidth="1.6" />
+      <line x1="10.5" y1="12.5" x2="20.5" y2="12.5" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <rect x="3.5" y="17" width="4" height="4" rx="1" stroke={color} strokeWidth="1.6" />
+      <line x1="10.5" y1="19" x2="20.5" y2="19" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconStats({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="13" width="4" height="7" rx="0.8" fill={color} />
+      <rect x="10" y="5" width="4" height="15" rx="0.8" fill={color} />
+      <rect x="16" y="9" width="4" height="11" rx="0.8" fill={color} />
+    </svg>
+  );
+}
+function IconSettings({ color, size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <line x1="7" y1="4" x2="7" y2="20" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="12" y1="4" x2="12" y2="20" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="17" y1="4" x2="17" y2="20" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="7" cy="9" r="2" fill={color} />
+      <circle cx="12" cy="16" r="2" fill={color} />
+      <circle cx="17" cy="12" r="2" fill={color} />
+    </svg>
+  );
+}
+function IconPlay({ color, size = 28 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24"><path d="M8.5 5.5v13l11-6.5z" fill={color} /></svg>
+  );
+}
+function IconPause({ color, size = 28 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <rect x="6" y="5" width="4" height="14" rx="1" fill={color} />
+      <rect x="14" y="5" width="4" height="14" rx="1" fill={color} />
+    </svg>
+  );
+}
+function IconPlus({ color, size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <line x1="12" y1="5" x2="12" y2="19" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      <line x1="5" y1="12" x2="19" y2="12" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconCheck({ color, size = 13 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16">
+      <path d="M3 8.5l3 3 7-7" stroke={color} strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function IconClose({ color, size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <line x1="5" y1="5" x2="19" y2="19" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <line x1="19" y1="5" x2="5" y2="19" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/* =========================================================================
+   Reusable "instrument panel" controls
+   ========================================================================= */
+function SegmentedControl({ options, value, onChange, theme }) {
+  return (
+    <div style={{
+      display: 'flex', background: theme.surfaceAlt, borderRadius: 10, padding: 3, gap: 2,
+      border: `1px solid ${theme.divider}`,
+    }}>
+      {options.map(opt => {
+        const active = opt.value === value;
+        return (
+          <button
+            key={opt.value}
+            className="toma-press-opacity"
+            onClick={() => onChange(opt.value)}
+            style={{
+              flex: 1, border: 'none', cursor: 'pointer', padding: '9px 6px',
+              borderRadius: 7, fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700,
+              letterSpacing: 0.2,
+              background: active ? theme.text : 'transparent',
+              color: active ? theme.bg : theme.textSecondary,
+              transition: 'background .18s ease, color .18s ease',
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function Toggle({ checked, onChange, theme }) {
+  return (
+    <div
+      className="toma-press"
+      onClick={() => onChange(!checked)}
+      role="switch"
+      aria-checked={checked}
+      style={{
+        width: 48, height: 27, borderRadius: 6, position: 'relative', cursor: 'pointer',
+        background: checked ? theme.text : 'transparent',
+        border: `2px solid ${checked ? theme.text : theme.divider}`,
+        transition: 'background .2s ease, border-color .2s ease',
+        flexShrink: 0,
+      }}
+    >
+      <div style={{
+        position: 'absolute', top: 2, left: checked ? 23 : 2,
+        width: 18, height: 17, borderRadius: 3,
+        background: checked ? theme.bg : theme.textSecondary,
+        boxShadow: '0 1px 2px rgba(0,0,0,0.35)',
+        transition: 'left .2s cubic-bezier(.4,0,.2,1)',
+      }} />
+    </div>
+  );
+}
+
+function Stepper({ value, unit, min, max, step, onChange, theme, width }) {
+  const dec = () => onChange(Math.max(min, value - step));
+  const inc = () => onChange(Math.min(max, value + step));
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 10,
+      background: theme.surfaceAlt, borderRadius: 10, padding: 4,
+      border: `1px solid ${theme.divider}`, width: width || 172,
+    }}>
+      <button className="toma-press" onClick={dec} style={btnSquare(theme)}>
+        <svg width="12" height="2" viewBox="0 0 12 2"><rect width="12" height="2" rx="1" fill={theme.text} /></svg>
+      </button>
+      <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 700, color: theme.text, fontVariantNumeric: 'tabular-nums' }}>
+        {value}<span style={{ fontSize: 11, fontWeight: 600, color: theme.textSecondary, marginLeft: 3 }}>{unit}</span>
+      </div>
+      <button className="toma-press" onClick={inc} style={btnSquare(theme)}>
+        <IconPlus color={theme.text} size={12} />
+      </button>
+    </div>
+  );
+}
+function btnSquare(theme) {
+  return {
+    width: 30, height: 30, borderRadius: 7, border: `1px solid ${theme.divider}`,
+    background: theme.surface, display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', flexShrink: 0,
+  };
+}
+
+/* =========================================================================
+   ★ The one "120%" detail: the Braun-instrument timer dial.
+   A tick-marked analogue face, a conic progress ring that is coloured
+   ONLY while the timer is actually running (grey while paused — colour
+   here means "running", nothing else), and a separately-mounted,真-physical
+   push button below it with a real resting ledge + press travel.
+   ========================================================================= */
+function TimerDial({ theme, progressDeg, running, sessionLabel, timeText }) {
+  const outer = 264, ring = 226, hole = 190;
+  const ticks = useMemo(() => Array.from({ length: 60 }, (_, i) => i), []);
+  return (
+    <div style={{ width: outer, height: outer, position: 'relative', margin: '0 auto' }}>
+      {ticks.map(i => {
+        const deg = i * 6;
+        const major = i % 5 === 0;
+        return (
+          <div key={i} style={{
+            position: 'absolute', top: 0, left: '50%',
+            width: major ? 2 : 1, height: major ? 11 : 5,
+            background: major ? theme.textSecondary : theme.divider,
+            transform: `translateX(-50%) rotate(${deg}deg)`,
+            transformOrigin: `50% ${outer / 2}px`,
+          }} />
+        );
+      })}
+      <div style={{
+        position: 'absolute', top: (outer - ring) / 2, left: (outer - ring) / 2,
+        width: ring, height: ring, borderRadius: '50%',
+        background: `conic-gradient(${running ? theme.accent : theme.textSecondary} ${progressDeg}deg, ${theme.track} ${progressDeg}deg 360deg)`,
+        transition: 'background 0.4s linear',
+      }} />
+      <div style={{
+        position: 'absolute', top: (outer - hole) / 2, left: (outer - hole) / 2,
+        width: hole, height: hole, borderRadius: '50%', background: theme.bg,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        boxShadow: `inset 0 1px 4px ${theme.shadowDark}`,
+      }}>
+        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2, color: theme.textSecondary, textTransform: 'uppercase' }}>
+          {sessionLabel}
+        </div>
+        <div style={{ fontSize: 46, fontWeight: 700, color: theme.text, fontVariantNumeric: 'tabular-nums', letterSpacing: -1, marginTop: 4 }}>
+          {timeText}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   Screens
+   ========================================================================= */
+function ScreenHeader({ theme, title, right }) {
+  return (
+    <div style={{ padding: '18px 20px 4px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+      <div>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 3, color: theme.textSecondary }}>TOMA</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: theme.text, letterSpacing: -0.3, marginTop: 2 }}>{title}</div>
+      </div>
+      {right}
+    </div>
+  );
+}
+
+function TimerScreen({ theme, settings, sessionType, switchSession, secondsLeft, running, onToggleRun, onReset, focusCount, currentTask }) {
+  const total = durationFor(sessionType, settings) * 60;
+  const progressDeg = total > 0 ? Math.min(360, Math.max(0, ((total - secondsLeft) / total) * 360)) : 0;
+  const sessionLabels = { focus: 'Focus', short: 'Short break', long: 'Long break' };
+  const dotsTotal = settings.sessionsBeforeLong;
+  const dotsFilled = focusCount % dotsTotal === 0 && focusCount > 0 ? dotsTotal : focusCount % dotsTotal;
+
+  return (
+    <div>
+      <ScreenHeader theme={theme} title="TIMER" />
+      <div style={{ padding: '10px 20px 0' }}>
+        <SegmentedControl
+          theme={theme}
+          value={sessionType}
+          onChange={(v) => switchSession(v, false)}
+          options={[{ value: 'focus', label: 'Focus' }, { value: 'short', label: 'Short break' }, { value: 'long', label: 'Long break' }]}
+        />
+      </div>
+
+      <div style={{ padding: '26px 0 6px' }}>
+        <TimerDial theme={theme} progressDeg={progressDeg} running={running} sessionLabel={sessionLabels[sessionType]} timeText={formatClock(secondsLeft)} />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '2px 0 18px' }}>
+        <button
+          className="toma-press toma-start-btn"
+          onClick={onToggleRun}
+          style={{
+            width: 88, height: 88, borderRadius: '50%', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: running ? theme.accent : theme.surface,
+            border: running ? 'none' : `1px solid ${theme.divider}`,
+            boxShadow: running
+              ? `0 3px 0 rgba(0,0,0,0.28), 0 8px 16px rgba(0,0,0,0.25)`
+              : `0 3px 0 ${theme.divider}, 0 10px 18px ${theme.shadowDark}, inset 0 1px 0 ${theme.shadowLight}`,
+          }}
+        >
+          {running ? <IconPause color="#fff" /> : <IconPlay color={theme.text} />}
+        </button>
+        <button className="toma-press-opacity" onClick={onReset} style={{
+          border: 'none', background: 'transparent', cursor: 'pointer',
+          fontFamily: 'inherit', fontSize: 11.5, fontWeight: 700, letterSpacing: 1.5,
+          color: theme.textSecondary, textTransform: 'uppercase', padding: 6,
+        }}>Reset</button>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 9, paddingBottom: 20 }}>
+        {Array.from({ length: dotsTotal }).map((_, i) => (
+          <div key={i} style={{
+            width: 8, height: 8, borderRadius: 2,
+            background: i < dotsFilled ? theme.text : 'transparent',
+            border: `1.6px solid ${i < dotsFilled ? theme.text : theme.divider}`,
+          }} />
+        ))}
+      </div>
+
+      <div style={{ margin: '0 20px 24px', padding: '14px 16px', background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}` }}>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: theme.textSecondary, textTransform: 'uppercase', marginBottom: 6 }}>
+          Current task
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: theme.text }}>
+          {currentTask ? currentTask.title : 'No task selected'}
+        </div>
+        {currentTask && (
+          <div style={{ fontSize: 12, color: theme.textSecondary, marginTop: 2 }}>
+            {currentTask.est} pomodoros estimated
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TasksScreen({ theme, tasks, setTasks, currentTaskId, setCurrentTaskId, adding, setAdding, newTitle, setNewTitle, newEst, setNewEst }) {
+  const toggleDone = (id, e) => {
+    e.stopPropagation();
+    setTasks(ts => ts.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+  const addTask = () => {
+    const title = newTitle.trim();
+    if (!title) return;
+    const id = Date.now();
+    setTasks(ts => [...ts, { id, title, est: newEst, done: false }]);
+    setNewTitle('');
+    setNewEst(1);
+    setAdding(false);
+  };
+  return (
+    <div>
+      <ScreenHeader theme={theme} title="TASKS" right={
+        <button className="toma-press" onClick={() => setAdding(a => !a)} style={{
+          width: 34, height: 34, borderRadius: 9, border: 'none', cursor: 'pointer',
+          background: theme.text, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 2px 0 ${theme.divider}`,
+        }}>
+          {adding ? <IconClose color={theme.bg} /> : <IconPlus color={theme.bg} />}
+        </button>
+      } />
+
+      {adding && (
+        <div style={{ margin: '14px 20px 0', padding: 14, background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}` }}>
+          <input
+            className="toma-input"
+            autoFocus
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') addTask(); }}
+            placeholder="Task title"
+            style={{
+              width: '100%', fontSize: 14, padding: '10px 12px', borderRadius: 8,
+              border: `1px solid ${theme.divider}`, background: theme.bg, color: theme.text,
+            }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSecondary }}>Estimated pomodoros</div>
+            <Stepper theme={theme} value={newEst} unit="" min={1} max={8} step={1} onChange={setNewEst} width={112} />
+          </div>
+          <button className="toma-press" onClick={addTask} style={{
+            marginTop: 12, width: '100%', padding: '11px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
+            background: theme.text, color: theme.bg, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
+          }}>ADD TASK</button>
+        </div>
+      )}
+
+      <div style={{ marginTop: 14 }}>
+        {tasks.map(t => {
+          const isCurrent = t.id === currentTaskId;
+          return (
+            <div
+              key={t.id}
+              className="toma-row"
+              onClick={() => setCurrentTaskId(t.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: '13px 20px',
+                borderBottom: `1px solid ${theme.divider}`,
+                borderLeft: `3px solid ${isCurrent ? theme.text : 'transparent'}`,
+                background: isCurrent ? theme.surfaceAlt : 'transparent',
+              }}
+            >
+              <div onClick={(e) => toggleDone(t.id, e)} style={{
+                width: 22, height: 22, borderRadius: 5, flexShrink: 0, cursor: 'pointer',
+                border: `2px solid ${t.done ? theme.text : theme.divider}`,
+                background: t.done ? theme.text : 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {t.done && <IconCheck color={theme.bg} />}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: 14.5, fontWeight: 600, color: t.done ? theme.textSecondary : theme.text,
+                  textDecoration: t.done ? 'line-through' : 'none', opacity: t.done ? 0.7 : 1,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>{t.title}</div>
+                {isCurrent && (
+                  <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: 1, color: theme.textSecondary, marginTop: 2 }}>
+                    IN TIMER
+                  </div>
+                )}
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSecondary, flexShrink: 0 }}>×{t.est}</div>
+            </div>
+          );
+        })}
+        {tasks.length === 0 && (
+          <div style={{ padding: 30, textAlign: 'center', color: theme.textSecondary, fontSize: 13 }}>No tasks yet.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BarChart({ theme, data }) {
+  const max = Math.max(...data.map(d => d.m), 1);
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, height: 148, padding: '0 20px' }}>
+      {data.map((d, i) => (
+        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
+          <div style={{ fontSize: 9.5, fontWeight: 700, color: theme.text, marginBottom: 5, visibility: d.isToday ? 'visible' : 'hidden' }}>
+            {d.m}
+          </div>
+          <div style={{
+            width: '100%', maxWidth: 26, borderRadius: 4,
+            height: `${(d.m / max) * 100}%`, minHeight: 3,
+            background: d.isToday ? theme.text : theme.track,
+            transition: 'height .4s ease',
+          }} />
+          <div style={{ fontSize: 9.5, fontWeight: 600, color: theme.textSecondary, marginTop: 7 }}>{d.d}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function StatsScreen({ theme, view, setView, weekData, monthData, streak, totalPomodoros, last7Active }) {
+  const data = view === 'week' ? weekData : monthData;
+  const todayVal = weekData.find(d => d.isToday).m;
+  const weekTotal = weekData.reduce((s, d) => s + d.m, 0);
+  const monthTotal = monthData.reduce((s, d) => s + d.m, 0);
+  const primaryLabel = view === 'week' ? 'Today' : 'This week';
+  const primaryVal = view === 'week' ? todayVal : monthData[monthData.length - 1].m;
+  const secondaryLabel = view === 'week' ? 'This week' : 'This month';
+  const secondaryVal = view === 'week' ? weekTotal : monthTotal;
+
+  return (
+    <div>
+      <ScreenHeader theme={theme} title="STATS" right={
+        <SegmentedControl theme={theme} value={view} onChange={setView} options={[{ value: 'week', label: 'Week' }, { value: 'month', label: 'Month' }]} />
+      } />
+
+      <div style={{ display: 'flex', gap: 10, padding: '18px 20px 6px' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: theme.textSecondary, textTransform: 'uppercase' }}>{primaryLabel}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: theme.text, fontVariantNumeric: 'tabular-nums', marginTop: 4 }}>{formatMinutes(primaryVal)}</div>
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: theme.textSecondary, textTransform: 'uppercase' }}>{secondaryLabel}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: theme.text, fontVariantNumeric: 'tabular-nums', marginTop: 4 }}>{formatMinutes(secondaryVal)}</div>
+        </div>
+      </div>
+
+      <div style={{ margin: '18px 20px 0', padding: '16px 0', background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}` }}>
+        <BarChart theme={theme} data={data} />
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, padding: '16px 20px 24px' }}>
+        <div style={{ flex: 1, background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}`, padding: 14 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: theme.textSecondary, textTransform: 'uppercase' }}>Streak</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: theme.text, marginTop: 4 }}>{streak}<span style={{ fontSize: 12, fontWeight: 600, color: theme.textSecondary }}> days</span></div>
+          <div style={{ display: 'flex', gap: 4, marginTop: 9 }}>
+            {last7Active.map((active, i) => (
+              <div key={i} style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: active ? theme.text : 'transparent',
+                border: `1.4px solid ${active ? theme.text : theme.divider}`,
+              }} />
+            ))}
+          </div>
+        </div>
+        <div style={{ flex: 1, background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}`, padding: 14 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: theme.textSecondary, textTransform: 'uppercase' }}>Total pomodoros</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: theme.text, marginTop: 4 }}>{totalPomodoros}</div>
+          <div style={{ fontSize: 11, color: theme.textSecondary, marginTop: 9 }}>Since you started</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsRow({ theme, label, control, last }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '14px 16px', borderBottom: last ? 'none' : `1px solid ${theme.divider}`,
+    }}>
+      <div style={{ fontSize: 14, fontWeight: 600, color: theme.text }}>{label}</div>
+      {control}
+    </div>
+  );
+}
+
+function SettingsScreen({ theme, settings, setSettings }) {
+  const set = (key) => (val) => setSettings(s => ({ ...s, [key]: val }));
+  return (
+    <div>
+      <ScreenHeader theme={theme} title="SETTINGS" />
+
+      <div style={{ padding: '18px 20px 6px', fontSize: 10.5, fontWeight: 700, letterSpacing: 1.5, color: theme.textSecondary, textTransform: 'uppercase' }}>
+        Session durations
+      </div>
+      <div style={{ margin: '0 20px', background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}` }}>
+        <SettingsRow theme={theme} label="Focus" control={
+          <Stepper theme={theme} value={settings.focusMin} unit="min" min={5} max={60} step={1} onChange={set('focusMin')} />
+        } />
+        <SettingsRow theme={theme} label="Short break" control={
+          <Stepper theme={theme} value={settings.shortMin} unit="min" min={1} max={15} step={1} onChange={set('shortMin')} />
+        } />
+        <SettingsRow theme={theme} label="Long break" control={
+          <Stepper theme={theme} value={settings.longMin} unit="min" min={5} max={30} step={1} onChange={set('longMin')} />
+        } last />
+      </div>
+
+      <div style={{ padding: '20px 20px 6px', fontSize: 10.5, fontWeight: 700, letterSpacing: 1.5, color: theme.textSecondary, textTransform: 'uppercase' }}>
+        Cycle
+      </div>
+      <div style={{ margin: '0 20px', background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}` }}>
+        <SettingsRow theme={theme} label="Focus sessions before long break" control={
+          <Stepper theme={theme} value={settings.sessionsBeforeLong} unit="" min={2} max={6} step={1} onChange={set('sessionsBeforeLong')} />
+        } last />
+      </div>
+
+      <div style={{ padding: '20px 20px 6px', fontSize: 10.5, fontWeight: 700, letterSpacing: 1.5, color: theme.textSecondary, textTransform: 'uppercase' }}>
+        Preferences
+      </div>
+      <div style={{ margin: '0 20px 30px', background: theme.surface, borderRadius: 12, border: `1px solid ${theme.divider}` }}>
+        <SettingsRow theme={theme} label="Sound on session end" control={
+          <Toggle theme={theme} checked={settings.soundOn} onChange={set('soundOn')} />
+        } />
+        <SettingsRow theme={theme} label="Auto-start next session" control={
+          <Toggle theme={theme} checked={settings.autoStart} onChange={set('autoStart')} />
+        } />
+        <SettingsRow theme={theme} label="Dark mode" control={
+          <Toggle theme={theme} checked={settings.darkMode} onChange={set('darkMode')} />
+        } last />
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   Tab bar
+   ========================================================================= */
+const TABS = [
+  { key: 'timer', label: 'Timer', Icon: IconTimer },
+  { key: 'tasks', label: 'Tasks', Icon: IconTasks },
+  { key: 'stats', label: 'Stats', Icon: IconStats },
+  { key: 'settings', label: 'Settings', Icon: IconSettings },
+];
+
+function TabBar({ theme, screen, setScreen, running }) {
+  const idx = TABS.findIndex(t => t.key === screen);
+  return (
+    <div style={{ position: 'relative', display: 'flex', borderTop: `1px solid ${theme.divider}`, paddingTop: 9, paddingBottom: 6, background: theme.bg, flexShrink: 0 }}>
+      <div style={{
+        position: 'absolute', top: -1, left: `${idx * 25}%`, width: '25%', height: 2,
+        background: theme.text, transition: 'left .25s cubic-bezier(.4,0,.2,1)',
+      }} />
+      {TABS.map(t => {
+        const active = t.key === screen;
+        const color = active ? theme.text : theme.textSecondary;
+        return (
+          <div key={t.key} className="toma-press-opacity" onClick={() => setScreen(t.key)} style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+            cursor: 'pointer', position: 'relative',
+          }}>
+            <div style={{ position: 'relative' }}>
+              <t.Icon color={color} size={21} />
+              {t.key === 'timer' && running && (
+                <div className="toma-pulse-dot" style={{
+                  position: 'absolute', top: -2, right: -5, width: 6, height: 6, borderRadius: '50%', background: theme.accent,
+                }} />
+              )}
+            </div>
+            <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: 0.3, color }}>{t.label}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* =========================================================================
+   Phone — one fully independent state machine
+   ========================================================================= */
+function makeInitialTasks() {
+  return [
+    { id: 1, title: 'Draft quarterly report', est: 4, done: false },
+    { id: 2, title: 'Review pull requests', est: 2, done: false },
+    { id: 3, title: 'Email client feedback', est: 1, done: true },
+    { id: 4, title: 'Plan next sprint', est: 3, done: false },
+  ];
+}
+const WEEK_DATA = [
+  { d: 'Mon', m: 45 }, { d: 'Tue', m: 90 }, { d: 'Wed', m: 60 }, { d: 'Thu', m: 120 },
+  { d: 'Fri', m: 75 }, { d: 'Sat', m: 30 }, { d: 'Sun', m: 55, isToday: true },
+];
+const MONTH_DATA = [
+  { d: 'W1', m: 320 }, { d: 'W2', m: 410 }, { d: 'W3', m: 280 }, { d: 'W4', m: 465 }, { d: 'W5', m: 210, isToday: true },
+];
+const LAST7_ACTIVE = [true, true, false, true, true, true, true];
+
+function Phone({ initialScreen }) {
+  const [screen, setScreen] = useState(initialScreen);
+  const [settings, setSettings] = useState({
+    focusMin: 25, shortMin: 5, longMin: 15, sessionsBeforeLong: 4,
+    soundOn: true, autoStart: false, darkMode: false,
+  });
+  const [sessionType, setSessionType] = useState('focus');
+  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
+  const [running, setRunning] = useState(false);
+  const [focusCount, setFocusCount] = useState(2);
+
+  const [tasks, setTasks] = useState(makeInitialTasks);
+  const [currentTaskId, setCurrentTaskId] = useState(2);
+
+  const [statsView, setStatsView] = useState('week');
+
+  const [adding, setAdding] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newEst, setNewEst] = useState(1);
+
+  const theme = getTheme(settings.darkMode);
+
+  // tick every second while running
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => {
+      setSecondsLeft(s => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [running]);
+
+  const switchSession = (type, autoRun) => {
+    setSessionType(type);
+    setSecondsLeft(durationFor(type, settings) * 60);
+    setRunning(!!autoRun);
+  };
+
+  // handle session completion
+  useEffect(() => {
+    if (secondsLeft !== 0 || !running) return;
+    setRunning(false);
+    if (sessionType === 'focus') {
+      const nextCount = focusCount + 1;
+      setFocusCount(nextCount);
+      const nextType = nextCount % settings.sessionsBeforeLong === 0 ? 'long' : 'short';
+      setSessionType(nextType);
+      setSecondsLeft(durationFor(nextType, settings) * 60);
+      setRunning(!!settings.autoStart);
+    } else {
+      setSessionType('focus');
+      setSecondsLeft(durationFor('focus', settings) * 60);
+      setRunning(!!settings.autoStart);
+    }
+    // eslint-disable-next-line
+  }, [secondsLeft]);
+
+  // reflect duration edits made in Settings while idle
+  useEffect(() => {
+    if (!running) {
+      setSecondsLeft(durationFor(sessionType, settings) * 60);
+    }
+    // eslint-disable-next-line
+  }, [settings.focusMin, settings.shortMin, settings.longMin, sessionType]);
+
+  const currentTask = tasks.find(t => t.id === currentTaskId) || null;
+
+  return (
+    <IosFrame darkMode={settings.darkMode}>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: theme.bg, fontFamily: "'Archivo', -apple-system, sans-serif" }}>
+        <div style={{ flex: '1 1 auto', overflowY: 'auto', minHeight: 0, WebkitOverflowScrolling: 'touch' }}>
+          {screen === 'timer' && (
+            <TimerScreen
+              theme={theme} settings={settings} sessionType={sessionType} switchSession={switchSession}
+              secondsLeft={secondsLeft} running={running}
+              onToggleRun={() => setRunning(r => !r)}
+              onReset={() => { setRunning(false); setSecondsLeft(durationFor(sessionType, settings) * 60); }}
+              focusCount={focusCount} currentTask={currentTask}
+            />
+          )}
+          {screen === 'tasks' && (
+            <TasksScreen
+              theme={theme} tasks={tasks} setTasks={setTasks}
+              currentTaskId={currentTaskId} setCurrentTaskId={setCurrentTaskId}
+              adding={adding} setAdding={setAdding}
+              newTitle={newTitle} setNewTitle={setNewTitle}
+              newEst={newEst} setNewEst={setNewEst}
+            />
+          )}
+          {screen === 'stats' && (
+            <StatsScreen
+              theme={theme} view={statsView} setView={setStatsView}
+              weekData={WEEK_DATA} monthData={MONTH_DATA}
+              streak={6} totalPomodoros={138} last7Active={LAST7_ACTIVE}
+            />
+          )}
+          {screen === 'settings' && (
+            <SettingsScreen theme={theme} settings={settings} setSettings={setSettings} />
+          )}
+        </div>
+        <TabBar theme={theme} screen={screen} setScreen={setScreen} running={running} />
+      </div>
+    </IosFrame>
+  );
+}
+
+function App() {
+  return (
+    <div className="fleet">
+      <div className="phone-card">
+        <div className="phone-label">Timer</div>
+        <Phone initialScreen="timer" />
+      </div>
+      <div className="phone-card">
+        <div className="phone-label">Task List</div>
+        <Phone initialScreen="tasks" />
+      </div>
+      <div className="phone-card">
+        <div className="phone-label">Thống kê</div>
+        <Phone initialScreen="stats" />
+      </div>
+      <div className="phone-card">
+        <div className="phone-label">Cài đặt</div>
+        <Phone initialScreen="settings" />
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
