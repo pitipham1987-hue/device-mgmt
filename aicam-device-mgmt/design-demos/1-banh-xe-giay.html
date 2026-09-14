@@ -1,0 +1,1208 @@
+<!--
+  LOGIC ① BÁNH XE GIÂY — không tham chiếu IVSS.
+  Xúc xắc: `date +%S` = 20 → (20 % 20) + 1 = 1 → phong cách #1 trong phân vùng "网页20种" (design-styles.md):
+  "媒体级粗野主义 Editorial Brutalism（巨号Helvetica压小正文）" — tham chiếu Bloomberg Businessweek (Richard Turley 2010-2014).
+  DNA giữ nguyên: đen #000/trắng #FFF nền chính, chữ Grotesk khổng lồ đè lên thân chữ nhỏ, lưới module + rule-line 1px chia cột,
+  mật độ cao cố tình không chừa khoảng trắng. Đã thay xanh hyperlink #0000EE bằng xanh VNPT AI #0047BB theo brand-spec, giữ 4 màu
+  chức năng (success/warning/error/neutral) tách biệt khỏi màu thương hiệu.
+
+  Hình thức mọc ra từ đâu trong nội dung: tít khổng lồ kiểu trang nhất "2.486 MẮT · 68 ĐANG MÙ" biến thẳng khái niệm
+  nhìn-thấy/mù của camera thành nhan đề bài báo (thay vì một ô KPI trang trí), và toàn bộ màn được bổ dọc bằng rule-line
+  thành các "mục tin" độc lập — cây địa bàn là mục lục, bảng tổng hợp là "box-score", danh sách phẳng là "log đào sâu" —
+  nên đây không phải một bảng CRM gắn thêm cột trạng thái mà là một tờ tin tình báo phủ sóng in ra hằng ngày.
+-->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M2 · Danh sách thiết bị — AICAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0A0A;
+    --ink-soft:#3D3D3D;
+    --paper:#FFFFFF;
+    --paper-soft:#F4F3F0;
+    --paper-mute:#EAE8E3;
+    --rule:#0A0A0A;
+    --rule-soft:rgba(10,10,10,.16);
+    --rule-faint:rgba(10,10,10,.09);
+    --brand:#0047BB;
+    --brand-bright:#02AAFA;
+    --brand-navy:#00173D;
+    --success:#52C41A;   --success-text:#237804;
+    --warning:#FAAD14;   --warning-text:#874D00;
+    --error:#FF4D4F;     --error-text:#A8071A;
+    --neutral:#BFBFBF;   --neutral-text:#595959;
+    --font-disp:"Be Vietnam Pro",Arial,sans-serif;
+    --font-body:"Be Vietnam Pro",Arial,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper-mute);
+    font-family:var(--font-body);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    container-type:inline-size;
+    container-name:aicam;
+    width:100%;
+    max-width:1920px;
+    margin:0 auto;
+    background:var(--paper);
+    min-height:100%;
+  }
+  .band{border-top:4px solid transparent;background:linear-gradient(90deg,var(--brand) 0%,var(--brand-bright) 100%);height:4px;width:100%;}
+
+  /* ===== Masthead ===== */
+  .masthead{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 3.2%;
+    border-bottom:2px solid var(--rule);
+  }
+  .masthead-left{display:flex;align-items:center;gap:18px;}
+  .logo{height:30px;width:auto;display:block;}
+  .masthead-div{width:1px;align-self:stretch;background:var(--rule-soft);}
+  .masthead-title{font-family:var(--font-disp);font-weight:800;font-size:15px;letter-spacing:.02em;text-transform:uppercase;line-height:1.1;}
+  .masthead-title small{display:block;font-family:var(--font-body);font-weight:500;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);text-transform:none;margin-top:2px;}
+  .masthead-nav{display:flex;gap:22px;font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--ink-soft);}
+  .masthead-nav a{color:var(--ink-soft);text-decoration:none;}
+  .masthead-nav .current{color:var(--ink);border-bottom:2px solid var(--brand);padding-bottom:3px;}
+  .masthead-right{display:flex;align-items:center;gap:14px;}
+  .user-chip{display:flex;align-items:center;gap:8px;border:1px solid var(--rule);padding:5px 10px;}
+  .user-avatar{width:22px;height:22px;background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;}
+  .user-meta{line-height:1.15;}
+  .user-meta b{display:block;font-size:12.5px;font-weight:700;}
+  .user-meta span{display:block;font-size:11px;color:var(--ink-soft);}
+
+  /* ===== Headline ===== */
+  .headline{padding:26px 3.2% 20px;border-bottom:2px solid var(--rule);}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase;margin:0 0 16px;}
+  .eyebrow b{color:var(--ink);}
+  .headline-num{display:flex;align-items:stretch;gap:0;}
+  .hn-block{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;padding-right:28px;}
+  .hn-rule{width:2px;background:var(--rule);margin:0 28px;flex:none;}
+  .hn-figure{
+    font-family:var(--font-disp);font-weight:900;
+    font-size:clamp(2.6rem,13cqw,6.2rem);
+    line-height:.86;letter-spacing:-.02em;
+    color:var(--ink);white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .hn-figure--alert{color:var(--error-text);}
+  .hn-label{display:block;margin-top:10px;font-family:var(--font-disp);font-weight:700;font-size:15px;letter-spacing:.01em;text-transform:uppercase;}
+  .hn-sub{display:block;margin-top:4px;font-family:var(--font-body);font-weight:500;font-size:13px;text-transform:none;letter-spacing:0;color:var(--ink-soft);}
+  .headline-summary{margin:18px 0 0;font-size:14px;line-height:1.6;max-width:74ch;color:var(--ink-soft);border-top:1px solid var(--rule-faint);padding-top:14px;}
+  .headline-summary b{color:var(--ink);font-weight:700;}
+
+  /* ===== Resource strip ===== */
+  .resource-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:2px solid var(--rule);}
+  .stat{padding:16px 3.2%;border-right:1px solid var(--rule-soft);}
+  .stat:last-child{border-right:none;}
+  .stat-label{font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px;}
+  .stat-value{font-family:var(--font-disp);font-weight:800;font-size:clamp(1.3rem,4.4cqw,2.05rem);letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .stat-value small{font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--ink-soft);margin-left:3px;}
+  .stat-bar{margin-top:9px;height:5px;background:var(--paper-mute);position:relative;}
+  .stat-bar i{display:block;height:100%;background:var(--brand);}
+  .stat-bar.accent i{background:linear-gradient(90deg,var(--brand),var(--brand-bright));}
+  .stat-foot{margin-top:6px;font-size:12px;color:var(--ink-soft);}
+
+  /* ===== Filter bar ===== */
+  .filter-bar{
+    display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 22px;
+    padding:14px 3.2%;border-bottom:2px solid var(--rule);background:var(--paper-soft);
+  }
+  .f-group{display:flex;flex-direction:column;gap:5px;}
+  .f-label{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
+  .f-select, .f-input{
+    font-family:var(--font-body);font-size:13.5px;font-weight:600;color:var(--ink);
+    border:1.5px solid var(--rule);background:var(--paper);padding:7px 9px;min-width:150px;
+    border-radius:2px;
+  }
+  .f-input{font-weight:500;min-width:220px;}
+  .f-input::placeholder{color:#9a9a9a;font-weight:400;}
+  .f-spacer{flex:1;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;align-self:center;padding-bottom:2px;}
+  .legend-item{display:flex;align-items:center;font-size:12px;color:var(--ink-soft);font-weight:600;gap:5px;}
+
+  /* ===== Icon glyphs: trạng thái luôn có hình + chữ, không chỉ màu ===== */
+  .ic{display:inline-block;width:12px;height:12px;position:relative;vertical-align:-1.5px;margin-right:5px;flex:none;}
+  .ic-conn-online{border-radius:50%;background:var(--success);}
+  .ic-conn-degraded{border-radius:50%;border:1.6px solid var(--warning);background:linear-gradient(90deg,var(--warning) 50%,transparent 50%);}
+  .ic-conn-offline{border-radius:50%;border:1.6px solid var(--error);}
+  .ic-conn-offline::after{content:"";position:absolute;left:0;top:4.6px;width:12px;height:1.6px;background:var(--error);transform:rotate(-40deg);}
+  .ic-conn-fail{width:13px;height:13px;background:var(--error);clip-path:polygon(50% 4%,4% 96%,96% 96%);}
+  .ic-conn-fail::after{content:"!";position:absolute;left:0;right:0;bottom:0;text-align:center;color:#fff;font-size:9px;font-weight:800;line-height:1;font-family:var(--font-disp);}
+  .ic-rec-on{border-radius:2px;background:var(--success);}
+  .ic-rec-off{border-radius:2px;border:1.6px solid var(--neutral-text);background:transparent;}
+  .ic-rec-err{border-radius:2px;border:1.6px solid var(--error);position:relative;}
+  .ic-rec-err::before,.ic-rec-err::after{content:"";position:absolute;left:1px;top:5px;width:10px;height:1.5px;background:var(--error);}
+  .ic-rec-err::before{transform:rotate(45deg);}
+  .ic-rec-err::after{transform:rotate(-45deg);}
+  .ic-ai-on,.ic-ai-off,.ic-ai-err,.ic-ai-limited{width:12px;height:12px;transform:rotate(45deg);position:relative;}
+  .ic-ai-on{background:var(--brand);}
+  .ic-ai-off{border:1.6px solid var(--neutral-text);}
+  .ic-ai-err{border:1.6px solid var(--error);}
+  .ic-ai-err::after{content:"!";position:absolute;left:0;right:0;top:-1.5px;bottom:0;text-align:center;color:var(--error-text);font-size:9px;font-weight:800;transform:rotate(-45deg);font-family:var(--font-disp);}
+  .ic-ai-limited{border:1.6px solid var(--warning);}
+  .ic-ai-limited::after{content:"";position:absolute;left:3px;top:3px;width:4px;height:4px;border-radius:50%;background:var(--warning);}
+
+  /* ===== Workspace ===== */
+  .workspace{display:grid;grid-template-columns:290px 1px 1fr;align-items:start;}
+  .workspace-rule{background:var(--rule);align-self:stretch;}
+
+  /* Tree panel */
+  .tree-panel{padding:16px 18px 40px;min-width:0;}
+  .panel-title{font-family:var(--font-mono);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule);}
+  details.tree-node{border-bottom:1px solid var(--rule-faint);}
+  details.tree-node > summary{
+    list-style:none;cursor:pointer;padding:8px 0;display:flex;align-items:baseline;gap:6px;
+  }
+  details.tree-node > summary::-webkit-details-marker{display:none;}
+  .tree-toggle{width:9px;flex:none;font-family:var(--font-mono);font-size:10px;color:var(--ink-soft);transform:translateY(-1px);}
+  details[open] > summary .tree-toggle::before{content:"▾";}
+  details:not([open]) > summary .tree-toggle::before{content:"▸";}
+  .tree-name{font-weight:700;font-size:13.5px;flex:none;}
+  .tree-name.is-link{cursor:pointer;}
+  .tree-name.is-link:hover{color:var(--brand);text-decoration:underline;}
+  .tree-stats{font-size:11.5px;color:var(--ink-soft);font-weight:500;}
+  .tree-stats b.err{color:var(--error-text);font-weight:700;}
+  .tree-stats b.ok{color:var(--success-text);font-weight:700;}
+  .tree-children{padding-left:15px;border-left:1px solid var(--rule-faint);margin-left:3px;}
+  .tree-children .tree-children{padding-left:13px;}
+  .tree-camera-row{display:flex;align-items:center;padding:4px 0 4px 15px;font-size:12px;}
+  .tree-camera-row .tc-name{flex:1;font-weight:500;}
+  .tree-camera-row .tc-badge{font-size:11px;font-weight:600;}
+  .tree-note{margin-top:14px;font-size:11.5px;color:var(--ink-soft);line-height:1.5;border-top:1px solid var(--rule-faint);padding-top:10px;}
+
+  /* Content panel */
+  .content-panel{min-width:0;padding:16px 3% 40px;}
+  .mode-tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:0;}
+  .mode-tab{
+    font-family:var(--font-disp);font-weight:800;font-size:13.5px;letter-spacing:.02em;text-transform:uppercase;
+    padding:10px 4px;margin-right:26px;background:none;border:none;cursor:pointer;color:var(--ink-soft);
+    border-bottom:3px solid transparent;position:relative;top:2px;
+  }
+  .mode-tab.active{color:var(--ink);border-bottom-color:var(--brand);}
+  .mode-tab .count{font-family:var(--font-mono);font-weight:500;font-size:11px;margin-left:6px;color:var(--ink-soft);}
+
+  .scope-chip{display:none;align-items:center;gap:10px;margin:14px 0;padding:8px 12px;background:var(--paper-soft);border:1px solid var(--rule);font-size:12.5px;font-weight:600;}
+  .scope-chip.active{display:flex;}
+  .scope-chip button{font-family:var(--font-mono);font-size:11px;border:1px solid var(--rule);background:var(--paper);padding:2px 7px;cursor:pointer;font-weight:700;}
+
+  /* Aggregate table */
+  .agg-wrap{margin-top:14px;}
+  table{width:100%;border-collapse:collapse;}
+  .agg-table{font-size:13px;}
+  .agg-table thead th{
+    text-align:left;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--ink-soft);padding:0 10px 8px 0;border-bottom:2px solid var(--rule);white-space:nowrap;
+  }
+  .agg-table tbody td{padding:10px 10px 10px 0;border-bottom:1px solid var(--rule-faint);vertical-align:middle;}
+  .agg-table tbody tr:hover{background:var(--paper-soft);}
+  .agg-site{font-weight:700;font-size:13.5px;cursor:pointer;}
+  .agg-site:hover{color:var(--brand);text-decoration:underline;}
+  .agg-num{font-family:var(--font-mono);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .agg-num.err{color:var(--error-text);}
+  .agg-bar{display:flex;height:8px;width:130px;background:var(--paper-mute);overflow:hidden;}
+  .agg-bar i{display:block;height:100%;}
+  .agg-bar i.b-online{background:var(--success);}
+  .agg-bar i.b-degraded{background:var(--warning);}
+  .agg-bar i.b-fail{background:var(--ink);}
+  .agg-bar i.b-offline{background:var(--error);}
+  .agg-breakdown{margin-top:4px;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+
+  /* Bulk bar */
+  .bulk-bar{
+    display:none;align-items:center;gap:16px;background:var(--ink);color:#fff;padding:11px 16px;margin-top:14px;
+  }
+  .bulk-bar.active{display:flex;}
+  .bulk-count{font-family:var(--font-disp);font-weight:800;font-size:13.5px;letter-spacing:.01em;white-space:nowrap;}
+  .bulk-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .bulk-actions button{
+    font-family:var(--font-body);font-size:12.5px;font-weight:700;color:#fff;background:transparent;
+    border:1.4px solid #fff;padding:6px 12px;cursor:pointer;
+  }
+  .bulk-actions button:hover{background:#fff;color:var(--ink);}
+  .bulk-clear{margin-left:auto;background:none;border:none;color:#bdbdbd;font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;}
+
+  /* Ledger */
+  .ledger{margin-top:14px;padding:14px 16px;border:1px solid var(--rule);background:var(--paper-soft);display:none;}
+  .ledger.active{display:block;}
+  .ledger-title{font-family:var(--font-mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px;}
+  .ledger-track{display:flex;align-items:flex-start;overflow-x:auto;padding-bottom:4px;}
+  .ledger-tick{display:flex;flex-direction:column;align-items:center;min-width:104px;position:relative;}
+  .ledger-tick::before{content:"";position:absolute;top:6px;left:-52px;width:104px;height:2px;background:var(--rule-soft);z-index:0;}
+  .ledger-tick:first-child::before{display:none;}
+  .ledger-dot{width:13px;height:13px;border-radius:50%;position:relative;z-index:1;background:var(--paper-soft);}
+  .ledger-dot.online{background:var(--success);}
+  .ledger-dot.degraded{border:1.8px solid var(--warning);background:linear-gradient(90deg,var(--warning) 50%,transparent 50%);}
+  .ledger-dot.offline{border:1.8px solid var(--error);}
+  .ledger-dot.offline::after{content:"";position:absolute;left:0;top:5px;width:13px;height:1.6px;background:var(--error);transform:rotate(-40deg);}
+  .ledger-name{margin-top:7px;font-size:11.5px;font-weight:700;text-align:center;}
+  .ledger-state{font-size:10.5px;color:var(--ink-soft);text-align:center;margin-top:2px;}
+  .ledger-empty{font-size:13px;color:var(--ink-soft);}
+
+  /* Flat table */
+  .flat-toolbar{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--ink-soft);}
+  .flat-wrap{margin-top:8px;max-height:560px;overflow-y:auto;border-top:2px solid var(--rule);}
+  table.flat{font-size:13px;}
+  .flat thead th{
+    position:sticky;top:0;background:var(--paper);text-align:left;font-family:var(--font-mono);font-size:10.8px;font-weight:600;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);padding:9px 10px 9px 0;border-bottom:1px solid var(--rule);white-space:nowrap;z-index:2;
+  }
+  .flat tbody td{padding:10px 10px 10px 0;border-bottom:1px solid var(--rule-faint);vertical-align:middle;font-size:13px;}
+  .flat tbody tr:hover{background:var(--paper-soft);}
+  .flat tbody tr.row-hidden{display:none;}
+  .cam-name{font-weight:700;}
+  .cam-site{display:block;font-size:11.5px;color:var(--ink-soft);font-weight:500;margin-top:1px;}
+  .status-cell{white-space:nowrap;}
+  .status-label{font-weight:700;font-size:12.5px;}
+  .st-online{color:var(--success-text);}
+  .st-degraded{color:var(--warning-text);}
+  .st-offline,.st-fail{color:var(--error-text);}
+  .st-neutral{color:var(--neutral-text);}
+  .mono{font-family:var(--font-mono);font-size:12px;white-space:nowrap;}
+  .brandmodel{font-size:12.5px;font-weight:600;}
+  .brandmodel small{display:block;font-weight:500;color:var(--ink-soft);font-size:11px;}
+  .nd13-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--brand);border:1px solid var(--brand);padding:2px 6px;}
+  .nd13-dash{color:var(--ink-soft);font-size:12px;font-weight:500;}
+  .face-glyph{width:14px;height:14px;position:relative;flex:none;}
+  .face-glyph::before{content:"";position:absolute;left:3px;top:0;width:8px;height:8px;border-radius:50%;background:var(--brand);}
+  .face-glyph::after{content:"";position:absolute;left:1px;top:8px;width:12px;height:6px;border-radius:6px 6px 0 0;background:var(--brand);}
+  .rowchk{width:15px;height:15px;accent-color:var(--ink);cursor:pointer;}
+  .flat-empty{padding:34px 12px;text-align:center;font-size:13px;color:var(--ink-soft);border-bottom:1px solid var(--rule-faint);}
+  .load-more-row td{padding:14px 0;text-align:center;font-size:12px;color:var(--ink-soft);font-weight:600;border-bottom:none;}
+
+  /* Footer */
+  .footer{border-top:2px solid var(--rule);padding:16px 3.2% 26px;display:flex;gap:34px;flex-wrap:wrap;}
+  .footer-col{flex:1;min-width:260px;}
+  .footer-title{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px;}
+  .footer p{margin:0;font-size:12.5px;line-height:1.6;color:var(--ink-soft);}
+  .footer b{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="band" aria-hidden="true"></div>
+
+  <header class="masthead">
+    <div class="masthead-left">
+      <img class="logo" src="../assets/vnptai-brand/logo.svg" alt="VNPT AI">
+      <div class="masthead-div"></div>
+      <div class="masthead-title">Quản lý thiết bị<small>AICAM · Nền tảng camera AI</small></div>
+      <div class="masthead-div"></div>
+      <nav class="masthead-nav">
+        <a href="#">M1 · Trang chủ</a>
+        <a href="#" class="current">M2 · Danh sách thiết bị</a>
+        <a href="#">M3 · Thêm thiết bị</a>
+        <a href="#">M5 · Cấu hình AI</a>
+      </nav>
+    </div>
+    <div class="masthead-right">
+      <div class="user-chip">
+        <div class="user-avatar">NC</div>
+        <div class="user-meta"><b>Ngô Văn Cường</b><span>Trực NOC miền Bắc</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="headline">
+    <p class="eyebrow"><b>NOC MIỀN BẮC</b> · CẬP NHẬT 09:42, 14/09/2026 · NGUỒN: AICAM PLATFORM · 3 TỈNH/THÀNH ĐANG GIÁM SÁT</p>
+    <div class="headline-num">
+      <div class="hn-block">
+        <span class="hn-figure">2.486</span>
+        <span class="hn-label">Camera trong tầm phủ sóng<span class="hn-sub">Tổng thiết bị đang quản lý — Hà Nội, TP. Hồ Chí Minh, Đà Nẵng</span></span>
+      </div>
+      <div class="hn-rule" aria-hidden="true"></div>
+      <div class="hn-block hn-block--alert">
+        <span class="hn-figure hn-figure--alert">68</span>
+        <span class="hn-label">Đang mù hoặc nghi ngờ mù<span class="hn-sub">Mất kết nối · kết nối thất bại · đang xuống cấp, trong 2 giờ qua</span></span>
+      </div>
+    </div>
+    <p class="headline-summary">Tập trung tại <b>Quận Cầu Giấy (12)</b> và <b>Huyện Đông Anh (9)</b>. Ngoài ra <b>14 camera đang ghi hình lỗi</b> dù kết nối bình thường, và <b>9 camera bật AI nhưng thuật toán lỗi hoặc thiếu tài nguyên tính toán</b> — ba sự cố này độc lập nhau, xem chi tiết theo địa bàn ở cột trái hoặc đào sâu ở danh sách phẳng bên dưới.</p>
+  </section>
+
+  <section class="resource-strip">
+    <div class="stat">
+      <p class="stat-label">Kênh đã dùng / tổng</p>
+      <p class="stat-value">2.486 <small>/ 3.000 kênh</small></p>
+      <div class="stat-bar accent"><i style="width:82.9%"></i></div>
+      <p class="stat-foot">82,9% hạn mức cấp phép</p>
+    </div>
+    <div class="stat">
+      <p class="stat-label">Băng thông đã dùng / tổng</p>
+      <p class="stat-value">4,8 <small>/ 8,0 Gbps</small></p>
+      <div class="stat-bar"><i style="width:60%"></i></div>
+      <p class="stat-foot">Đỉnh giờ cao điểm 07:30–08:30</p>
+    </div>
+    <div class="stat">
+      <p class="stat-label">Dung lượng lưu trữ</p>
+      <p class="stat-value">612 <small>/ 960 TB</small></p>
+      <div class="stat-bar"><i style="width:63.7%"></i></div>
+      <p class="stat-foot">Còn ghi được ~11 ngày ở tốc độ hiện tại</p>
+    </div>
+    <div class="stat">
+      <p class="stat-label">Camera đã bật AI / tổng</p>
+      <p class="stat-value">1.104 <small>/ 2.486</small></p>
+      <div class="stat-bar"><i style="width:44.4%"></i></div>
+      <p class="stat-foot">9 lỗi thuật toán · 21 thiếu tài nguyên tính toán</p>
+    </div>
+  </section>
+
+  <section class="filter-bar">
+    <div class="f-group">
+      <label class="f-label" for="fStatus">Trạng thái kết nối</label>
+      <select class="f-select" id="fStatus">
+        <option value="">Tất cả</option>
+        <option value="online">Trực tuyến</option>
+        <option value="degraded">Đang xuống cấp</option>
+        <option value="offline">Mất kết nối</option>
+        <option value="fail">Kết nối thất bại</option>
+      </select>
+    </div>
+    <div class="f-group">
+      <label class="f-label" for="fBrand">Hãng</label>
+      <select class="f-select" id="fBrand">
+        <option value="">Tất cả</option>
+        <option value="KBVISION">KBVISION</option>
+        <option value="VANTECH">VANTECH</option>
+        <option value="AVTECH">AVTECH</option>
+        <option value="VNP AI CAM">VNP AI CAM</option>
+      </select>
+    </div>
+    <div class="f-group">
+      <label class="f-label" for="fModel">Model</label>
+      <select class="f-select" id="fModel">
+        <option value="">Tất cả</option>
+        <option value="KX-D2K">KX-D2K</option>
+        <option value="VP-291">VP-291</option>
+        <option value="DGM1105">DGM1105</option>
+        <option value="P2">P2</option>
+      </select>
+    </div>
+    <div class="f-group">
+      <label class="f-label" for="fAi">Bật AI</label>
+      <select class="f-select" id="fAi">
+        <option value="">Tất cả</option>
+        <option value="on">Đang chạy</option>
+        <option value="off">Chưa bật</option>
+        <option value="err">Lỗi thuật toán</option>
+        <option value="limited">Thiếu tài nguyên</option>
+      </select>
+    </div>
+    <div class="f-group" style="flex:1;">
+      <label class="f-label" for="fSearch">Tìm theo tên / site / serial / IP</label>
+      <input class="f-input" id="fSearch" type="text" placeholder="vd: Cầu Giấy, VNP-88213-A, 10.20.14.11…">
+    </div>
+    <div class="f-spacer"></div>
+    <div class="legend">
+      <span class="legend-item"><span class="ic ic-conn-online"></span>Trực tuyến</span>
+      <span class="legend-item"><span class="ic ic-conn-degraded"></span>Xuống cấp</span>
+      <span class="legend-item"><span class="ic ic-conn-offline"></span>Mất kết nối</span>
+      <span class="legend-item"><span class="ic ic-conn-fail"></span>Kết nối thất bại</span>
+    </div>
+  </section>
+
+  <div class="workspace">
+    <aside class="tree-panel">
+      <p class="panel-title">Cây phủ sóng theo địa bàn</p>
+
+      <details class="tree-node" open>
+        <summary><span class="tree-toggle"></span><span class="tree-name">Hà Nội</span></summary>
+        <div class="tree-stats" style="padding-left:15px;margin-bottom:4px;">1.240 thiết bị · <b class="err">41 lỗi</b></div>
+        <div class="tree-children">
+
+          <details class="tree-node" open>
+            <summary><span class="tree-toggle"></span><span class="tree-name">Quận Cầu Giấy</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">312 thiết bị · <b class="err">12 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node" open>
+                <summary><span class="tree-toggle"></span><span class="tree-name">Phường Dịch Vọng</span></summary>
+                <div class="tree-stats" style="padding-left:15px;">168 thiết bị · <b class="err">7 lỗi</b></div>
+                <div class="tree-children">
+                  <details class="tree-node" open>
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Trụ sở UBND Quận Cầu Giấy')">Trụ sở UBND Quận Cầu Giấy</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">24 camera · <b class="err">1 lỗi</b></div>
+                    <div class="tree-children">
+                      <div class="tree-camera-row"><span class="ic ic-conn-online"></span><span class="tc-name">Camera 01 · Sảnh chính</span><span class="tc-badge st-online">Trực tuyến</span></div>
+                      <div class="tree-camera-row"><span class="ic ic-conn-online"></span><span class="tc-name">Camera 02 · Bãi xe</span><span class="tc-badge st-online">Trực tuyến</span></div>
+                      <div class="tree-camera-row"><span class="ic ic-conn-degraded"></span><span class="tc-name">Camera 03 · Cửa kho lưu trữ</span><span class="tc-badge st-degraded">Xuống cấp</span></div>
+                    </div>
+                  </details>
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Trường THCS Dịch Vọng')">Trường THCS Dịch Vọng</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">18 camera · <b class="ok">0 lỗi</b></div>
+                  </details>
+                </div>
+              </details>
+              <details class="tree-node">
+                <summary><span class="tree-toggle"></span><span class="tree-name">Phường Trung Hòa</span></summary>
+                <div class="tree-stats" style="padding-left:15px;">144 thiết bị · <b class="err">5 lỗi</b></div>
+                <div class="tree-children">
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Ngã tư Nguyễn Trãi - Khuất Duy Tiến')">Ngã tư Nguyễn Trãi - Khuất Duy Tiến</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">8 camera · <b class="err">2 lỗi</b></div>
+                  </details>
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Chung cư Trung Hòa - Nhân Chính')">Chung cư Trung Hòa - Nhân Chính</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">36 camera · <b class="ok">0 lỗi</b></div>
+                  </details>
+                </div>
+              </details>
+            </div>
+          </details>
+
+          <details class="tree-node">
+            <summary><span class="tree-toggle"></span><span class="tree-name">Huyện Đông Anh</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">268 thiết bị · <b class="err">9 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node">
+                <summary><span class="tree-toggle"></span><span class="tree-name">Xã Kim Chung</span></summary>
+                <div class="tree-stats" style="padding-left:15px;">96 thiết bị · <b class="err">4 lỗi</b></div>
+                <div class="tree-children">
+                  <details class="tree-node" open>
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Cổng chính KCN Thăng Long')">Cổng chính KCN Thăng Long</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">42 camera · <b class="err">4 lỗi</b></div>
+                    <div class="tree-children">
+                      <div class="tree-camera-row"><span class="ic ic-conn-online"></span><span class="tc-name">Camera 01 · Cổng chính</span><span class="tc-badge st-online">Trực tuyến</span></div>
+                      <div class="tree-camera-row"><span class="ic ic-conn-degraded"></span><span class="tc-name">Camera 02 · Bãi xe A</span><span class="tc-badge st-degraded">Xuống cấp</span></div>
+                      <div class="tree-camera-row"><span class="ic ic-conn-offline"></span><span class="tc-name">Camera 03 · Barie ra vào</span><span class="tc-badge st-offline">Mất kết nối</span></div>
+                      <div class="tree-camera-row"><span class="ic ic-conn-online"></span><span class="tc-name">Camera 04 · Hành lang kho</span><span class="tc-badge st-online">Trực tuyến</span></div>
+                      <div class="tree-camera-row"><span class="ic ic-conn-online"></span><span class="tc-name">Camera 05 · Sân sau</span><span class="tc-badge st-online">Trực tuyến</span></div>
+                      <div class="tree-camera-row"><span class="ic ic-conn-fail"></span><span class="tc-name">Camera 06 · Cổng phụ số 2</span><span class="tc-badge st-fail">Thất bại</span></div>
+                    </div>
+                  </details>
+                </div>
+              </details>
+              <details class="tree-node">
+                <summary><span class="tree-toggle"></span><span class="tree-name">Thị trấn Đông Anh</span></summary>
+                <div class="tree-stats" style="padding-left:15px;">172 thiết bị · <b class="err">5 lỗi</b></div>
+                <div class="tree-children">
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Ga Đông Anh')">Ga Đông Anh</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">20 camera · <b class="err">1 lỗi</b></div>
+                  </details>
+                </div>
+              </details>
+            </div>
+          </details>
+
+          <details class="tree-node">
+            <summary><span class="tree-toggle"></span><span class="tree-name">Quận Hoàn Kiếm</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">214 thiết bị · <b class="err">6 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node">
+                <summary><span class="tree-toggle"></span><span class="tree-name">Phường Hàng Trống</span></summary>
+                <div class="tree-stats" style="padding-left:15px;">214 thiết bị · <b class="err">6 lỗi</b></div>
+                <div class="tree-children">
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Hồ Gươm - khu vực tượng đài Lý Thái Tổ')">Hồ Gươm - khu vực tượng đài Lý Thái Tổ</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">32 camera · <b class="err">3 lỗi</b></div>
+                  </details>
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Chợ Đồng Xuân')">Chợ Đồng Xuân</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">46 camera · <b class="err">3 lỗi</b></div>
+                  </details>
+                </div>
+              </details>
+            </div>
+          </details>
+
+          <details class="tree-node">
+            <summary><span class="tree-toggle"></span><span class="tree-name">Quận Đống Đa</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">446 thiết bị · <b class="err">14 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node">
+                <summary><span class="tree-toggle"></span><span class="tree-name">Phường Trung Liệt</span></summary>
+                <div class="tree-stats" style="padding-left:15px;">446 thiết bị · <b class="err">14 lỗi</b></div>
+                <div class="tree-children">
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Bệnh viện Đa khoa Đống Đa')">Bệnh viện Đa khoa Đống Đa</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">28 camera · <b class="err">2 lỗi</b></div>
+                  </details>
+                  <details class="tree-node">
+                    <summary>
+                      <span class="tree-toggle"></span>
+                      <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Ga Hà Nội')">Ga Hà Nội</span>
+                    </summary>
+                    <div class="tree-stats" style="padding-left:15px;">52 camera · <b class="err">6 lỗi</b></div>
+                  </details>
+                </div>
+              </details>
+            </div>
+          </details>
+
+        </div>
+      </details>
+
+      <details class="tree-node">
+        <summary><span class="tree-toggle"></span><span class="tree-name">TP. Hồ Chí Minh</span></summary>
+        <div class="tree-stats" style="padding-left:15px;margin-bottom:4px;">812 thiết bị · <b class="err">19 lỗi</b></div>
+        <div class="tree-children">
+          <details class="tree-node">
+            <summary><span class="tree-toggle"></span><span class="tree-name">Quận 1</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">320 thiết bị · <b class="err">8 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node">
+                <summary>
+                  <span class="tree-toggle"></span>
+                  <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Ngã sáu Phù Đổng')">Ngã sáu Phù Đổng</span>
+                </summary>
+                <div class="tree-stats" style="padding-left:15px;">24 camera · <b class="err">3 lỗi</b></div>
+              </details>
+            </div>
+          </details>
+          <details class="tree-node">
+            <summary><span class="tree-toggle"></span><span class="tree-name">Quận Bình Thạnh</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">246 thiết bị · <b class="err">5 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node">
+                <summary>
+                  <span class="tree-toggle"></span>
+                  <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Cổng chào Landmark 81')">Cổng chào Landmark 81</span>
+                </summary>
+                <div class="tree-stats" style="padding-left:15px;">18 camera · <b class="err">1 lỗi</b></div>
+              </details>
+            </div>
+          </details>
+          <details class="tree-node">
+            <summary><span class="tree-toggle"></span><span class="tree-name">TP. Thủ Đức</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">246 thiết bị · <b class="err">6 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node">
+                <summary>
+                  <span class="tree-toggle"></span>
+                  <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Bến xe Miền Đông mới')">Bến xe Miền Đông mới</span>
+                </summary>
+                <div class="tree-stats" style="padding-left:15px;">40 camera · <b class="err">5 lỗi</b></div>
+              </details>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <details class="tree-node">
+        <summary><span class="tree-toggle"></span><span class="tree-name">Đà Nẵng</span></summary>
+        <div class="tree-stats" style="padding-left:15px;margin-bottom:4px;">434 thiết bị · <b class="err">8 lỗi</b></div>
+        <div class="tree-children">
+          <details class="tree-node">
+            <summary><span class="tree-toggle"></span><span class="tree-name">Quận Hải Châu</span></summary>
+            <div class="tree-stats" style="padding-left:15px;">434 thiết bị · <b class="err">8 lỗi</b></div>
+            <div class="tree-children">
+              <details class="tree-node">
+                <summary>
+                  <span class="tree-toggle"></span>
+                  <span class="tree-name is-link" onclick="event.stopPropagation();selectSite('Cầu Rồng - bờ Đông')">Cầu Rồng - bờ Đông</span>
+                </summary>
+                <div class="tree-stats" style="padding-left:15px;">16 camera · <b class="err">2 lỗi</b></div>
+              </details>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <p class="tree-note">Mỗi nút hiện số liệu tổng hợp của toàn nhánh. Bấm tên site (chữ đậm gạch chân khi trỏ chuột) để lọc thẳng xuống danh sách phẳng — cây không tải toàn bộ camera cùng lúc, giống cách máy chủ trả dữ liệu theo trang ở quy mô nghìn thiết bị.</p>
+    </aside>
+
+    <div class="workspace-rule"></div>
+
+    <main class="content-panel">
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tabAgg" onclick="setMode('agg')">Bảng tổng hợp trạng thái<span class="count">· 14 site hiển thị</span></button>
+        <button class="mode-tab" id="tabFlat" onclick="setMode('flat')">Danh sách phẳng — đào sâu<span class="count">· 18 / 2.486 đã tải</span></button>
+      </div>
+
+      <div class="scope-chip" id="scopeChip">
+        <span>Đang khoanh vùng: <b id="scopeName">—</b></span>
+        <button onclick="clearScope()">✕ Bỏ lọc, xem toàn bộ</button>
+      </div>
+
+      <!-- AGGREGATE MODE -->
+      <div id="modeAgg" class="agg-wrap">
+        <table class="agg-table">
+          <thead>
+            <tr>
+              <th>Địa bàn / Site</th>
+              <th>Tổng thiết bị</th>
+              <th>Kết nối (●online ◐xuống cấp ▲thất bại ⊘mất kết nối)</th>
+              <th>Lỗi ghi hình</th>
+              <th>AI đang chạy / tổng</th>
+              <th>Cập nhật gần nhất</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr onclick="selectSite('Trụ sở UBND Quận Cầu Giấy')">
+              <td class="agg-site">Trụ sở UBND Quận Cầu Giấy</td>
+              <td class="agg-num">24</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:95.8%"></i><i class="b-degraded" style="width:4.2%"></i></div><div class="agg-breakdown">●23 ◐1 ▲0 ⊘0</div></td>
+              <td class="agg-num">0</td>
+              <td class="agg-num">9 / 24</td>
+              <td class="mono">vừa xong</td>
+            </tr>
+            <tr onclick="selectSite('Trường THCS Dịch Vọng')">
+              <td class="agg-site">Trường THCS Dịch Vọng</td>
+              <td class="agg-num">18</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:100%"></i></div><div class="agg-breakdown">●18 ◐0 ▲0 ⊘0</div></td>
+              <td class="agg-num">0</td>
+              <td class="agg-num">4 / 18</td>
+              <td class="mono">6 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Ngã tư Nguyễn Trãi - Khuất Duy Tiến')">
+              <td class="agg-site">Ngã tư Nguyễn Trãi - Khuất Duy Tiến</td>
+              <td class="agg-num">8</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:75%"></i><i class="b-fail" style="width:12.5%"></i><i class="b-offline" style="width:12.5%"></i></div><div class="agg-breakdown">●6 ◐0 ▲1 ⊘1</div></td>
+              <td class="agg-num err">1</td>
+              <td class="agg-num">5 / 8</td>
+              <td class="mono">1 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Chung cư Trung Hòa - Nhân Chính')">
+              <td class="agg-site">Chung cư Trung Hòa - Nhân Chính</td>
+              <td class="agg-num">36</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:100%"></i></div><div class="agg-breakdown">●36 ◐0 ▲0 ⊘0</div></td>
+              <td class="agg-num">0</td>
+              <td class="agg-num">10 / 36</td>
+              <td class="mono">3 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Cổng chính KCN Thăng Long')">
+              <td class="agg-site">Cổng chính KCN Thăng Long</td>
+              <td class="agg-num">42</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:90.5%"></i><i class="b-degraded" style="width:2.4%"></i><i class="b-fail" style="width:2.4%"></i><i class="b-offline" style="width:4.7%"></i></div><div class="agg-breakdown">●38 ◐1 ▲1 ⊘2</div></td>
+              <td class="agg-num err">2</td>
+              <td class="agg-num">30 / 42</td>
+              <td class="mono">vừa xong</td>
+            </tr>
+            <tr onclick="selectSite('Ga Đông Anh')">
+              <td class="agg-site">Ga Đông Anh</td>
+              <td class="agg-num">20</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:95%"></i><i class="b-degraded" style="width:5%"></i></div><div class="agg-breakdown">●19 ◐1 ▲0 ⊘0</div></td>
+              <td class="agg-num">0</td>
+              <td class="agg-num">6 / 20</td>
+              <td class="mono">4 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Hồ Gươm - khu vực tượng đài Lý Thái Tổ')">
+              <td class="agg-site">Hồ Gươm - khu vực tượng đài Lý Thái Tổ</td>
+              <td class="agg-num">32</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:90.6%"></i><i class="b-degraded" style="width:6.3%"></i><i class="b-fail" style="width:3.1%"></i></div><div class="agg-breakdown">●29 ◐2 ▲1 ⊘0</div></td>
+              <td class="agg-num err">1</td>
+              <td class="agg-num">12 / 32</td>
+              <td class="mono">2 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Chợ Đồng Xuân')">
+              <td class="agg-site">Chợ Đồng Xuân</td>
+              <td class="agg-num">46</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:93.5%"></i><i class="b-degraded" style="width:2.1%"></i><i class="b-fail" style="width:2.1%"></i><i class="b-offline" style="width:2.1%"></i></div><div class="agg-breakdown">●43 ◐1 ▲1 ⊘1</div></td>
+              <td class="agg-num err">2</td>
+              <td class="agg-num">20 / 46</td>
+              <td class="mono">5 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Bệnh viện Đa khoa Đống Đa')">
+              <td class="agg-site">Bệnh viện Đa khoa Đống Đa</td>
+              <td class="agg-num">28</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:92.9%"></i><i class="b-degraded" style="width:3.6%"></i><i class="b-fail" style="width:3.6%"></i></div><div class="agg-breakdown">●26 ◐1 ▲1 ⊘0</div></td>
+              <td class="agg-num">0</td>
+              <td class="agg-num">14 / 28</td>
+              <td class="mono">vừa xong</td>
+            </tr>
+            <tr onclick="selectSite('Ga Hà Nội')">
+              <td class="agg-site">Ga Hà Nội</td>
+              <td class="agg-num">52</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:88.5%"></i><i class="b-degraded" style="width:3.8%"></i><i class="b-fail" style="width:3.8%"></i><i class="b-offline" style="width:3.8%"></i></div><div class="agg-breakdown">●46 ◐2 ▲2 ⊘2</div></td>
+              <td class="agg-num err">3</td>
+              <td class="agg-num">25 / 52</td>
+              <td class="mono">1 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Ngã sáu Phù Đổng')">
+              <td class="agg-site">Ngã sáu Phù Đổng</td>
+              <td class="agg-num">24</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:87.5%"></i><i class="b-degraded" style="width:4.2%"></i><i class="b-fail" style="width:4.2%"></i><i class="b-offline" style="width:4.2%"></i></div><div class="agg-breakdown">●21 ◐1 ▲1 ⊘1</div></td>
+              <td class="agg-num err">1</td>
+              <td class="agg-num">9 / 24</td>
+              <td class="mono">7 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Cổng chào Landmark 81')">
+              <td class="agg-site">Cổng chào Landmark 81</td>
+              <td class="agg-num">18</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:94.4%"></i><i class="b-degraded" style="width:5.6%"></i></div><div class="agg-breakdown">●17 ◐1 ▲0 ⊘0</div></td>
+              <td class="agg-num">0</td>
+              <td class="agg-num">7 / 18</td>
+              <td class="mono">2 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Bến xe Miền Đông mới')">
+              <td class="agg-site">Bến xe Miền Đông mới</td>
+              <td class="agg-num">40</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:87.5%"></i><i class="b-degraded" style="width:5%"></i><i class="b-fail" style="width:5%"></i><i class="b-offline" style="width:2.5%"></i></div><div class="agg-breakdown">●35 ◐2 ▲2 ⊘1</div></td>
+              <td class="agg-num err">2</td>
+              <td class="agg-num">15 / 40</td>
+              <td class="mono">9 phút trước</td>
+            </tr>
+            <tr onclick="selectSite('Cầu Rồng - bờ Đông')">
+              <td class="agg-site">Cầu Rồng - bờ Đông</td>
+              <td class="agg-num">16</td>
+              <td><div class="agg-bar"><i class="b-online" style="width:87.5%"></i><i class="b-degraded" style="width:6.3%"></i><i class="b-fail" style="width:6.3%"></i></div><div class="agg-breakdown">●14 ◐1 ▲1 ⊘0</div></td>
+              <td class="agg-num">0</td>
+              <td class="agg-num">6 / 16</td>
+              <td class="mono">10 phút trước</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="tree-note" style="margin-top:12px;">Đây là <b style="color:var(--ink)">lối vào mặc định ở quy mô nghìn thiết bị</b> — bảng tổng hợp theo site, không phải danh sách phẳng. 14/&gt;200 site đang hiển thị theo trang; bấm tên site để đào sâu xuống từng camera.</p>
+      </div>
+
+      <!-- FLAT MODE -->
+      <div id="modeFlat" style="display:none;">
+        <div class="ledger" id="ledger">
+          <p class="ledger-title" id="ledgerTitle">Tuyến phủ sóng</p>
+          <div class="ledger-track" id="ledgerTrack"></div>
+        </div>
+
+        <div class="bulk-bar" id="bulkBar">
+          <span class="bulk-count" id="bulkCount">Đã chọn 0 thiết bị</span>
+          <div class="bulk-actions">
+            <button>Khởi động lại</button>
+            <button>Thử kết nối lại</button>
+            <button>Gán cấu hình AI hàng loạt</button>
+            <button>Xuất danh sách (CSV)</button>
+            <button>Gỡ khỏi hệ thống</button>
+          </div>
+          <button class="bulk-clear" onclick="clearSelection()">Bỏ chọn tất cả</button>
+        </div>
+
+        <div class="flat-toolbar">
+          <span id="flatCountLabel">Hiển thị 18 / 2.486 thiết bị khớp bộ lọc hiện tại</span>
+          <span>Cuộn ảo — máy chủ chỉ trả về từng lô khi cuộn tới cuối</span>
+        </div>
+
+        <div class="flat-wrap">
+          <table class="flat">
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="rowchk" id="chkAll" onchange="toggleAll(this)"></th>
+                <th>Camera / Site</th>
+                <th>Kết nối</th>
+                <th>Ghi hình</th>
+                <th>AI</th>
+                <th>Hãng / Model</th>
+                <th>Địa chỉ IP</th>
+                <th>Serial</th>
+                <th>Tuân thủ NĐ13</th>
+                <th>Cập nhật</th>
+              </tr>
+            </thead>
+            <tbody id="flatBody">
+
+              <tr data-site="Cổng chính KCN Thăng Long" data-status="online" data-brand="KBVISION" data-model="KX-D2K" data-ai="on" data-q="cổng chính kcn thăng long camera 01 vnp-88213-a 10.20.14.11 kbvision">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 01 · Cổng chính</span><span class="cam-site">Cổng chính KCN Thăng Long</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-on"></span><span class="status-label st-online">Đếm người</span></td>
+                <td class="brandmodel">KBVISION<small>KX-D2K</small></td>
+                <td class="mono">10.20.14.11</td>
+                <td class="mono">VNP-88213-A</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">2 phút trước</td>
+              </tr>
+
+              <tr data-site="Cổng chính KCN Thăng Long" data-status="degraded" data-brand="KBVISION" data-model="KX-D2K" data-ai="limited" data-q="cổng chính kcn thăng long bãi xe a vnp-88214-a 10.20.14.12">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 02 · Bãi xe A</span><span class="cam-site">Cổng chính KCN Thăng Long</span></td>
+                <td class="status-cell"><span class="ic ic-conn-degraded"></span><span class="status-label st-degraded">Đang xuống cấp</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-limited"></span><span class="status-label st-degraded">Thiếu tài nguyên</span></td>
+                <td class="brandmodel">KBVISION<small>KX-D2K</small></td>
+                <td class="mono">10.20.14.12</td>
+                <td class="mono">VNP-88214-A</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">vừa xong</td>
+              </tr>
+
+              <tr data-site="Cổng chính KCN Thăng Long" data-status="offline" data-brand="VANTECH" data-model="VP-291" data-ai="off" data-q="cổng chính kcn thăng long barie ra vào vnp-88215-a 10.20.14.13">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 03 · Barie ra vào</span><span class="cam-site">Cổng chính KCN Thăng Long</span></td>
+                <td class="status-cell"><span class="ic ic-conn-offline"></span><span class="status-label st-offline">Mất kết nối</span></td>
+                <td class="status-cell"><span class="ic ic-rec-err"></span><span class="status-label st-fail">Lỗi ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">VANTECH<small>VP-291</small></td>
+                <td class="mono">10.20.14.13</td>
+                <td class="mono">VNP-88215-A</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">mất 41 phút</td>
+              </tr>
+
+              <tr data-site="Cổng chính KCN Thăng Long" data-status="online" data-brand="VANTECH" data-model="VP-291" data-ai="err" data-q="cổng chính kcn thăng long hành lang kho vnp-88216-a 10.20.14.14 biển số">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 04 · Hành lang kho</span><span class="cam-site">Cổng chính KCN Thăng Long</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-err"></span><span class="status-label st-fail">Lỗi thuật toán (biển số)</span></td>
+                <td class="brandmodel">VANTECH<small>VP-291</small></td>
+                <td class="mono">10.20.14.14</td>
+                <td class="mono">VNP-88216-A</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">1 phút trước</td>
+              </tr>
+
+              <tr data-site="Cổng chính KCN Thăng Long" data-status="online" data-brand="AVTECH" data-model="DGM1105" data-ai="off" data-q="cổng chính kcn thăng long sân sau vnp-88217-a 10.20.14.15">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 05 · Sân sau</span><span class="cam-site">Cổng chính KCN Thăng Long</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-off"></span><span class="status-label st-neutral">Không ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">AVTECH<small>DGM1105</small></td>
+                <td class="mono">10.20.14.15</td>
+                <td class="mono">VNP-88217-A</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">3 phút trước</td>
+              </tr>
+
+              <tr data-site="Cổng chính KCN Thăng Long" data-status="fail" data-brand="AVTECH" data-model="DGM1105" data-ai="off" data-q="cổng chính kcn thăng long cổng phụ số 2 vnp-88218-a 10.20.14.16">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 06 · Cổng phụ số 2</span><span class="cam-site">Cổng chính KCN Thăng Long</span></td>
+                <td class="status-cell"><span class="ic ic-conn-fail"></span><span class="status-label st-fail">Kết nối thất bại</span></td>
+                <td class="status-cell"><span class="ic ic-rec-err"></span><span class="status-label st-fail">Lỗi ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">AVTECH<small>DGM1105</small></td>
+                <td class="mono">10.20.14.16</td>
+                <td class="mono">VNP-88218-A</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">thử lại thất bại 09:12</td>
+              </tr>
+
+              <tr data-site="Trụ sở UBND Quận Cầu Giấy" data-status="online" data-brand="VNP AI CAM" data-model="P2" data-ai="on" data-q="trụ sở ubnd quận cầu giấy sảnh chính vnp-77012-b 10.10.2.21 khuôn mặt">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 01 · Sảnh chính</span><span class="cam-site">Trụ sở UBND Quận Cầu Giấy</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-on"></span><span class="status-label st-online">Nhận diện khuôn mặt</span></td>
+                <td class="brandmodel">VNP AI CAM<small>P2</small></td>
+                <td class="mono">10.10.2.21</td>
+                <td class="mono">VNP-77012-B</td>
+                <td><span class="nd13-tag"><span class="face-glyph" aria-hidden="true"></span>Sinh trắc học · lưu 30 ngày</span></td>
+                <td class="mono">vừa xong</td>
+              </tr>
+
+              <tr data-site="Trụ sở UBND Quận Cầu Giấy" data-status="online" data-brand="VNP AI CAM" data-model="P2" data-ai="off" data-q="trụ sở ubnd quận cầu giấy bãi xe vnp-77013-b 10.10.2.22">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 02 · Bãi xe</span><span class="cam-site">Trụ sở UBND Quận Cầu Giấy</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">VNP AI CAM<small>P2</small></td>
+                <td class="mono">10.10.2.22</td>
+                <td class="mono">VNP-77013-B</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">1 phút trước</td>
+              </tr>
+
+              <tr data-site="Trụ sở UBND Quận Cầu Giấy" data-status="degraded" data-brand="KBVISION" data-model="KX-D2K" data-ai="limited" data-q="trụ sở ubnd quận cầu giấy cửa kho lưu trữ vnp-77014-b 10.10.2.23">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera 03 · Cửa kho lưu trữ</span><span class="cam-site">Trụ sở UBND Quận Cầu Giấy</span></td>
+                <td class="status-cell"><span class="ic ic-conn-degraded"></span><span class="status-label st-degraded">Đang xuống cấp</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-limited"></span><span class="status-label st-degraded">Thiếu tài nguyên</span></td>
+                <td class="brandmodel">KBVISION<small>KX-D2K</small></td>
+                <td class="mono">10.10.2.23</td>
+                <td class="mono">VNP-77014-B</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">4 phút trước</td>
+              </tr>
+
+              <tr data-site="Ngã tư Nguyễn Trãi - Khuất Duy Tiến" data-status="online" data-brand="KBVISION" data-model="KX-D2K" data-ai="on" data-q="ngã tư nguyễn trãi khuất duy tiến camera giao thông 01 vnp-55001-c 10.30.5.1 biển số">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera giao thông 01</span><span class="cam-site">Ngã tư Nguyễn Trãi - Khuất Duy Tiến</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-on"></span><span class="status-label st-online">Nhận diện biển số</span></td>
+                <td class="brandmodel">KBVISION<small>KX-D2K</small></td>
+                <td class="mono">10.30.5.1</td>
+                <td class="mono">VNP-55001-C</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">1 phút trước</td>
+              </tr>
+
+              <tr data-site="Ngã tư Nguyễn Trãi - Khuất Duy Tiến" data-status="offline" data-brand="KBVISION" data-model="KX-D2K" data-ai="off" data-q="ngã tư nguyễn trãi khuất duy tiến camera giao thông 02 vnp-55002-c 10.30.5.2">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera giao thông 02</span><span class="cam-site">Ngã tư Nguyễn Trãi - Khuất Duy Tiến</span></td>
+                <td class="status-cell"><span class="ic ic-conn-offline"></span><span class="status-label st-offline">Mất kết nối</span></td>
+                <td class="status-cell"><span class="ic ic-rec-err"></span><span class="status-label st-fail">Lỗi ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">KBVISION<small>KX-D2K</small></td>
+                <td class="mono">10.30.5.2</td>
+                <td class="mono">VNP-55002-C</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">mất 18 phút</td>
+              </tr>
+
+              <tr data-site="Chợ Đồng Xuân" data-status="online" data-brand="VANTECH" data-model="VP-291" data-ai="on" data-q="chợ đồng xuân camera an ninh cổng bắc vnp-33110-d 10.40.9.4 đếm người">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera an ninh cổng Bắc</span><span class="cam-site">Chợ Đồng Xuân</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-on"></span><span class="status-label st-online">Đếm người</span></td>
+                <td class="brandmodel">VANTECH<small>VP-291</small></td>
+                <td class="mono">10.40.9.4</td>
+                <td class="mono">VNP-33110-D</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">2 phút trước</td>
+              </tr>
+
+              <tr data-site="Hồ Gươm - khu vực tượng đài Lý Thái Tổ" data-status="degraded" data-brand="AVTECH" data-model="DGM1105" data-ai="err" data-q="hồ gươm tượng đài lý thái tổ camera quảng trường vnp-33115-d 10.40.9.9">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera quảng trường</span><span class="cam-site">Hồ Gươm - khu vực tượng đài Lý Thái Tổ</span></td>
+                <td class="status-cell"><span class="ic ic-conn-degraded"></span><span class="status-label st-degraded">Đang xuống cấp</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-err"></span><span class="status-label st-fail">Lỗi thuật toán</span></td>
+                <td class="brandmodel">AVTECH<small>DGM1105</small></td>
+                <td class="mono">10.40.9.9</td>
+                <td class="mono">VNP-33115-D</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">5 phút trước</td>
+              </tr>
+
+              <tr data-site="Bệnh viện Đa khoa Đống Đa" data-status="online" data-brand="VNP AI CAM" data-model="P2" data-ai="off" data-q="bệnh viện đa khoa đống đa sảnh cấp cứu vnp-21044-e 10.50.1.2">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera sảnh cấp cứu</span><span class="cam-site">Bệnh viện Đa khoa Đống Đa</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">VNP AI CAM<small>P2</small></td>
+                <td class="mono">10.50.1.2</td>
+                <td class="mono">VNP-21044-E</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">2 phút trước</td>
+              </tr>
+
+              <tr data-site="Ga Hà Nội" data-status="fail" data-brand="KBVISION" data-model="KX-D2K" data-ai="off" data-q="ga hà nội camera ke ga số 3 vnp-21099-e 10.50.3.7">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera ke ga số 3</span><span class="cam-site">Ga Hà Nội</span></td>
+                <td class="status-cell"><span class="ic ic-conn-fail"></span><span class="status-label st-fail">Kết nối thất bại</span></td>
+                <td class="status-cell"><span class="ic ic-rec-err"></span><span class="status-label st-fail">Lỗi ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">KBVISION<small>KX-D2K</small></td>
+                <td class="mono">10.50.3.7</td>
+                <td class="mono">VNP-21099-E</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">thử lại thất bại 08:55</td>
+              </tr>
+
+              <tr data-site="Cổng chào Landmark 81" data-status="online" data-brand="VNP AI CAM" data-model="P2" data-ai="on" data-q="cổng chào landmark 81 camera cổng chào vnp-90211-f 10.60.7.3 khuôn mặt">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera cổng chào</span><span class="cam-site">Cổng chào Landmark 81</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-on"></span><span class="status-label st-online">Nhận diện khuôn mặt</span></td>
+                <td class="brandmodel">VNP AI CAM<small>P2</small></td>
+                <td class="mono">10.60.7.3</td>
+                <td class="mono">VNP-90211-F</td>
+                <td><span class="nd13-tag"><span class="face-glyph" aria-hidden="true"></span>Sinh trắc học · lưu 30 ngày</span></td>
+                <td class="mono">vừa xong</td>
+              </tr>
+
+              <tr data-site="Bến xe Miền Đông mới" data-status="online" data-brand="VANTECH" data-model="VP-291" data-ai="off" data-q="bến xe miền đông mới camera sảnh chờ vnp-90355-f 10.60.9.5">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera sảnh chờ</span><span class="cam-site">Bến xe Miền Đông mới</span></td>
+                <td class="status-cell"><span class="ic ic-conn-online"></span><span class="status-label st-online">Trực tuyến</span></td>
+                <td class="status-cell"><span class="ic ic-rec-off"></span><span class="status-label st-neutral">Không ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-off"></span><span class="status-label st-neutral">Chưa bật</span></td>
+                <td class="brandmodel">VANTECH<small>VP-291</small></td>
+                <td class="mono">10.60.9.5</td>
+                <td class="mono">VNP-90355-F</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">6 phút trước</td>
+              </tr>
+
+              <tr data-site="Cầu Rồng - bờ Đông" data-status="degraded" data-brand="AVTECH" data-model="DGM1105" data-ai="limited" data-q="cầu rồng bờ đông camera cầu vnp-66021-g 10.70.2.2">
+                <td><input type="checkbox" class="rowchk" onchange="onRowCheck()"></td>
+                <td><span class="cam-name">Camera cầu</span><span class="cam-site">Cầu Rồng - bờ Đông</span></td>
+                <td class="status-cell"><span class="ic ic-conn-degraded"></span><span class="status-label st-degraded">Đang xuống cấp</span></td>
+                <td class="status-cell"><span class="ic ic-rec-on"></span><span class="status-label st-online">Đang ghi</span></td>
+                <td class="status-cell"><span class="ic ic-ai-limited"></span><span class="status-label st-degraded">Thiếu tài nguyên</span></td>
+                <td class="brandmodel">AVTECH<small>DGM1105</small></td>
+                <td class="mono">10.70.2.2</td>
+                <td class="mono">VNP-66021-G</td>
+                <td class="nd13-dash">—</td>
+                <td class="mono">10 phút trước</td>
+              </tr>
+
+            </tbody>
+            <tfoot>
+              <tr class="load-more-row"><td colspan="10">▾ Cuộn tiếp để máy chủ tải thêm — còn 2.468 thiết bị chưa hiển thị trong trang dữ liệu mẫu này</td></tr>
+            </tfoot>
+          </table>
+          <div class="flat-empty" id="flatEmpty" style="display:none;">Không có dòng nào trong trang dữ liệu mẫu khớp bộ lọc / khoanh vùng hiện tại. Ở dữ liệu thật, máy chủ sẽ truy vấn tiếp theo bộ lọc này thay vì lọc trên toàn bộ 2.486 dòng tải sẵn.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-col">
+      <p class="footer-title">Mô hình trạng thái — ba trục độc lập</p>
+      <p><b>Kết nối</b> (trực tuyến / mất kết nối / kết nối thất bại / đang xuống cấp), <b>ghi hình</b> (đang ghi / không ghi / lỗi ghi) và <b>AI</b> (chưa bật / đang chạy / lỗi thuật toán / thiếu tài nguyên) không gộp vào nhau. Một camera trực tuyến nhưng không ghi là sự cố khác hẳn camera mất kết nối — mọi chỉ báo trong màn này đều đi kèm hình dạng riêng, không chỉ dựa vào màu.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-title">Tuân thủ Nghị định 13/2023/NĐ-CP</p>
+      <p>Camera có cột <b>"Tuân thủ NĐ13"</b> đang xử lý dữ liệu sinh trắc học (nhận diện khuôn mặt). Dữ liệu lưu tối đa 30 ngày tại trung tâm dữ liệu Hà Nội/TP.HCM theo khu vực site, không hiển thị ảnh khuôn mặt thật trong bản mẫu này.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-title">Bảo mật thiết bị</p>
+      <p>Mật khẩu camera không hiển thị dạng chữ ở bất kỳ đâu trong hệ thống, kể cả ở màn quản trị viên. Đổi mật khẩu thực hiện qua luồng riêng ở M3 · Thêm thiết bị.</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+  var ledgers = {
+    'Cổng chính KCN Thăng Long': [
+      {name:'Cổng chính', state:'online', label:'Trực tuyến'},
+      {name:'Bãi xe A', state:'degraded', label:'Xuống cấp'},
+      {name:'Barie ra vào', state:'offline', label:'Mất kết nối'},
+      {name:'Hành lang kho', state:'online', label:'Trực tuyến'},
+      {name:'Sân sau', state:'online', label:'Trực tuyến'},
+      {name:'Cổng phụ số 2', state:'offline', label:'Thất bại'}
+    ],
+    'Trụ sở UBND Quận Cầu Giấy': [
+      {name:'Sảnh chính', state:'online', label:'Trực tuyến'},
+      {name:'Bãi xe', state:'online', label:'Trực tuyến'},
+      {name:'Cửa kho lưu trữ', state:'degraded', label:'Xuống cấp'}
+    ]
+  };
+
+  function setMode(mode){
+    var agg = document.getElementById('modeAgg');
+    var flat = document.getElementById('modeFlat');
+    var tabAgg = document.getElementById('tabAgg');
+    var tabFlat = document.getElementById('tabFlat');
+    if(mode==='agg'){
+      agg.style.display='block'; flat.style.display='none';
+      tabAgg.classList.add('active'); tabFlat.classList.remove('active');
+    } else {
+      agg.style.display='none'; flat.style.display='block';
+      tabFlat.classList.add('active'); tabAgg.classList.remove('active');
+    }
+  }
+
+  function selectSite(name){
+    setMode('flat');
+    document.getElementById('scopeChip').classList.add('active');
+    document.getElementById('scopeName').textContent = name;
+    renderLedger(name);
+    applyFilters(name);
+  }
+
+  function clearScope(){
+    document.getElementById('scopeChip').classList.remove('active');
+    document.getElementById('scopeName').textContent = '—';
+    document.getElementById('ledger').classList.remove('active');
+    applyFilters(null);
+  }
+
+  function renderLedger(name){
+    var data = ledgers[name];
+    var track = document.getElementById('ledgerTrack');
+    var ledger = document.getElementById('ledger');
+    document.getElementById('ledgerTitle').textContent = 'Tuyến phủ sóng · ' + name;
+    if(!data){
+      track.innerHTML = '<div class="ledger-empty">Sơ đồ tuyến vị trí camera cho site này chưa đồng bộ trong trang dữ liệu mẫu — ở hệ thống thật sẽ truy vấn máy chủ theo site_id.</div>';
+      ledger.classList.add('active');
+      return;
+    }
+    var html = '';
+    data.forEach(function(t){
+      html += '<div class="ledger-tick"><span class="ledger-dot '+t.state+'"></span><span class="ledger-name">'+t.name+'</span><span class="ledger-state">'+t.label+'</span></div>';
+    });
+    track.innerHTML = html;
+    ledger.classList.add('active');
+  }
+
+  function getFilters(){
+    return {
+      status: document.getElementById('fStatus').value,
+      brand: document.getElementById('fBrand').value,
+      model: document.getElementById('fModel').value,
+      ai: document.getElementById('fAi').value,
+      q: document.getElementById('fSearch').value.trim().toLowerCase(),
+      site: document.getElementById('scopeChip').classList.contains('active') ? document.getElementById('scopeName').textContent : null
+    };
+  }
+
+  function applyFilters(forceSite){
+    var f = getFilters();
+    if(typeof forceSite !== 'undefined') f.site = forceSite;
+    var rows = document.querySelectorAll('#flatBody tr');
+    var visible = 0;
+    rows.forEach(function(r){
+      var ok = true;
+      if(f.status && r.dataset.status !== f.status) ok = false;
+      if(f.brand && r.dataset.brand !== f.brand) ok = false;
+      if(f.model && r.dataset.model !== f.model) ok = false;
+      if(f.ai && r.dataset.ai !== f.ai) ok = false;
+      if(f.site && r.dataset.site !== f.site) ok = false;
+      if(f.q && r.dataset.q.indexOf(f.q) === -1) ok = false;
+      r.classList.toggle('row-hidden', !ok);
+      if(ok) visible++;
+    });
+    document.getElementById('flatEmpty').style.display = visible===0 ? 'block' : 'none';
+    document.getElementById('flatCountLabel').textContent = 'Hiển thị ' + visible + ' / 2.486 thiết bị khớp bộ lọc hiện tại';
+    document.getElementById('chkAll').checked = false;
+    onRowCheck();
+  }
+
+  ['fStatus','fBrand','fModel','fAi'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', function(){ setMode('flat'); applyFilters(); });
+  });
+  document.getElementById('fSearch').addEventListener('input', function(){ setMode('flat'); applyFilters(); });
+
+  function toggleAll(box){
+    document.querySelectorAll('#flatBody tr:not(.row-hidden) .rowchk').forEach(function(c){ c.checked = box.checked; });
+    onRowCheck();
+  }
+
+  function onRowCheck(){
+    var checked = document.querySelectorAll('#flatBody tr:not(.row-hidden) .rowchk:checked').length;
+    var bar = document.getElementById('bulkBar');
+    bar.classList.toggle('active', checked > 0);
+    document.getElementById('bulkCount').textContent = 'Đã chọn ' + checked + ' thiết bị';
+  }
+
+  function clearSelection(){
+    document.querySelectorAll('.rowchk').forEach(function(c){ c.checked = false; });
+    onRowCheck();
+  }
+</script>
+</body>
+</html>
