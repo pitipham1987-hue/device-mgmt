@@ -14,13 +14,16 @@
 
 Người dùng chọn qua AskUserQuestion: **"② Hiện thực tham chiếu"**.
 
-## Áp dụng cho phần còn lại
+## Áp dụng cho phần còn lại — đã dựng xong cả 5 màn
 
-Hướng ② dùng làm nền tảng hệ thống thiết kế (token Ant Design 4 đã đổi màu chính sang `#0047BB`, bo góc 2px, phân tầng nền 3 mức, chip trạng thái ba trục, cây địa bàn trái + bảng phải) để tiếp tục dựng:
+Hướng ② dùng làm nền tảng hệ thống thiết kế (token Ant Design 4 đã đổi màu chính sang `#0047BB`, bo góc 2px, phân tầng nền 3 mức, chip trạng thái ba trục, cây địa bàn trái + bảng phải), hệ thống dùng chung đặt tại `mockups/shared.css`:
 
-- M1 · Trang chủ (khuôn Hub tile — 6 ô chức năng lưới 3×2)
-- M3 · Thêm thiết bị (Wizard 5 đường vào + bảng kết quả quét)
-- M4 · Chi tiết một camera
-- M5 · Cấu hình AI / thuật toán
+| Màn | File |
+|---|---|
+| M1 · Trang chủ (Hub tile — 6 ô chức năng lưới 3×2 + shortcut cấp hai + hàng cấu hình nhanh) | `mockups/M1-trang-chu.html` |
+| M2 · Danh sách thiết bị (giữ nguyên bản demo đã chọn) | `design-demos/2-hien-thuc-tham-chieu.html` |
+| M3 · Thêm thiết bị (Wizard 5 đường vào + bảng kết quả quét) | `mockups/M3-them-thiet-bi.html` |
+| M4 · Chi tiết một camera (thông tin thiết bị + luồng video + dòng sự kiện AI + ghi chú tuân thủ NĐ13) | `mockups/M4-chi-tiet-camera.html` |
+| M5 · Cấu hình AI / thuật toán (chọn thuật toán + vẽ vùng phát hiện SVG + ngưỡng cảnh báo + lịch kích hoạt) | `mockups/M5-cau-hinh-ai.html` |
 
-M2 giữ nguyên bản `2-hien-thuc-tham-chieu.html` làm chuẩn tham chiếu component (sidebar, tree, table, resource strip, status tag).
+Chưa dựng: điều hướng chuyển trang thật (mới là mockup tĩnh từng màn), trang Sự kiện & cảnh báo, Cấu hình hệ thống (nằm trong menu nhưng ngoài phạm vi 5 màn cốt lõi của vòng 1).

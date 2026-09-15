@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Device-mgmt-IVSS · Quản lý thiết bị · Hướng 🧠 Thiết kế sư hàng đầu</title>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  HƯỚNG 3/3 · 🧠 THIẾT KẾ SƯ HÀNG ĐẦU (deep-breath best designer)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  ĐÃ CHỌN: triết lý Edward Tufte (data-ink ratio / "small multiples" /
+  chartjunk tối thiểu), lai ghép tư duy phòng điều hành hạ tầng trọng yếu
+  (grid điện, kiểm soát không lưu) cho phần phân cấp không gian.
+
+  VÌ SAO PHÙ HỢP NHẤT — không phải Dieter Rams, không phải Pentagram:
+  - Đối tượng dùng là kỹ thuật viên NOC quét trạng thái NHANH qua hàng nghìn
+    dòng, phiên làm việc dài, phòng sáng đèn. Đây đúng là bài toán Tufte
+    giải cả đời: "trình bày dữ liệu dày đặc mà không làm người đọc mệt hơn
+    dữ liệu cần thiết" — tối đa hoá data-ink ratio, xoá mọi "chartjunk"
+    (bóng đổ, gradient, khung bo tròn dày, pill-badge màu đặc kín).
+  - Dieter Rams/Braun tối ưu cho SẢN PHẨM VẬT LÝ (nút bấm, vỏ máy) — không
+    có câu trả lời cho "1 bảng 12 cột × vài nghìn dòng nên trông ra sao".
+  - Pentagram giỏi HỆ NHẬN DIỆN (logo, brand system) — không phải bài toán
+    ở đây; VNPT AI đã có bảng màu/logo sẵn, cái thiếu là LOGIC TRÌNH BÀY.
+  - Tufte trực tiếp trả lời: dùng "small multiples" (thanh mini lặp lại có
+    cùng thang đo để mắt so sánh nhanh — áp cho cây địa bàn bên trái), dùng
+    "bullet graph" thay progress bar béo (thanh chỉ số tài nguyên trên
+    cùng), dùng gạch chân đôi (double-rule) cho tiêu đề nhóm thay vì nền
+    tô đặc, và ưu tiên số/chữ hơn icon trang trí.
+
+  FORM SUY RA TỪ ĐÂU TRONG NỘI DUNG:
+  - Spec nêu "vài nghìn thiết bị" → nếu chỉ là 1 bảng phẳng như ảnh gốc
+    Dahua (vài chục dòng) thì không co giãn được → bắt buộc phải có lớp
+    ĐIỀU HƯỚNG TỔNG HỢP TRƯỚC/CHI TIẾT SAU: cây địa bàn nhiều cấp bên trái,
+    mỗi nhánh tự mang theo số liệu tổng hợp (small multiple), bảng bên
+    phải chỉ hiển thị chi tiết của nhánh đang chọn, nhóm theo địa bàn với
+    hàng tiêu đề nhóm mang số liệu tổng hợp riêng — đúng tinh thần "tổng
+    quan trước, chi tiết sau" (overview first, details on demand) của Tufte
+    (thực ra là Shneiderman, nhưng Tufte thực hành cùng logic trong các
+    bảng dày đặc của ông — small multiples luôn có một lớp tổng trước khi
+    vào chi tiết).
+  - Hai trục trạng thái ĐỘC LẬP (Kết nối / Ghi hình) trong spec chính là
+    một biến thể "small multiples chiều ngang": hai chip cạnh nhau, cùng
+    hình thức trình bày (chấm + nhãn), khác trục đo — không gộp vì gộp sẽ
+    làm mất data-ink (mất thông tin thật để đổi lấy 1 chấm màu gọn hơn).
+  - Bảng ≥12 cột buộc phải "thanh cuộn ngang khi nhiều cột" (spec) — đúng
+    triết lý Tufte: đừng cắt bớt cột để vừa màn hình, hãy để dữ liệu chiếm
+    không gian nó cần và cho người đọc cuộn tới nó.
+
+  MÀU: chỉ dùng bảng đã xác minh trong brand-spec.md (#0047BB primary,
+  #02AAFA/#00B3FF accent, #00173D/#001250 navy, nền #FFFFFF/#F7F8F9).
+  Đỏ/amber CHỈ dùng cho vai trò cảnh báo/lỗi — đúng như brand-spec cho phép
+  ("giữ vai trò cảnh báo/lỗi"), không dùng làm màu thương hiệu. "Trực
+  tuyến/Đang ghi" (trạng thái khoẻ mạnh) dùng chính primary #0047BB thay vì
+  phát minh thêm màu xanh lá ngoài bảng — tuân thủ nghiêm "không đoán thêm
+  màu ngoài bảng đã trích".
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --primary:#0047BB;
+    --primary-dark:#00389A;
+    --accent:#00B3FF;
+    --accent2:#02AAFA;
+    --navy:#00173D;
+    --navy2:#001250;
+    --bg:#FFFFFF;
+    --bg-soft:#F7F8F9;
+    --bg-soft2:#F0F2F5;
+    --line:#E1E5EA;
+    --line-strong:#C7CDD5;
+    --text:#16202C;
+    --text-muted:#5B6675;
+    --text-faint:#8A93A0;
+    --error:#B3261E;
+    --error-bg:#FBEAE9;
+    --warning:#9A5B00;
+    --warning-bg:#FCF3DE;
+    --mono: 'Be Vietnam Pro', ui-monospace, monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Be Vietnam Pro', -apple-system, sans-serif;
+    background:var(--bg-soft2);
+    color:var(--text);
+    font-size:13px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  table{border-collapse:collapse;}
+  ::selection{background:#CFE0FA;}
+
+  .tabular{ font-variant-numeric: tabular-nums; font-feature-settings:"tnum" 1; }
+
+  /* ───────── Top brand bar ───────── */
+  .topbar{
+    height:52px;
+    background:var(--navy);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+    gap:16px;
+  }
+  .topbar .brand{
+    font-weight:800;
+    font-size:15px;
+    letter-spacing:.2px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .topbar .brand .mark{
+    width:22px;height:22px;border-radius:4px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:800;color:#fff;
+  }
+  .topbar .divider{width:1px;height:20px;background:rgba(255,255,255,.18);}
+  .topbar .crumb{font-size:12.5px;color:rgba(255,255,255,.72);}
+  .topbar .crumb b{color:#fff;font-weight:600;}
+  .topbar .spacer{flex:1;}
+  .topbar .who{font-size:12px;color:rgba(255,255,255,.68);display:flex;align-items:center;gap:8px;}
+  .topbar .who .avatar{width:24px;height:24px;border-radius:50%;background:var(--accent2);color:var(--navy);font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;}
+
+  /* ───────── Resource strip (bullet graphs, Tufte-style) ───────── */
+  .resource-strip{
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+    padding:14px 24px 16px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 48px;
+  }
+  .bullet{
+    display:grid;
+    grid-template-columns:168px 1fr auto;
+    align-items:center;
+    gap:14px;
+  }
+  .bullet .b-label{
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:.4px;
+  }
+  .bullet .b-track{
+    position:relative;
+    height:12px;
+    background:var(--bg-soft2);
+  }
+  .bullet .b-fill{
+    position:absolute;left:0;top:0;bottom:0;
+    background:var(--primary);
+  }
+  .bullet .b-tick{
+    position:absolute;top:-3px;bottom:-3px;width:2px;
+    background:var(--navy);
+  }
+  .bullet .b-figure{
+    font-size:13px;
+    font-weight:700;
+    color:var(--navy);
+    white-space:nowrap;
+    min-width:190px;
+    text-align:right;
+  }
+  .bullet .b-figure small{
+    font-weight:500;
+    color:var(--text-faint);
+    font-size:11.5px;
+  }
+
+  /* ───────── Layout shell ───────── */
+  .shell{
+    display:grid;
+    grid-template-columns:296px 1fr;
+    min-height:calc(100vh - 118px);
+  }
+
+  /* ───────── Left: region tree ───────── */
+  .tree-pane{
+    background:var(--bg);
+    border-right:1px solid var(--line);
+    padding:16px 0 40px;
+    overflow-y:auto;
+  }
+  .tree-pane .tp-heading{
+    padding:0 16px 10px;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:var(--text-faint);
+    border-bottom:1px solid var(--line);
+    margin-bottom:6px;
+  }
+  .node{padding-left:14px;}
+  .node > summary, .leaf{
+    list-style:none;
+    display:grid;
+    grid-template-columns:1fr 34px 54px;
+    align-items:center;
+    gap:8px;
+    padding:6px 16px 6px 6px;
+    cursor:pointer;
+    border-radius:3px;
+    font-size:12.5px;
+  }
+  /* summary generates its ::before as an extra grid item ahead of n-name/n-spark/
+     n-count — give it its own leading track so the 3 real children keep the
+     same 1fr/34px/54px proportions as .leaf rows (bug found + fixed via
+     Playwright screenshot review: without this, n-name was squeezed into the
+     34px track meant for the sparkline, truncating "Toàn hệ thống" to "To…"). */
+  .node > summary{grid-template-columns:14px 1fr 34px 54px;}
+  .node > summary::-webkit-details-marker{display:none;}
+  .node > summary::marker{content:"";}
+  .node > summary::before{
+    content:"▸";
+    display:inline-block;
+    width:10px;
+    color:var(--text-faint);
+    font-size:9px;
+  }
+  .node[open] > summary::before{content:"▾";}
+  .node > summary:hover, .leaf:hover{background:var(--bg-soft);}
+  .leaf.active{background:#E9F0FC;}
+  .leaf.active .n-name{color:var(--primary);font-weight:700;}
+  .n-name{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .n-count{color:var(--text-muted);text-align:right;font-size:11.5px;}
+  .n-spark{
+    position:relative;height:6px;background:var(--bg-soft2);align-self:center;
+  }
+  .n-spark i{position:absolute;left:0;top:0;bottom:0;background:var(--primary);}
+  .n-spark.warn i{background:var(--warning);}
+  .node .node, .node .leaf{padding-left:20px;}
+  .root-node > summary{font-weight:700;color:var(--navy);}
+  .tree-legend{
+    padding:12px 16px 0;
+    font-size:10.5px;
+    color:var(--text-faint);
+    border-top:1px solid var(--line);
+    margin-top:8px;
+    line-height:1.6;
+  }
+
+  /* ───────── Right: main content ───────── */
+  .main-pane{padding:18px 24px 40px;min-width:0;}
+
+  .panel-heading{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .panel-heading h1{
+    font-size:17px;
+    font-weight:700;
+    color:var(--navy);
+    margin:0;
+  }
+  .panel-heading .scope{
+    font-size:12.5px;
+    color:var(--text-muted);
+  }
+  .panel-heading .scope b{color:var(--primary);font-weight:600;}
+
+  /* ───────── Toolbar ───────── */
+  .toolbar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    appearance:none;
+    border:1px solid var(--line-strong);
+    background:var(--bg);
+    color:var(--text);
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 13px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border-radius:3px;
+  }
+  .btn:hover{border-color:var(--primary);color:var(--primary);}
+  .btn-primary{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+  }
+  .btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:#fff;}
+  .btn[disabled]{
+    color:var(--text-faint);
+    border-color:var(--line);
+    background:var(--bg-soft);
+    cursor:not-allowed;
+  }
+  .btn-icon{font-size:13px;line-height:1;}
+  .toolbar .fill{flex:1;}
+  .toolbar .selcount{font-size:12px;color:var(--text-muted);margin-right:4px;}
+
+  /* ───────── Table ───────── */
+  .table-scroll{
+    background:var(--bg);
+    border:1px solid var(--line);
+    overflow-x:auto;
+  }
+  table.devices{
+    width:100%;
+    min-width:1480px;
+    font-size:12.5px;
+  }
+  table.devices thead th{
+    text-align:left;
+    font-weight:700;
+    color:var(--navy);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.35px;
+    padding:9px 12px;
+    border-bottom:2px solid var(--navy);
+    border-top:1px solid var(--line);
+    white-space:nowrap;
+    background:var(--bg);
+    position:sticky;
+    top:0;
+  }
+  table.devices thead th.sortable{cursor:pointer;user-select:none;}
+  table.devices thead th.sortable .arrow{color:var(--text-faint);font-size:9px;margin-left:3px;}
+  table.devices thead th.sortable.sorted .arrow{color:var(--primary);}
+  table.devices thead th:first-child{width:34px;}
+  table.devices tbody td{
+    padding:8px 12px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+    white-space:nowrap;
+    color:var(--text);
+  }
+  table.devices tbody tr:hover td{background:#FAFBFC;}
+  table.devices tbody tr.selected td{background:#EDF3FC;}
+
+  tr.group-row td{
+    background:var(--bg-soft);
+    border-top:2px solid var(--navy);
+    border-bottom:1px solid var(--line-strong);
+    padding:7px 12px;
+    font-size:12px;
+  }
+  .group-row .g-name{font-weight:700;color:var(--navy);}
+  .group-row .g-stats{color:var(--text-muted);font-weight:500;}
+  .group-row .g-stats b{color:var(--text);font-weight:600;}
+  .group-row .g-stats .exc{color:var(--error);font-weight:700;}
+
+  .chname{font-weight:600;color:var(--text);}
+  .chname .sub{display:block;font-weight:400;color:var(--text-faint);font-size:11px;}
+
+  .status-pair{display:flex;flex-direction:column;gap:3px;}
+  .chip{display:flex;align-items:center;gap:5px;font-size:11.5px;white-space:nowrap;}
+  .chip .dot{width:7px;height:7px;border-radius:50%;flex:none;}
+  .dot.ok{background:var(--primary);}
+  .dot.neutral{background:var(--text-faint);}
+  .dot.warn{background:var(--warning);}
+  .dot.err{background:var(--error);}
+  .chip.c-err{color:var(--error);font-weight:600;}
+  .chip.c-warn{color:var(--warning);font-weight:600;}
+  .chip.c-neutral{color:var(--text-muted);}
+  .chip.c-ok{color:var(--text);}
+
+  .pw-mask{letter-spacing:2px;color:var(--text-faint);}
+  .mono-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+  .op-link{color:var(--primary);font-weight:600;cursor:pointer;text-decoration:none;}
+  .op-link:hover{text-decoration:underline;}
+  .op-link.danger{color:var(--error);margin-left:10px;}
+
+  .table-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 4px 0;
+    font-size:12px;
+    color:var(--text-muted);
+  }
+  .table-foot .pager{display:flex;gap:4px;}
+  .table-foot .pager button{
+    border:1px solid var(--line-strong);background:var(--bg);
+    padding:4px 9px;font-size:12px;cursor:pointer;border-radius:3px;color:var(--text);
+  }
+  .table-foot .pager button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  /* ───────── Modal ───────── */
+  .overlay{
+    position:fixed;inset:0;
+    background:rgba(6,14,28,.52);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:36px 20px;
+    z-index:100;
+    overflow-y:auto;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:#fff;
+    width:100%;
+    border-radius:5px;
+    box-shadow:0 18px 46px rgba(0,10,30,.28);
+  }
+  .modal.w-narrow{max-width:620px;}
+  .modal.w-wide{max-width:980px;}
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;border-bottom:1px solid var(--line);
+  }
+  .modal-head h2{margin:0;font-size:15px;font-weight:700;color:var(--navy);}
+  .modal-head .x{cursor:pointer;color:var(--text-faint);font-size:18px;line-height:1;border:none;background:none;}
+  .modal-head .x:hover{color:var(--error);}
+  .modal-body{padding:20px 22px;}
+  .modal-foot{
+    display:flex;justify-content:flex-end;gap:8px;
+    padding:14px 22px;border-top:1px solid var(--line);
+    background:var(--bg-soft);
+  }
+
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:18px;}
+  .tab-btn{
+    appearance:none;border:none;background:none;font-family:inherit;
+    padding:9px 4px;margin-right:22px;font-size:13px;font-weight:600;
+    color:var(--text-faint);cursor:pointer;border-bottom:2px solid transparent;
+  }
+  .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field.full{grid-column:1/-1;}
+  .field label{font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;}
+  .field input, .field select{
+    border:1px solid var(--line-strong);border-radius:3px;
+    padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;
+  }
+  .field input:focus, .field select:focus{outline:2px solid #CFE0FA;border-color:var(--primary);}
+  .field .hint{font-size:11px;color:var(--text-faint);}
+
+  .octet-group{display:flex;align-items:center;gap:6px;}
+  .octet-group input{width:52px;text-align:center;padding:8px 4px;}
+  .octet-group span{color:var(--text-faint);font-weight:700;}
+
+  .scan-row{display:flex;align-items:flex-end;gap:12px;margin-bottom:16px;}
+  .scan-row .field{flex:1;max-width:320px;}
+
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11px;font-weight:700;padding:3px 8px;border-radius:2px;
+    text-transform:uppercase;letter-spacing:.2px;
+  }
+  .badge.b-init{background:#E9F0FC;color:var(--primary);}
+  .badge.b-pending{background:var(--bg-soft2);color:var(--text-muted);}
+  .badge.b-progress{background:var(--warning-bg);color:var(--warning);}
+  .badge.b-error{background:var(--error-bg);color:var(--error);}
+
+  .warn-box{
+    display:flex;gap:10px;
+    background:var(--warning-bg);
+    border:1px solid #EAD9AE;
+    border-left:3px solid var(--warning);
+    padding:10px 13px;
+    font-size:12px;
+    color:#6B4400;
+    line-height:1.55;
+    margin:16px 0 4px;
+  }
+  .warn-box .wi{font-size:15px;flex:none;}
+
+  .dropzone{
+    border:1.5px dashed var(--line-strong);
+    padding:34px 20px;text-align:center;color:var(--text-muted);
+    font-size:12.5px;
+  }
+  .dropzone b{color:var(--primary);cursor:pointer;}
+
+  .scan-table{width:100%;font-size:12px;margin-top:10px;}
+  .scan-table th{
+    text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;
+    color:var(--text-muted);padding:7px 9px;border-bottom:2px solid var(--navy);white-space:nowrap;
+  }
+  .scan-table td{padding:7px 9px;border-bottom:1px solid var(--line);white-space:nowrap;}
+
+  .mini-bullet{display:flex;align-items:center;gap:10px;margin-top:18px;}
+  .mini-bullet .mb-track{position:relative;flex:1;height:9px;background:var(--bg-soft2);}
+  .mini-bullet .mb-fill{position:absolute;left:0;top:0;bottom:0;background:var(--primary);}
+  .mini-bullet .mb-label{font-size:11px;color:var(--text-muted);white-space:nowrap;}
+
+  .ip-select-table{width:100%;font-size:12px;margin-bottom:16px;border:1px solid var(--line);}
+  .ip-select-table th{background:var(--bg-soft);text-align:left;padding:7px 10px;font-size:10.5px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--line);}
+  .ip-select-table td{padding:7px 10px;border-bottom:1px solid var(--line);}
+
+  @media (max-width: 1180px){
+    .shell{grid-template-columns:1fr;}
+    .tree-pane{display:none;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Cấu hình &nbsp;/&nbsp; <b>Quản lý thiết bị</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <!-- ═══════════ RESOURCE STRIP — bullet graphs ═══════════ -->
+  <div class="resource-strip">
+    <div class="bullet">
+      <span class="b-label">Kênh còn lại</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:68.7%"></span>
+        <span class="b-tick" style="left:90%"></span>
+      </span>
+      <span class="b-figure tabular">1.284 <small>/ 4.096 · đã dùng 68,7%</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Băng thông còn lại</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:60.9%"></span>
+        <span class="b-tick" style="left:88%"></span>
+      </span>
+      <span class="b-figure tabular">312,5 Mbps <small>/ 800 Mbps · đã dùng 60,9%</small></span>
+    </div>
+  </div>
+
+  <!-- ═══════════ SHELL: tree + main ═══════════ -->
+  <div class="shell">
+
+    <!-- ─────── LEFT: multi-level region tree with aggregate small-multiples ─────── -->
+    <nav class="tree-pane">
+      <div class="tp-heading">Địa bàn quản lý</div>
+
+      <details class="node root-node" open>
+        <summary>
+          <span class="n-name">Toàn hệ thống</span>
+          <span class="n-spark"><i style="width:96.4%"></i></span>
+          <span class="n-count tabular">2.418</span>
+        </summary>
+
+        <details class="node" open>
+          <summary>
+            <span class="n-name">TP. Hà Nội</span>
+            <span class="n-spark"><i style="width:96.1%"></i></span>
+            <span class="n-count tabular">612</span>
+          </summary>
+          <div class="leaf active">
+            <span class="n-name">Quận Cầu Giấy</span>
+            <span class="n-spark"><i style="width:97.7%"></i></span>
+            <span class="n-count tabular">86</span>
+          </div>
+          <div class="leaf">
+            <span class="n-name">Quận Đống Đa</span>
+            <span class="n-spark"><i style="width:96.3%"></i></span>
+            <span class="n-count tabular">54</span>
+          </div>
+          <div class="leaf">
+            <span class="n-name">Quận Hai Bà Trưng</span>
+            <span class="n-spark"><i style="width:97.9%"></i></span>
+            <span class="n-count tabular">47</span>
+          </div>
+        </details>
+
+        <div class="leaf">
+          <span class="n-name">KCN Bắc Thăng Long</span>
+          <span class="n-spark warn"><i style="width:96.5%"></i></span>
+          <span class="n-count tabular">142</span>
+        </div>
+
+        <details class="node">
+          <summary>
+            <span class="n-name">TP. Hồ Chí Minh</span>
+            <span class="n-spark warn"><i style="width:96.2%"></i></span>
+            <span class="n-count tabular">498</span>
+          </summary>
+          <div class="leaf">
+            <span class="n-name">Quận 1</span>
+            <span class="n-spark"><i style="width:96.7%"></i></span>
+            <span class="n-count tabular">61</span>
+          </div>
+          <div class="leaf">
+            <span class="n-name">TP. Thủ Đức</span>
+            <span class="n-spark"><i style="width:96.6%"></i></span>
+            <span class="n-count tabular">88</span>
+          </div>
+        </details>
+
+        <div class="leaf">
+          <span class="n-name">Cao tốc Hà Nội - Hải Phòng</span>
+          <span class="n-spark"><i style="width:97.1%"></i></span>
+          <span class="n-count tabular">204</span>
+        </div>
+
+        <div class="leaf">
+          <span class="n-name">Cụm cảng Hải Phòng</span>
+          <span class="n-spark warn"><i style="width:95.2%"></i></span>
+          <span class="n-count tabular">167</span>
+        </div>
+      </details>
+
+      <div class="tree-legend">
+        Thanh mini = % thiết bị trực tuyến trên tổng nhánh.<br>
+        Số bên phải = tổng thiết bị đăng ký trong nhánh.
+      </div>
+    </nav>
+
+    <!-- ─────── RIGHT: toolbar + dense table ─────── -->
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Quản lý thiết bị</h1>
+        <span class="scope">Đang xem theo nhánh: <b>Quận Cầu Giấy, TP. Hà Nội</b> — 86 thiết bị đăng ký</span>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="openModal('modal-add')"><span class="btn-icon">＋</span> Thêm thiết bị</button>
+        <button class="btn" onclick="openModal('modal-ip')">Đổi IP</button>
+        <button class="btn">Xuất dữ liệu</button>
+        <button class="btn">Nhập hàng loạt</button>
+        <button class="btn" id="btn-delete" disabled>Xoá</button>
+        <div class="fill"></div>
+        <span class="selcount" id="selcount"></span>
+        <button class="btn">Bộ lọc ▾</button>
+      </div>
+
+      <div class="table-scroll">
+        <table class="devices">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="check-all" onclick="toggleAll(this)"></th>
+              <th>Trạng thái</th>
+              <th class="sortable sorted">Tên kênh <span class="arrow">▾</span></th>
+              <th class="sortable">Địa chỉ IP <span class="arrow">▾</span></th>
+              <th>Cổng</th>
+              <th>Tài khoản</th>
+              <th>Mật khẩu</th>
+              <th>Hãng sản xuất</th>
+              <th>Model</th>
+              <th>SN</th>
+              <th>Kênh remote</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr class="group-row">
+              <td colspan="12">
+                <span class="g-name">Quận Cầu Giấy, TP. Hà Nội</span>
+                &nbsp;·&nbsp;
+                <span class="g-stats"><b>86</b> thiết bị · <b>84</b> trực tuyến · <span class="exc">2 mất kết nối</span> · <b>79</b> đang ghi</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Cổng chính Toà nhà VNPT Cầu Giấy<span class="sub">Trục chính · tầng trệt</span></td>
+              <td class="mono-cell">10.20.14.11</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">admin01</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>VNPT AI Camera</td>
+              <td class="mono-cell">VA-IPC-4MP-AI</td>
+              <td class="mono-cell">VNTA24C11045</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Ngã tư Nguyễn Trãi - Khuất Duy Tiến<span class="sub">Giao thông · góc Đông Bắc</span></td>
+              <td class="mono-cell">10.20.14.27</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">admin01</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>Uniview</td>
+              <td class="mono-cell">IPC2124SB-ADF28KM</td>
+              <td class="mono-cell">UNV23G88012</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-neutral"><i class="dot neutral"></i>Mất kết nối</span>
+                  <span class="chip c-neutral"><i class="dot neutral"></i>Không ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Sảnh chờ ga Cầu Giấy (BRT)<span class="sub">Nhà chờ xe buýt nhanh</span></td>
+              <td class="mono-cell">10.20.14.33</td>
+              <td class="mono-cell tabular">8000</td>
+              <td class="mono-cell">opuser</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>KBVision</td>
+              <td class="mono-cell">KX-8005AN2</td>
+              <td class="mono-cell">KBV22F5590</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-warn"><i class="dot warn"></i>Đang xuống cấp</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ<span class="sub">Giao thông · vòng xuyến trung tâm</span></td>
+              <td class="mono-cell">10.20.14.41</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">admin02</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>Vantech</td>
+              <td class="mono-cell">VP-2000C</td>
+              <td class="mono-cell">VTC24H2201</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr class="group-row">
+              <td colspan="12">
+                <span class="g-name">Khu công nghiệp Bắc Thăng Long</span>
+                &nbsp;·&nbsp;
+                <span class="g-stats"><b>142</b> thiết bị · <b>137</b> trực tuyến · <span class="exc">5 ngoại lệ</span> · <b>129</b> đang ghi</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Cổng chính KCN Bắc Thăng Long<span class="sub">Cổng số 1 · kiểm soát ra vào</span></td>
+              <td class="mono-cell">10.40.2.10</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">kcnadmin</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>VNPT AI Camera</td>
+              <td class="mono-cell">VA-IPC-8MP-AI</td>
+              <td class="mono-cell">VNTA24K0091</td>
+              <td class="tabular">2</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Kho vận số 3<span class="sub">Bãi tập kết container</span></td>
+              <td class="mono-cell">10.40.2.18</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">kcnadmin</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>Uniview</td>
+              <td class="mono-cell">IPC3618SB</td>
+              <td class="mono-cell">UNV23K7742</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-err"><i class="dot err"></i>Kết nối thất bại</span>
+                  <span class="chip c-err"><i class="dot err"></i>Lỗi lưu trữ</span>
+                </div>
+              </td>
+              <td class="chname">Camera Trạm cân xe tải<span class="sub">Trạm cân số 2</span></td>
+              <td class="mono-cell">10.40.2.25</td>
+              <td class="mono-cell tabular">8000</td>
+              <td class="mono-cell">kcnadmin</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>Avtech</td>
+              <td class="mono-cell">AVM561B</td>
+              <td class="mono-cell">AVT22K3310</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span>
+                  <span class="chip c-neutral"><i class="dot neutral"></i>Không ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Bãi đỗ xe nhà máy Canon<span class="sub">Bãi đỗ khách</span></td>
+              <td class="mono-cell">10.40.2.31</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">kcnadmin</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>KBVision</td>
+              <td class="mono-cell">KX-4005AN2</td>
+              <td class="mono-cell">KBV23K7765</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr class="group-row">
+              <td colspan="12">
+                <span class="g-name">Tuyến cao tốc Hà Nội - Hải Phòng</span>
+                &nbsp;·&nbsp;
+                <span class="g-stats"><b>204</b> thiết bị · <b>198</b> trực tuyến · <span class="exc">6 ngoại lệ</span> · <b>190</b> đang ghi</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Km12+400 cao tốc HN - Hải Phòng<span class="sub">Làn xe hướng Hải Phòng</span></td>
+              <td class="mono-cell">10.60.5.12</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">vecadmin</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>VNPT AI Camera</td>
+              <td class="mono-cell">VA-IPC-4MP-AI</td>
+              <td class="mono-cell">VNTA24H1204</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Trạm thu phí Quốc lộ 5B Km9<span class="sub">Làn thu phí không dừng 3-4</span></td>
+              <td class="mono-cell">10.60.5.19</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">vecadmin</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>Vantech</td>
+              <td class="mono-cell">VP-6000C</td>
+              <td class="mono-cell">VTC23H9091</td>
+              <td class="tabular">2</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+              <td>
+                <div class="status-pair">
+                  <span class="chip c-warn"><i class="dot warn"></i>Đang xuống cấp</span>
+                  <span class="chip c-ok"><i class="dot ok"></i>Đang ghi</span>
+                </div>
+              </td>
+              <td class="chname">Camera Nút giao Km22 cao tốc HN-HP<span class="sub">Nút giao IC5</span></td>
+              <td class="mono-cell">10.60.5.27</td>
+              <td class="mono-cell tabular">37777</td>
+              <td class="mono-cell">vecadmin</td>
+              <td><span class="pw-mask">●●●●●●●●</span></td>
+              <td>Uniview</td>
+              <td class="mono-cell">IPC2122LB</td>
+              <td class="mono-cell">UNV24H2278</td>
+              <td class="tabular">1</td>
+              <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-foot">
+        <span>Tổng <b class="tabular">2.418</b> thiết bị — đang hiển thị 11 dòng thuộc 3 nhánh địa bàn</span>
+        <div class="pager">
+          <button disabled>‹</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>…</button>
+          <button>22</button>
+          <button>›</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════ MODAL: Thêm thiết bị ═══════════ -->
+  <div class="overlay" id="modal-add">
+    <div class="modal w-wide">
+      <div class="modal-head">
+        <h2>Thêm thiết bị</h2>
+        <button class="x" onclick="closeModal('modal-add')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(event,'tab-scan')">Quét nhanh</button>
+          <button class="tab-btn" onclick="switchTab(event,'tab-manual')">Nhập tay</button>
+          <button class="tab-btn" onclick="switchTab(event,'tab-rtsp')">RTSP</button>
+          <button class="tab-btn" onclick="switchTab(event,'tab-batch')">Nhập hàng loạt</button>
+        </div>
+
+        <!-- Quick scan -->
+        <div class="tab-panel active" id="tab-scan">
+          <div class="scan-row">
+            <div class="field">
+              <label>Mật khẩu kết nối thiết bị</label>
+              <input type="password" placeholder="Dùng chung cho toàn bộ thiết bị quét được" value="••••••••">
+            </div>
+            <button class="btn btn-primary" style="height:35px;">Bắt đầu quét</button>
+            <button class="btn" style="height:35px;">Khởi tạo</button>
+            <button class="btn" style="height:35px;">Đổi IP</button>
+          </div>
+
+          <table class="scan-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Trạng thái khởi tạo</th>
+                <th>Địa chỉ</th>
+                <th>Model</th>
+                <th>Hãng SX</th>
+                <th>Cổng</th>
+                <th>Loại thiết bị</th>
+                <th>SN</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><span class="badge b-init">Đã khởi tạo</span></td>
+                <td class="mono-cell">10.20.14.52</td>
+                <td class="mono-cell">VA-IPC-4MP-AI</td>
+                <td>VNPT AI Camera</td>
+                <td class="mono-cell tabular">37777</td>
+                <td>Camera IP</td>
+                <td class="mono-cell">VNTA24C11098</td>
+                <td><a class="op-link">Thêm</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><span class="badge b-progress">Đang khởi tạo</span></td>
+                <td class="mono-cell">10.20.14.53</td>
+                <td class="mono-cell">IPC2124SB</td>
+                <td>Uniview</td>
+                <td class="mono-cell tabular">37777</td>
+                <td>Camera IP</td>
+                <td class="mono-cell">UNV23G88099</td>
+                <td><a class="op-link">Thêm</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><span class="badge b-pending">Chưa khởi tạo</span></td>
+                <td class="mono-cell">10.20.14.54</td>
+                <td class="mono-cell">KX-8005AN2</td>
+                <td>KBVision</td>
+                <td class="mono-cell tabular">8000</td>
+                <td>Camera IP</td>
+                <td class="mono-cell">KBV22F5612</td>
+                <td><a class="op-link">Khởi tạo</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><span class="badge b-error">Lỗi khởi tạo</span></td>
+                <td class="mono-cell">10.20.14.55</td>
+                <td class="mono-cell">VP-2000C</td>
+                <td>Vantech</td>
+                <td class="mono-cell tabular">37777</td>
+                <td>Camera IP</td>
+                <td class="mono-cell">VTC24H2255</td>
+                <td><a class="op-link">Thử lại</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><span class="badge b-init">Đã khởi tạo</span></td>
+                <td class="mono-cell">10.20.14.56</td>
+                <td class="mono-cell">AVM561B</td>
+                <td>Avtech</td>
+                <td class="mono-cell tabular">37777</td>
+                <td>Camera IP</td>
+                <td class="mono-cell">AVT22K3388</td>
+                <td><a class="op-link">Thêm</a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="mini-bullet">
+            <span class="mb-label">Băng thông dự kiến sau khi thêm</span>
+            <span class="mb-track"><span class="mb-fill" style="width:64%"></span></span>
+            <span class="mb-label tabular">512,3 / 800 Mbps</span>
+          </div>
+        </div>
+
+        <!-- Manual -->
+        <div class="tab-panel" id="tab-manual">
+          <div class="form-grid">
+            <div class="field">
+              <label>Địa chỉ IP</label>
+              <input type="text" placeholder="10.20.14.60">
+            </div>
+            <div class="field">
+              <label>Cổng</label>
+              <input type="text" placeholder="37777">
+            </div>
+            <div class="field">
+              <label>Tài khoản</label>
+              <input type="text" placeholder="admin01">
+            </div>
+            <div class="field">
+              <label>Mật khẩu</label>
+              <input type="password" placeholder="••••••••">
+            </div>
+            <div class="field">
+              <label>Giao thức</label>
+              <select><option>Riêng (Private)</option><option>ONVIF</option></select>
+            </div>
+            <div class="field">
+              <label>Số kênh remote</label>
+              <input type="text" placeholder="1">
+            </div>
+            <div class="field full">
+              <label>Tên kênh hiển thị</label>
+              <input type="text" placeholder="VD: Camera Cổng phụ Toà nhà VNPT Cầu Giấy">
+            </div>
+          </div>
+        </div>
+
+        <!-- RTSP -->
+        <div class="tab-panel" id="tab-rtsp">
+          <div class="form-grid">
+            <div class="field full">
+              <label>Đường dẫn RTSP</label>
+              <input type="text" placeholder="rtsp://admin01:••••••••@10.20.14.61:554/cam/realmonitor?channel=1&subtype=0">
+            </div>
+            <div class="field">
+              <label>Tên kênh hiển thị</label>
+              <input type="text" placeholder="VD: Camera RTSP bổ sung">
+            </div>
+            <div class="field">
+              <label>Giao thức truyền</label>
+              <select><option>TCP</option><option>UDP</option></select>
+            </div>
+          </div>
+          <div class="scan-row" style="margin-top:16px;">
+            <button class="btn" style="height:35px;">Kiểm tra kết nối</button>
+            <span class="hint" style="color:var(--text-faint);font-size:12px;">Chưa kiểm tra</span>
+          </div>
+        </div>
+
+        <!-- Batch import -->
+        <div class="tab-panel" id="tab-batch">
+          <div class="dropzone">
+            Kéo thả file danh sách thiết bị (.xlsx, .csv) vào đây, hoặc <b>chọn file từ máy tính</b>.<br>
+            <span class="hint">Tải <b style="color:var(--primary);">file mẫu (.xlsx)</b> để đảm bảo đúng định dạng cột.</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-add')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-add')">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Đổi IP ═══════════ -->
+  <div class="overlay" id="modal-ip">
+    <div class="modal w-narrow">
+      <div class="modal-head">
+        <h2>Đổi IP hàng loạt</h2>
+        <button class="x" onclick="closeModal('modal-ip')">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <table class="ip-select-table">
+          <thead><tr><th>SN</th><th>Địa chỉ hiện tại</th></tr></thead>
+          <tbody>
+            <tr><td class="mono-cell">VNTA24C11045</td><td class="mono-cell">10.20.14.11</td></tr>
+            <tr><td class="mono-cell">UNV23G88012</td><td class="mono-cell">10.20.14.27</td></tr>
+          </tbody>
+        </table>
+
+        <div class="form-grid">
+          <div class="field full">
+            <label>Static IP bắt đầu</label>
+            <div class="octet-group">
+              <input value="10"><span>.</span><input value="20"><span>.</span><input value="14"><span>.</span><input value="11">
+            </div>
+          </div>
+          <div class="field">
+            <label>Subnet mask</label>
+            <div class="octet-group">
+              <input value="255"><span>.</span><input value="255"><span>.</span><input value="255"><span>.</span><input value="0">
+            </div>
+          </div>
+          <div class="field">
+            <label>Default gateway</label>
+            <div class="octet-group">
+              <input value="10"><span>.</span><input value="20"><span>.</span><input value="14"><span>.</span><input value="1">
+            </div>
+          </div>
+          <div class="field">
+            <label>Giá trị tăng dần (Incremental)</label>
+            <input type="text" value="1">
+          </div>
+          <div class="field">
+            <label>Tài khoản</label>
+            <input type="text" placeholder="admin01">
+          </div>
+          <div class="field">
+            <label>Mật khẩu</label>
+            <input type="password" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="warn-box">
+          <span class="wi">⚠</span>
+          <span>Chỉ áp dụng cho thiết bị <b>cùng phân đoạn mạng (subnet)</b> với địa chỉ bắt đầu. Thiết bị đang <b>Mất kết nối</b> hoặc <b>Kết nối thất bại</b> sẽ bị bỏ qua và cần đổi IP thủ công sau khi khôi phục kết nối.</span>
+        </div>
+
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-ip')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-ip')">Tiếp theo</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  function switchTab(ev, id){
+    const modal = ev.target.closest('.modal');
+    modal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    modal.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    modal.querySelector('#'+id).classList.add('active');
+  }
+
+  function toggleAll(src){
+    document.querySelectorAll('.row-check').forEach(cb=>{
+      cb.checked = src.checked;
+      cb.closest('tr').classList.toggle('selected', src.checked);
+    });
+    updateSelection();
+  }
+
+  function onRowCheck(cb){
+    cb.closest('tr').classList.toggle('selected', cb.checked);
+    updateSelection();
+  }
+
+  function updateSelection(){
+    const n = document.querySelectorAll('.row-check:checked').length;
+    document.getElementById('btn-delete').disabled = n === 0;
+    document.getElementById('selcount').textContent = n > 0 ? 'Đã chọn ' + n + ' thiết bị' : '';
+  }
+</script>
+
+</body>
+</html>

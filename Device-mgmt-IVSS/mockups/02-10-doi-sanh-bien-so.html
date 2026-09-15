@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đối sánh biển số · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 10-doi-sanh-bien-so.
+  Ảnh tham khảo: refs/02-van-hanh-ai/10-doi-sanh-bien-so/
+    fig6-61_plate-database.png (danh sách CSDL biển số dạng thẻ + toolbar
+      Create/Delete/Clear/Export/Refresh + chỉ số Quantity),
+    fig6-62_plate-database-configuration.png (wizard 2 bước: Name → Plate
+      Registration, form 2 cột: thông tin chủ xe trái / thông tin biển-xe phải),
+    fig6-63_plate-registration.png (form đăng ký biển số, cùng cấu trúc 2 cột),
+    fig6-64_batch-import.png (chọn file + tải template + Template Field Search),
+    fig6-65_plate-comparison.png (Enable, Schedule, Event Linkage for
+      Unregistered Vehicles dạng collapsible, Arming Settings),
+    fig6-66_event-linkage-for-unregistered-vehicles.png (chi tiết Local
+      Linkage: Record Control post-record giây + Device + Start Record),
+    fig6-67_motor-vehicle.png (dialog AI Display, không dùng trực tiếp).
+    p160_configure-plate-comparison.png thực chất là ảnh logo hãng SX gốc
+    (không phải nội dung UI) — bỏ qua, không dùng.
+  Theo brief người dùng: dựng thành 1 trang "Quản lý CSDL biển số" có
+  tab điều hướng 5 mục con (CSDL biển số / Cấu hình CSDL / Đăng ký biển số /
+  Nhập hàng loạt / Cấu hình đối sánh), mục "Liên kết sự kiện cho xe chưa đăng
+  ký" lồng vào bên trong tab Cấu hình đối sánh (đúng như cấu trúc gốc — đây
+  là phần mở rộng/collapsible của màn Plate Comparison, không phải màn độc
+  lập). Dùng table.devices cho CSDL, .form-grid cho các form cấu hình theo
+  đúng hệ thống thiết kế đã chốt.
+  Giả định: biển số kiểu Việt Nam thật, dữ liệu minh hoạ không phải hồ sơ
+  thật. Kế thừa nguyên vẹn shared.css — CSS mới (group-list, plate-chip,
+  photo-box, toggle) scoped riêng trong file này.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ───────── Scoped: toggle switch ───────── */
+  .toggle{position:relative;display:inline-block;width:36px;height:20px;flex:none;}
+  .toggle input{opacity:0;width:0;height:0;position:absolute;}
+  .toggle .slider{position:absolute;inset:0;background:var(--line-strong);border-radius:20px;cursor:pointer;transition:background .15s;}
+  .toggle .slider::before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3);}
+  .toggle input:checked + .slider{background:var(--primary);}
+  .toggle input:checked + .slider::before{transform:translateX(16px);}
+  .toggle-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);font-weight:600;}
+
+  .plate-chip{font-family:var(--mono);font-weight:800;font-size:13px;letter-spacing:.3px;color:var(--navy);border:1.5px solid var(--navy);border-radius:3px;padding:2px 7px;background:#FFF9E0;white-space:nowrap;display:inline-block;}
+
+  /* ───────── Scoped: Cấu hình CSDL — danh sách nhóm ───────── */
+  .group-list{border:1px solid var(--line);background:var(--line);display:flex;flex-direction:column;gap:1px;}
+  .group-row2{background:#fff;padding:12px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .group-row2 .g-main{min-width:220px;flex:1;}
+  .group-row2 .g-name{font-weight:700;font-size:13px;color:var(--navy);}
+  .group-row2 .g-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+  .group-row2 .g-count{font-size:19px;font-weight:800;color:var(--text);min-width:70px;text-align:center;}
+  .group-row2 .g-count small{display:block;font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;}
+  .group-row2 .g-arm{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-muted);min-width:150px;}
+  .group-row2 .g-links{display:flex;gap:12px;margin-left:auto;}
+
+  /* ───────── Scoped: preview ảnh xe ───────── */
+  .photo-box{border:1.5px dashed var(--line-strong);background:var(--bg-soft);height:118px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:11.5px;text-align:center;padding:0 14px;}
+
+  /* ───────── Scoped: collapsible section (details) ───────── */
+  .collapse{border:1px solid var(--line);margin-top:16px;}
+  .collapse > summary{list-style:none;cursor:pointer;padding:11px 14px;background:var(--bg-soft);font-size:12.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
+  .collapse > summary::-webkit-details-marker{display:none;}
+  .collapse > summary::before{content:"▸";font-size:10px;color:var(--text-faint);}
+  .collapse[open] > summary::before{content:"▾";}
+  .collapse .collapse-body{padding:16px;border-top:1px solid var(--line);}
+  .linkage-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--text);margin-top:10px;}
+  .linkage-row input[type=text], .linkage-row select{border:1px solid var(--line-strong);border-radius:3px;padding:6px 9px;font-size:12.5px;font-family:inherit;}
+  .arm-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+  .arm-item{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Đối sánh biển số</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Quản lý CSDL biển số</h1>
+        <span class="scope">Cơ sở dữ liệu biển số dùng để đối sánh tự động qua ANPR — quản lý danh sách, nhóm CSDL, đăng ký/nhập hàng loạt và cấu hình đối sánh</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event,'tab-list')">CSDL biển số</button>
+        <button class="tab-btn" onclick="switchTab(event,'tab-groups')">Cấu hình CSDL</button>
+        <button class="tab-btn" onclick="switchTab(event,'tab-register')">Đăng ký biển số</button>
+        <button class="tab-btn" onclick="switchTab(event,'tab-batch')">Nhập hàng loạt</button>
+        <button class="tab-btn" onclick="switchTab(event,'tab-compare')">Cấu hình đối sánh</button>
+      </div>
+
+      <!-- ═══════════ TAB 1: CSDL BIỂN SỐ ═══════════ -->
+      <div class="tab-panel active" id="tab-list">
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="switchTabByName('tab-register')"><span class="btn-icon">＋</span> Thêm biển số</button>
+          <button class="btn">Xuất danh sách</button>
+          <button class="btn" onclick="switchTabByName('tab-batch')">Nhập hàng loạt</button>
+          <button class="btn" id="btn-del-plate" disabled>Xoá</button>
+          <div class="fill"></div>
+          <span class="selcount" id="selcount"></span>
+          <button class="btn">Bộ lọc ▾</button>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices">
+            <thead>
+              <tr>
+                <th><input type="checkbox" onclick="toggleAll(this)"></th>
+                <th>Biển số</th>
+                <th>Chủ phương tiện / Đơn vị</th>
+                <th>Loại xe</th>
+                <th>Hãng xe</th>
+                <th>Màu xe</th>
+                <th>Nhóm CSDL</th>
+                <th>Ngày đăng ký</th>
+                <th>Ghi chú</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr class="group-row"><td colspan="10"><span class="g-name">Nhóm cho phép · Nhân viên &amp; đối tác VNPT</span>&nbsp;·&nbsp;<span class="g-stats"><b>4</b> biển số · toàn bộ đang <b>vũ trang</b></span></td></tr>
+
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">30A-123.45</span></td>
+                <td class="chname">Nguyễn Văn Đạt</td>
+                <td>Ô tô con</td>
+                <td>Toyota</td>
+                <td>Trắng</td>
+                <td><span class="badge b-init">Cho phép</span></td>
+                <td class="mono-cell">12/01/2026</td>
+                <td>Nhân viên kỹ thuật NOC</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">29H1-678.90</span></td>
+                <td class="chname">Cty TNHH Vận tải Thăng Long</td>
+                <td>Xe khách 45 chỗ</td>
+                <td>Thaco</td>
+                <td>Trắng</td>
+                <td><span class="badge b-init">Cho phép</span></td>
+                <td class="mono-cell">03/02/2026</td>
+                <td>Xe đưa đón nhân viên KCN</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">89C-045.12</span></td>
+                <td class="chname">Trần Thị Hương</td>
+                <td>Xe tải</td>
+                <td>Hyundai</td>
+                <td>Xanh lá</td>
+                <td><span class="badge b-init">Cho phép</span></td>
+                <td class="mono-cell">15/02/2026</td>
+                <td>Xe chở hàng nội bộ kho vận</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">30E-891.23</span></td>
+                <td class="chname">Phạm Minh Tuấn</td>
+                <td>Ô tô con</td>
+                <td>Kia</td>
+                <td>Đen</td>
+                <td><span class="badge b-init">Cho phép</span></td>
+                <td class="mono-cell">20/03/2026</td>
+                <td>Ban quản lý toà nhà</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+              <tr class="group-row"><td colspan="10"><span class="g-name">Nhóm chặn · Cảnh báo an ninh</span>&nbsp;·&nbsp;<span class="g-stats"><b>3</b> biển số · <span class="exc">toàn bộ đang vũ trang</span></span></td></tr>
+
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">16A-234.56</span></td>
+                <td class="chname">Không xác định</td>
+                <td>Container</td>
+                <td>—</td>
+                <td>Xanh dương</td>
+                <td><span class="badge b-error">Chặn</span></td>
+                <td class="mono-cell">01/04/2026</td>
+                <td>Nghi vấn liên quan trộm thiết bị, theo yêu cầu công an</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">30G-334.91</span></td>
+                <td class="chname">Không xác định</td>
+                <td>Ô tô con</td>
+                <td>—</td>
+                <td>Trắng</td>
+                <td><span class="badge b-error">Chặn</span></td>
+                <td class="mono-cell">18/04/2026</td>
+                <td>Từng vi phạm ra vào trái phép cổng số 1</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">99A-567.89</span></td>
+                <td class="chname">Không xác định</td>
+                <td>Xe bán tải</td>
+                <td>—</td>
+                <td>Bạc</td>
+                <td><span class="badge b-error">Chặn</span></td>
+                <td class="mono-cell">02/05/2026</td>
+                <td>Cảnh báo an ninh khu vực trạm cân</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+              <tr class="group-row"><td colspan="10"><span class="g-name">Nhóm chờ duyệt · Đăng ký mới</span>&nbsp;·&nbsp;<span class="g-stats"><b>2</b> biển số · chưa vũ trang</span></td></tr>
+
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">15C-112.34</span></td>
+                <td class="chname">Đỗ Văn Long</td>
+                <td>Ô tô con</td>
+                <td>Mazda</td>
+                <td>Đỏ</td>
+                <td><span class="badge b-pending">Chờ duyệt</span></td>
+                <td class="mono-cell">14/09/2026</td>
+                <td>Đăng ký mới, chờ xác minh giấy tờ</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><span class="plate-chip">29B2-456.78</span></td>
+                <td class="chname">Cty CP Logistics Bắc Thăng Long</td>
+                <td>Xe tải</td>
+                <td>Isuzu</td>
+                <td>Trắng</td>
+                <td><span class="badge b-pending">Chờ duyệt</span></td>
+                <td class="mono-cell">14/09/2026</td>
+                <td>Đăng ký mới</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-foot">
+          <span>Tổng <b class="tabular">9</b> biển số trong CSDL — 3 nhóm</span>
+          <div class="pager"><button disabled>‹</button><button class="active">1</button><button>›</button></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ TAB 2: CẤU HÌNH CSDL ═══════════ -->
+      <div class="tab-panel" id="tab-groups">
+
+        <div class="toolbar">
+          <button class="btn btn-primary">＋ Tạo nhóm CSDL mới</button>
+          <button class="btn">Xoá nhóm</button>
+          <button class="btn">Xuất dữ liệu</button>
+          <div class="fill"></div>
+          <button class="btn">Làm mới</button>
+        </div>
+
+        <div class="group-list">
+          <div class="group-row2">
+            <div class="g-main"><div class="g-name">Nhóm cho phép · Nhân viên &amp; đối tác VNPT</div><div class="g-meta">Loại: Cho phép (Allowlist) — bỏ qua cảnh báo khi trùng khớp</div></div>
+            <div class="g-count">4<small>biển số</small></div>
+            <div class="g-arm"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Đang vũ trang</div>
+            <div class="g-links"><a class="op-link">Xem danh sách</a><a class="op-link">Xuất dữ liệu</a><a class="op-link danger">Xoá nhóm</a></div>
+          </div>
+          <div class="group-row2">
+            <div class="g-main"><div class="g-name">Nhóm chặn · Cảnh báo an ninh</div><div class="g-meta">Loại: Chặn (Blocklist) — phát cảnh báo ngay khi trùng khớp</div></div>
+            <div class="g-count">3<small>biển số</small></div>
+            <div class="g-arm"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Đang vũ trang</div>
+            <div class="g-links"><a class="op-link">Xem danh sách</a><a class="op-link">Xuất dữ liệu</a><a class="op-link danger">Xoá nhóm</a></div>
+          </div>
+          <div class="group-row2">
+            <div class="g-main"><div class="g-name">Nhóm chờ duyệt · Đăng ký mới</div><div class="g-meta">Loại: Trung lập — chỉ ghi nhận, không phát cảnh báo</div></div>
+            <div class="g-count">2<small>biển số</small></div>
+            <div class="g-arm"><label class="toggle"><input type="checkbox"><span class="slider"></span></label> Đã tắt</div>
+            <div class="g-links"><a class="op-link">Xem danh sách</a><a class="op-link">Xuất dữ liệu</a><a class="op-link danger">Xoá nhóm</a></div>
+          </div>
+          <div class="group-row2">
+            <div class="g-main"><div class="g-name">Nhóm cho phép · Xe công vụ cao tốc HN-HP (VEC)</div><div class="g-meta">Loại: Cho phép (Allowlist) — đồng bộ định kỳ từ VECOMS</div></div>
+            <div class="g-count">0<small>biển số</small></div>
+            <div class="g-arm"><label class="toggle"><input type="checkbox"><span class="slider"></span></label> Đã tắt</div>
+            <div class="g-links"><a class="op-link">Xem danh sách</a><a class="op-link">Xuất dữ liệu</a><a class="op-link danger">Xoá nhóm</a></div>
+          </div>
+        </div>
+
+        <div class="mini-bullet">
+          <span class="mb-label">Dung lượng CSDL biển số đã dùng</span>
+          <span class="mb-track"><span class="mb-fill" style="width:9%"></span></span>
+          <span class="mb-label tabular">9 / 100.000 biển số</span>
+        </div>
+      </div>
+
+      <!-- ═══════════ TAB 3: ĐĂNG KÝ BIỂN SỐ ═══════════ -->
+      <div class="tab-panel" id="tab-register">
+        <div class="card">
+          <div class="wizard-rail">
+            <div class="step done"><span class="num">✓</span> Thông tin chủ phương tiện</div>
+            <div class="rail-line"></div>
+            <div class="step active"><span class="num">2</span> Đăng ký biển số</div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field"><label>Vùng biển số</label><select><option>Hà Nội (29, 30, 31, 32, 33, 40)</option><option>Hải Phòng (15, 16)</option><option>Hưng Yên (89)</option><option>Bắc Ninh (99)</option></select></div>
+            <div class="field"><label>Biển số *</label><input type="text" placeholder="VD: 30A-123.45" style="font-family:var(--mono);"></div>
+            <div class="field"><label>Họ tên / Tên đơn vị</label><input type="text" placeholder="VD: Nguyễn Văn Đạt"></div>
+            <div class="field"><label>Hãng xe</label><select><option>Toyota</option><option>Kia</option><option>Hyundai</option><option>Thaco</option><option>Isuzu</option><option>Khác</option></select></div>
+            <div class="field"><label>Số CCCD / GPLX</label><input type="text" placeholder="0012xxxxxxxx"></div>
+            <div class="field"><label>Loại xe</label><select><option>Ô tô con</option><option>Xe tải</option><option>Xe khách</option><option>Xe bán tải</option><option>Container</option></select></div>
+            <div class="field"><label>Số điện thoại</label><input type="text" placeholder="09xx xxx xxx"></div>
+            <div class="field"><label>Màu xe</label><select><option>Trắng</option><option>Đen</option><option>Bạc</option><option>Xanh dương</option><option>Đỏ</option></select></div>
+            <div class="field"><label>Email</label><input type="text" placeholder="ten@congty.vn"></div>
+            <div class="field"><label>Màu biển số</label><select><option>Trắng (dân sự)</option><option>Vàng (kinh doanh vận tải)</option><option>Xanh dương (cơ quan nhà nước)</option><option>Đỏ (quân đội)</option></select></div>
+            <div class="field full"><label>Địa chỉ</label><input type="text" placeholder="VD: Toà nhà VNPT, Quận Cầu Giấy, Hà Nội"></div>
+            <div class="field"><label>Nhóm CSDL gán</label><select><option>Nhóm cho phép · Nhân viên &amp; đối tác VNPT</option><option>Nhóm chặn · Cảnh báo an ninh</option><option>Nhóm chờ duyệt · Đăng ký mới</option></select></div>
+            <div class="field"><label>Ảnh xe (tuỳ chọn)</label><div class="photo-box">Chưa có ảnh xe — kéo thả file hoặc chụp trực tiếp từ camera đang xem</div></div>
+          </div>
+
+          <div style="margin-top:18px;display:flex;gap:8px;">
+            <button class="btn">Quay lại</button>
+            <button class="btn">Thêm biển khác</button>
+            <button class="btn btn-primary">Lưu</button>
+            <button class="btn">Huỷ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ TAB 4: NHẬP HÀNG LOẠT ═══════════ -->
+      <div class="tab-panel" id="tab-batch">
+        <div class="card">
+          <h2>Nhập danh sách biển số từ file</h2>
+
+          <div class="dropzone">
+            Kéo thả file danh sách biển số (.xlsx, .csv) vào đây, hoặc <b>chọn file từ máy tính</b>.<br>
+            <span class="hint">Tải <b style="color:var(--primary);">file mẫu (.xlsx)</b> để đảm bảo đúng định dạng cột &nbsp;·&nbsp; <label style="color:var(--text-muted);"><input type="checkbox" checked style="vertical-align:middle;"> Ghi đè nếu biển số đã tồn tại</label></span>
+          </div>
+
+          <div class="form-grid" style="margin-top:18px;">
+            <div class="field"><label>Nhóm CSDL áp dụng</label><select><option>Nhóm cho phép · Nhân viên &amp; đối tác VNPT</option><option>Nhóm chặn · Cảnh báo an ninh</option><option>Nhóm chờ duyệt · Đăng ký mới</option></select></div>
+            <div class="field"><label>Hãng xe mặc định (nếu thiếu trong file)</label><select><option>Không đặt mặc định</option><option>Toyota</option><option>Hyundai</option><option>Thaco</option></select></div>
+            <div class="field"><label>Loại xe mặc định (nếu thiếu trong file)</label><select><option>Không đặt mặc định</option><option>Ô tô con</option><option>Xe tải</option><option>Xe khách</option></select></div>
+            <div class="field"><label>Màu biển mặc định (nếu thiếu trong file)</label><select><option>Trắng (dân sự)</option><option>Vàng (kinh doanh vận tải)</option></select></div>
+          </div>
+
+          <h2 style="margin-top:22px;">Xem trước dữ liệu đã đọc được (12 dòng)</h2>
+          <table class="scan-table">
+            <thead><tr><th><input type="checkbox"></th><th>Biển số</th><th>Chủ phương tiện</th><th>Loại xe</th><th>Hãng xe</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox"></td><td class="mono-cell">30K-556.71</td><td>Vũ Thị Ngọc</td><td>Ô tô con</td><td>Honda</td><td><span class="badge b-init">Hợp lệ</span></td></tr>
+              <tr><td><input type="checkbox"></td><td class="mono-cell">16A-889.02</td><td>Cty CP Cảng Hải Phòng</td><td>Container</td><td>—</td><td><span class="badge b-init">Hợp lệ</span></td></tr>
+              <tr><td><input type="checkbox"></td><td class="mono-cell">29A-102.4x</td><td>Lê Quang Huy</td><td>Ô tô con</td><td>Ford</td><td><span class="badge b-error">Thiếu số biển</span></td></tr>
+              <tr><td><input type="checkbox"></td><td class="mono-cell">30A-123.45</td><td>Nguyễn Văn Đạt</td><td>Ô tô con</td><td>Toyota</td><td><span class="badge b-progress">Trùng biển đã có</span></td></tr>
+              <tr><td><input type="checkbox"></td><td class="mono-cell">89H-227.18</td><td>Đặng Văn Sơn</td><td>Xe tải</td><td>Hino</td><td><span class="badge b-init">Hợp lệ</span></td></tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top:18px;display:flex;gap:8px;">
+            <button class="btn btn-primary">Nhập 10 dòng hợp lệ</button>
+            <button class="btn">Bỏ qua dòng lỗi &amp; nhập tiếp</button>
+            <button class="btn">Huỷ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ TAB 5: CẤU HÌNH ĐỐI SÁNH ═══════════ -->
+      <div class="tab-panel" id="tab-compare">
+        <div class="card">
+          <h2>Cấu hình đối sánh biển số (AI by Recorder)</h2>
+
+          <div class="toggle-row" style="margin-bottom:16px;"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Bật đối sánh biển số theo CSDL</div>
+
+          <div class="form-grid">
+            <div class="field"><label>Lịch áp dụng</label><select><option>Lịch mặc định (cả ngày)</option><option>Giờ hành chính (07:00–18:00)</option></select></div>
+            <div class="field"><label></label><button class="btn" style="height:35px;width:fit-content;">＋ Thêm lịch mới</button></div>
+          </div>
+
+          <details class="collapse" open>
+            <summary>Liên kết sự kiện cho xe chưa đăng ký</summary>
+            <div class="collapse-body">
+              <div class="linkage-row"><b>Liên kết sự kiện</b> <button class="btn">＋ Chọn</button> <span style="color:var(--text-faint);">Chưa có liên kết nào được chọn</span></div>
+
+              <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);">
+                <div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px;">Liên kết cục bộ (Local Linkage)</div>
+                <div class="linkage-row">
+                  <b>Ghi hình</b>
+                  Ghi trước/sau <input type="text" value="10" style="width:48px;text-align:center;"> giây (10–300s)
+                  Thiết bị: <select><option>Camera Km12+400 cao tốc HN-HP</option><option>Camera Cổng chính KCN Bắc Thăng Long</option></select>
+                  <label><input type="checkbox" checked> Bắt đầu ghi</label>
+                </div>
+                <div class="linkage-row">
+                  <b>Chụp ảnh lưu trữ</b>
+                  Thiết bị: <select><option>Camera Km12+400 cao tốc HN-HP</option><option>Camera Cổng chính KCN Bắc Thăng Long</option></select>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="card" style="margin-top:16px;background:var(--bg-soft);">
+            <h2 style="margin-bottom:10px;">Cấu hình vũ trang</h2>
+            <button class="btn" style="margin-bottom:4px;">＋ Vũ trang nhóm CSDL</button>
+            <div class="arm-list">
+              <div class="arm-item"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Nhóm cho phép · Nhân viên &amp; đối tác VNPT <span style="color:var(--text-faint);">— bỏ qua cảnh báo khi trùng khớp</span></div>
+              <div class="arm-item"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Nhóm chặn · Cảnh báo an ninh <span style="color:var(--text-faint);">— phát cảnh báo ngay khi trùng khớp</span></div>
+              <div class="arm-item"><label class="toggle"><input type="checkbox"><span class="slider"></span></label> Nhóm chờ duyệt · Đăng ký mới <span style="color:var(--text-faint);">— đang tắt, chỉ ghi nhận</span></div>
+            </div>
+          </div>
+
+          <div class="warn-box">
+            <span class="wi">⚠</span>
+            <span>Biển số <b>không thuộc bất kỳ nhóm CSDL nào đang vũ trang</b> sẽ được coi là "xe chưa đăng ký" và áp dụng theo cấu hình Liên kết sự kiện ở trên.</span>
+          </div>
+
+          <div style="margin-top:16px;display:flex;gap:8px;"><button class="btn btn-primary">Lưu cấu hình</button><button class="btn">Làm mới</button></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function switchTab(ev, id){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+  function switchTabByName(id){
+    const idx = ['tab-list','tab-groups','tab-register','tab-batch','tab-compare'].indexOf(id);
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', i===idx));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  function toggleAll(src){
+    document.querySelectorAll('.row-check').forEach(cb=>{ cb.checked = src.checked; cb.closest('tr').classList.toggle('selected', src.checked); });
+    updateSelection();
+  }
+  function onRowCheck(cb){ cb.closest('tr').classList.toggle('selected', cb.checked); updateSelection(); }
+  function updateSelection(){
+    const n = document.querySelectorAll('.row-check:checked').length;
+    document.getElementById('btn-del-plate').disabled = n === 0;
+    document.getElementById('selcount').textContent = n > 0 ? 'Đã chọn ' + n + ' biển số' : '';
+  }
+</script>
+
+</body>
+</html>

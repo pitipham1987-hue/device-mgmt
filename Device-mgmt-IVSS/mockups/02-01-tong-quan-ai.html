@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tổng quan AI · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 01-tong-quan (ma trận năng lực AI).
+  Ảnh tham khảo: refs/02-van-hanh-ai/01-tong-quan/fig6-01_overview.png
+  — bảng "Device Info | Face (Face Detection, Face Recognition) | Face & Body
+  Detection | Video Metadata (People/Motor Vehicle/Non-Motor Vehicle)" với cột
+  trạng thái bật/tắt theo từng kênh.
+
+  Kế thừa hệ thống thiết kế đã chốt tại shared.css (hướng "Thiết kế sư hàng đầu",
+  xem ../direction-approved.md) — dùng lại .matrix/.mx-cell/.mx-head/.mx-on/.mx-off
+  đã định nghĩa sẵn. Ma trận được dựng bằng CSS Grid với header 2 tầng (nhóm
+  thuật toán → thuật toán cụ thể), dùng grid-column:span để gộp ô tiêu đề nhóm —
+  không sửa shared.css, phần định kiểu bổ sung (mx-name, info-box) là pattern mới
+  scoped riêng trong file này.
+
+  Giả định: mở rộng ma trận gốc (7 thuật toán) lên 9 thuật toán để phản ánh danh
+  mục AI rộng hơn của VNPT AI Camera (thêm Vượt rào/xâm nhập, Tụ tập đông người,
+  Bỏ lại vật thể — các cảnh báo IVS phổ biến trong bối cảnh NOC hạ tầng). Dữ liệu
+  camera dùng chung bối cảnh Hà Nội / KCN Bắc Thăng Long / cao tốc HN-HP như màn
+  neo Quản lý thiết bị.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* ── Pattern mới scoped riêng cho trang này (không đụng shared.css) ── */
+
+  .info-box{
+    display:flex;gap:10px;
+    background:#E9F0FC;
+    border:1px solid #C7D9F5;
+    border-left:3px solid var(--primary);
+    padding:10px 13px;
+    font-size:12px;
+    color:var(--navy2);
+    line-height:1.55;
+    margin-bottom:16px;
+  }
+  .info-box .wi{font-size:15px;flex:none;color:var(--primary);}
+
+  /* Ma trận năng lực AI: lưới 13 cột — 2 cột thông tin thiết bị + 9 cột thuật
+     toán + 2 cột phụ (cập nhật cuối, thao tác) */
+  .ai-matrix{
+    grid-template-columns: 250px 96px repeat(9, 84px) 110px 64px;
+    font-size:11.5px;
+    margin-bottom:22px;
+  }
+  .ai-matrix .mx-head{padding:8px 10px;text-align:center;}
+  .ai-matrix .mx-head.grp{
+    background:var(--bg-soft2);
+    color:var(--text-muted);
+    font-size:10px;
+  }
+  .ai-matrix .mx-head.left{text-align:left;}
+  .ai-matrix .mx-cell.mx-name{
+    text-align:left;
+    font-weight:600;
+    color:var(--text);
+  }
+  .ai-matrix .mx-cell.mx-name .sub{
+    display:block;font-weight:400;color:var(--text-faint);font-size:10.5px;margin-top:2px;
+  }
+  .ai-matrix .mx-cell.mx-status{padding:8px 8px;}
+  .ai-matrix .mx-cell.mx-updated{color:var(--text-faint);font-size:11px;}
+  .ai-matrix .mx-cell.mx-op{padding:8px 6px;}
+  .ai-matrix .mx-on{font-size:13px;}
+  .ai-matrix .mx-off{font-size:13px;}
+  .ai-matrix .mx-cell{display:flex;align-items:center;justify-content:center;}
+  .ai-matrix .mx-cell.mx-name, .ai-matrix .mx-cell.mx-status, .ai-matrix .mx-cell.mx-updated{
+    justify-content:flex-start;
+  }
+
+  .legend-row{display:flex;gap:20px;align-items:center;margin:-8px 0 16px;flex-wrap:wrap;}
+  .legend-row .li{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);}
+  .legend-row .sw{width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex:none;}
+  .legend-row .sw.on{background:#E9F0FC;color:var(--primary);}
+  .legend-row .sw.off{background:var(--bg-soft2);color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Tổng quan AI</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <!-- ═══════════ RESOURCE STRIP ═══════════ -->
+  <div class="resource-strip cols-3">
+    <div class="bullet">
+      <span class="b-label">Kênh đang bật ≥1 AI</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:74.2%"></span>
+        <span class="b-tick" style="left:90%"></span>
+      </span>
+      <span class="b-figure tabular">1.794 <small>/ 2.418 · đạt 74,2%</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Tải xử lý AI edge trung bình</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:57.4%"></span>
+        <span class="b-tick" style="left:85%"></span>
+      </span>
+      <span class="b-figure tabular">57,4% <small>công suất NPU</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Cảnh báo AI phát sinh hôm nay</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:31%"></span>
+      </span>
+      <span class="b-figure tabular">3.062 <small>· 214 chưa xử lý</small></span>
+    </div>
+  </div>
+
+  <!-- ═══════════ SHELL: tree + main ═══════════ -->
+  <div class="shell">
+
+    <!-- ─────── LEFT: region tree (kế thừa từ màn neo) ─────── -->
+    <nav class="tree-pane">
+      <div class="tp-heading">Địa bàn quản lý</div>
+
+      <details class="node root-node" open>
+        <summary>
+          <span class="n-name">Toàn hệ thống</span>
+          <span class="n-spark"><i style="width:74.2%"></i></span>
+          <span class="n-count tabular">2.418</span>
+        </summary>
+
+        <details class="node" open>
+          <summary>
+            <span class="n-name">TP. Hà Nội</span>
+            <span class="n-spark"><i style="width:78.5%"></i></span>
+            <span class="n-count tabular">612</span>
+          </summary>
+          <div class="leaf active">
+            <span class="n-name">Quận Cầu Giấy</span>
+            <span class="n-spark"><i style="width:81.2%"></i></span>
+            <span class="n-count tabular">86</span>
+          </div>
+          <div class="leaf">
+            <span class="n-name">Quận Đống Đa</span>
+            <span class="n-spark"><i style="width:76.4%"></i></span>
+            <span class="n-count tabular">54</span>
+          </div>
+        </details>
+
+        <div class="leaf">
+          <span class="n-name">KCN Bắc Thăng Long</span>
+          <span class="n-spark warn"><i style="width:68.9%"></i></span>
+          <span class="n-count tabular">142</span>
+        </div>
+
+        <div class="leaf">
+          <span class="n-name">Cao tốc Hà Nội - Hải Phòng</span>
+          <span class="n-spark"><i style="width:73.1%"></i></span>
+          <span class="n-count tabular">204</span>
+        </div>
+
+        <div class="leaf">
+          <span class="n-name">Cụm cảng Hải Phòng</span>
+          <span class="n-spark warn"><i style="width:61.5%"></i></span>
+          <span class="n-count tabular">167</span>
+        </div>
+      </details>
+
+      <div class="tree-legend">
+        Thanh mini = % kênh đang bật ít nhất một thuật toán AI trên tổng nhánh.<br>
+        Số bên phải = tổng thiết bị đăng ký trong nhánh.
+      </div>
+    </nav>
+
+    <!-- ─────── RIGHT: matrix ─────── -->
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Tổng quan AI — Ma trận năng lực</h1>
+        <span class="scope">Đang xem theo nhánh: <b>Quận Cầu Giấy, TP. Hà Nội</b> — 86 kênh camera</span>
+      </div>
+
+      <div class="info-box">
+        <span class="wi">ⓘ</span>
+        <span>Ma trận thể hiện trạng thái bật/tắt của từng thuật toán AI theo <b>từng kênh camera</b>. Nhấp vào một ô để bật/tắt nhanh; dùng <b>Bật AI hàng loạt</b> để áp dụng cho nhiều kênh cùng lúc theo nhóm địa bàn.</span>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-primary"><span class="btn-icon">＋</span> Bật AI hàng loạt</button>
+        <button class="btn">Tắt AI hàng loạt</button>
+        <button class="btn">Cấu hình ngưỡng nhạy</button>
+        <button class="btn">Xuất báo cáo</button>
+        <div class="fill"></div>
+        <button class="btn">Bộ lọc ▾</button>
+      </div>
+
+      <div class="legend-row">
+        <span class="li"><span class="sw on">✓</span> Đang bật</span>
+        <span class="li"><span class="sw off">–</span> Đang tắt / không hỗ trợ</span>
+      </div>
+
+      <div class="table-scroll">
+        <div class="matrix ai-matrix">
+          <!-- Header hàng 1: nhóm thuật toán -->
+          <div class="mx-cell mx-head grp left" style="grid-column:span 2;">Thông tin thiết bị</div>
+          <div class="mx-cell mx-head grp" style="grid-column:span 2;">Khuôn mặt</div>
+          <div class="mx-cell mx-head grp" style="grid-column:span 1;">Người &amp; vật thể</div>
+          <div class="mx-cell mx-head grp" style="grid-column:span 3;">Metadata video</div>
+          <div class="mx-cell mx-head grp" style="grid-column:span 3;">Cảnh báo hành vi (IVS)</div>
+
+          <!-- Header hàng 2: thuật toán cụ thể -->
+          <div class="mx-cell mx-head left">Tên kênh</div>
+          <div class="mx-cell mx-head">Trạng thái</div>
+          <div class="mx-cell mx-head">Phát hiện<br>khuôn mặt</div>
+          <div class="mx-cell mx-head">Nhận diện<br>khuôn mặt</div>
+          <div class="mx-cell mx-head">Người &amp;<br>vật thể</div>
+          <div class="mx-cell mx-head">Phát hiện<br>người</div>
+          <div class="mx-cell mx-head">Phương tiện<br>cơ giới</div>
+          <div class="mx-cell mx-head">Phương tiện<br>thô sơ</div>
+          <div class="mx-cell mx-head">Vượt rào /<br>xâm nhập</div>
+          <div class="mx-cell mx-head">Tụ tập<br>đông người</div>
+          <div class="mx-cell mx-head">Bỏ lại<br>vật thể</div>
+          <div class="mx-cell mx-head left">Cập nhật gần nhất</div>
+          <div class="mx-cell mx-head">Thao tác</div>
+
+          <!-- Hàng 1 -->
+          <div class="mx-cell mx-name">Camera Cổng chính Toà nhà VNPT Cầu Giấy<span class="sub">Trục chính · tầng trệt</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span></div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">15/09 08:12</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+
+          <!-- Hàng 2 -->
+          <div class="mx-cell mx-name">Camera Ngã tư Nguyễn Trãi - Khuất Duy Tiến<span class="sub">Giao thông · góc Đông Bắc</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span></div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">15/09 07:40</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+
+          <!-- Hàng 3 -->
+          <div class="mx-cell mx-name">Camera Sảnh chờ ga Cầu Giấy (BRT)<span class="sub">Nhà chờ xe buýt nhanh</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-neutral"><i class="dot neutral"></i>Mất kết nối</span></div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">14/09 22:05</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+
+          <!-- Hàng 4 -->
+          <div class="mx-cell mx-name">Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ<span class="sub">Giao thông · vòng xuyến trung tâm</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-warn"><i class="dot warn"></i>Đang xuống cấp</span></div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">15/09 06:58</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+
+          <!-- Hàng 5 -->
+          <div class="mx-cell mx-name">Camera Cổng chính KCN Bắc Thăng Long<span class="sub">Cổng số 1 · kiểm soát ra vào</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span></div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">15/09 08:20</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+
+          <!-- Hàng 6 -->
+          <div class="mx-cell mx-name">Camera Trạm cân xe tải<span class="sub">Trạm cân số 2</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-err"><i class="dot err"></i>Kết nối thất bại</span></div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">13/09 03:11</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+
+          <!-- Hàng 7 -->
+          <div class="mx-cell mx-name">Camera Km12+400 cao tốc HN - Hải Phòng<span class="sub">Làn xe hướng Hải Phòng</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span></div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">15/09 05:30</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+
+          <!-- Hàng 8 -->
+          <div class="mx-cell mx-name">Camera Trạm thu phí Quốc lộ 5B Km9<span class="sub">Làn thu phí không dừng 3-4</span></div>
+          <div class="mx-cell mx-status"><span class="chip c-ok"><i class="dot ok"></i>Trực tuyến</span></div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-on">✓</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-off">–</div>
+          <div class="mx-cell mx-updated">15/09 08:02</div>
+          <div class="mx-cell mx-op"><a class="op-link">Sửa</a></div>
+        </div>
+      </div>
+
+      <div class="table-foot">
+        <span>Tổng <b class="tabular">86</b> kênh — đang hiển thị 8 dòng đại diện</span>
+        <div class="pager">
+          <button disabled>‹</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>…</button>
+          <button>11</button>
+          <button>›</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

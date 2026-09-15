@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trang chủ · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm 01-thiet-lap-ban-dau / 4-trang-chu.
+  Nguồn tham chiếu cấu trúc (KHÔNG copy pixel-for-pixel):
+    refs/01-thiet-lap-ban-dau/4-trang-chu/fig5-11_home-page.png
+
+  Giả định: trang chủ là hub điều hướng ngay sau đăng nhập — 6 ô chức năng
+  lớn (Giám sát trực tiếp, Xem lại, Tìm kiếm AI, Ứng dụng AI, Trung tâm sự
+  kiện, Bảo trì) mỗi ô có nhãn phụ dẫn nhanh, cộng dải "Danh mục cấu hình"
+  bên dưới (Camera/Mạng/Lưu trữ/Thuật toán AI/Sự kiện/Hệ thống — các mục
+  này sẽ trỏ tới màn neo 04-cau-hinh-1-quan-ly-thiet-bi.html ở vòng dựng
+  sau). Dùng topbar dùng chung, KHÔNG dùng tree-pane/resource-strip vì đây
+  là trang điều hướng, không phải màn quản trị danh sách. Card nền mờ +
+  icon hoạ tiết dựng bằng CSS thuần, không ảnh chụp thật. Component thẻ
+  hub mới viết scoped tiền tố "hp-", tái dùng .topbar/.btn/.badge có sẵn.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  body{background:
+    radial-gradient(circle at 85% 0%, rgba(0,179,255,.08), transparent 40%),
+    var(--bg-soft2);
+  }
+  .hp-main{max-width:1180px;margin:0 auto;padding:26px 24px 60px;}
+  .hp-hello{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px;}
+  .hp-hello h1{font-size:19px;font-weight:800;color:var(--navy);margin:0;}
+  .hp-hello .time{font-size:12.5px;color:var(--text-muted);font-family:var(--mono);}
+
+  .hp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+  .hp-card{
+    background:var(--bg);border:1px solid var(--line);border-radius:6px;
+    padding:20px 20px 16px;position:relative;overflow:hidden;transition:border-color .15s,box-shadow .15s;cursor:pointer;
+  }
+  .hp-card:hover{border-color:var(--primary);box-shadow:0 4px 14px rgba(0,23,61,.08);}
+  .hp-card .hp-icon{
+    position:absolute;right:16px;top:16px;width:52px;height:52px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;
+  }
+  .hp-card.c1 .hp-icon{background:linear-gradient(135deg,var(--primary),var(--accent));}
+  .hp-card.c2 .hp-icon{background:linear-gradient(135deg,#3E5EA8,#7C93C9);}
+  .hp-card.c3 .hp-icon{background:linear-gradient(135deg,var(--navy),#2A4B8A);}
+  .hp-card.c4 .hp-icon{background:linear-gradient(135deg,#0E8F5C,#3FC98A);}
+  .hp-card.c5 .hp-icon{background:linear-gradient(135deg,var(--error),#E8776E);}
+  .hp-card.c6 .hp-icon{background:linear-gradient(135deg,#7A5AD1,#A98AF0);}
+
+  .hp-card h2{font-size:14.5px;font-weight:700;color:var(--navy);margin:0 0 4px;max-width:75%;}
+  .hp-card .desc{font-size:12px;color:var(--text-muted);max-width:78%;line-height:1.5;min-height:32px;}
+  .hp-card .badge-row{margin:6px 0 12px;}
+  .hp-links{display:flex;gap:16px;border-top:1px solid var(--line);padding-top:11px;flex-wrap:wrap;}
+  .hp-links a{font-size:12px;color:var(--text);text-decoration:none;font-weight:600;display:flex;align-items:center;gap:5px;}
+  .hp-links a:hover{color:var(--primary);}
+  .hp-links a .li{color:var(--text-faint);font-size:12px;}
+
+  .hp-config-title{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin:0 0 12px;}
+  .hp-config-strip{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  }
+  .hp-cfg-item{background:var(--bg);padding:18px 10px;text-align:center;cursor:pointer;transition:background .12s;}
+  .hp-cfg-item:hover{background:var(--bg-soft);}
+  .hp-cfg-item .ci{width:34px;height:34px;border-radius:8px;background:var(--bg-soft2);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px;margin:0 auto 8px;}
+  .hp-cfg-item .cl{font-size:12px;font-weight:600;color:var(--text);}
+
+  .hp-alert-bar{
+    display:flex;align-items:center;gap:10px;background:var(--error-bg);border:1px solid #F3CAC7;
+    border-left:3px solid var(--error);padding:10px 14px;font-size:12.5px;color:#7A1D17;margin-bottom:20px;
+  }
+  .hp-alert-bar b{font-weight:700;}
+  .hp-alert-bar a{margin-left:auto;color:var(--error);font-weight:700;text-decoration:none;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb"><b>Trang chủ</b></div>
+    <div class="spacer"></div>
+    <div class="who">
+      <span style="cursor:pointer;">🔍</span>
+      <span style="cursor:pointer;">⚠</span>
+      <span style="cursor:pointer;position:relative;">✉<span style="position:absolute;top:-6px;right:-8px;background:var(--error);color:#fff;font-size:9px;border-radius:8px;padding:0 4px;">3</span></span>
+      <span style="cursor:pointer;">⚙</span>
+      <div class="divider"></div>
+      <span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC
+    </div>
+  </div>
+
+  <main class="hp-main">
+    <div class="hp-hello">
+      <h1>Chào buổi chiều, Văn Đạt</h1>
+      <span class="time tabular">Thứ Ba, 15/09/2026 · 14:32</span>
+    </div>
+
+    <div class="hp-alert-bar">
+      <span>⚠</span>
+      <span><b>2 camera mất kết nối</b> tại KCN Bắc Thăng Long trong 15 phút qua.</span>
+      <a href="#">Xem Trung tâm sự kiện →</a>
+    </div>
+
+    <div class="hp-grid">
+      <div class="hp-card c1">
+        <span class="hp-icon">▶</span>
+        <h2>Giám sát trực tiếp</h2>
+        <div class="desc">Xem hình ảnh trực tiếp từ toàn bộ camera đã đăng ký.</div>
+        <div class="hp-links"><a>Xem trực tiếp</a></div>
+      </div>
+
+      <div class="hp-card c2">
+        <span class="hp-icon">◉</span>
+        <h2>Xem lại</h2>
+        <div class="desc">Tra cứu và phát lại video đã ghi theo thời gian, gắn nhãn sự kiện.</div>
+        <div class="hp-links">
+          <a>Tra cứu video</a><span class="li">·</span>
+          <a>Nhãn đánh dấu</a><span class="li">·</span>
+          <a>Watermark</a>
+        </div>
+      </div>
+
+      <div class="hp-card c3">
+        <span class="hp-icon">✦</span>
+        <h2>Tìm kiếm AI</h2>
+        <div class="desc">Tìm kiếm và phát video theo nhận diện thông minh, tìm theo hình ảnh.</div>
+        <div class="hp-links">
+          <a>Tìm đa năng</a><span class="li">·</span>
+          <a>Tìm khuôn mặt</a><span class="li">·</span>
+          <a>Tìm biển số</a>
+        </div>
+      </div>
+
+      <div class="hp-card c4">
+        <span class="hp-icon">Σ</span>
+        <h2>Ứng dụng AI</h2>
+        <div class="desc">Báo cáo AI, phân tích theo file và các tác vụ AI đang chạy.</div>
+        <div class="hp-links">
+          <a>Báo cáo AI</a><span class="li">·</span>
+          <a>Bảng chấm công</a><span class="li">·</span>
+          <a>Tác vụ phân tích</a>
+        </div>
+      </div>
+
+      <div class="hp-card c5">
+        <span class="hp-icon">◈</span>
+        <h2>Trung tâm sự kiện</h2>
+        <div class="desc">Sự kiện thời gian thực và lịch sử sự kiện toàn hệ thống.</div>
+        <div class="badge-row"><span class="badge b-error">3 sự kiện mới</span></div>
+        <div class="hp-links"><a>Sự kiện thời gian thực</a><span class="li">·</span><a>Lịch sử sự kiện</a></div>
+      </div>
+
+      <div class="hp-card c6">
+        <span class="hp-icon">⚒</span>
+        <h2>Bảo trì</h2>
+        <div class="desc">Thông tin hệ thống, bảo trì thiết bị, cập nhật firmware.</div>
+        <div class="hp-links">
+          <a>Tổng quan</a><span class="li">·</span>
+          <a>Chẩn đoán 1-chạm</a><span class="li">·</span>
+          <a>Cập nhật</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hp-config-title">Danh mục cấu hình</div>
+    <div class="hp-config-strip">
+      <div class="hp-cfg-item"><div class="ci">📷</div><div class="cl">Camera</div></div>
+      <div class="hp-cfg-item"><div class="ci">◎</div><div class="cl">Mạng</div></div>
+      <div class="hp-cfg-item"><div class="ci">▤</div><div class="cl">Lưu trữ</div></div>
+      <div class="hp-cfg-item"><div class="ci">AI</div><div class="cl">Thuật toán AI</div></div>
+      <div class="hp-cfg-item"><div class="ci">◈</div><div class="cl">Sự kiện</div></div>
+      <div class="hp-cfg-item"><div class="ci">⚙</div><div class="cl">Hệ thống</div></div>
+    </div>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liên kết AI &amp; Lịch trực · Device-mgmt-IVSS</title>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  CẤU TRÚC ĐIỀU HƯỚNG — PHẦN 2 của nhóm "Quản lý sự kiện"
+  ═══════════════════════════════════════════════════════════════════════
+  File này tiếp nối 04-3-quan-ly-su-kien.html (đọc comment đầu file đó để
+  biết toàn bộ lý do tách file). Ở đây sống 2 tab lớn còn lại:
+
+    Tab lớn 3 · Liên kết AI     (id #lienket-ai)  — luồng NHIỀU BƯỚC:
+        sub-tab "Thiết lập AI theo bước" = wizard 3 bước (dùng lại
+        .wizard-rail có sẵn trong shared.css: Chọn kênh & AI → Cấu hình
+        AI → Gửi thuật toán), phỏng theo fig8-39/40/41.
+        sub-tab "Gửi lệnh xuống thiết bị" = form độc lập, phỏng fig8-47.
+    Tab lớn 4 · Lịch trực & VPN (id #lichtruc) — cấu hình CẤP HỆ THỐNG,
+        không gắn với 1 kênh cụ thể: Hủy vũ trang (fig8-50), Kế hoạch
+        thông minh (fig8-53), Tần suất ra vào (fig8-54), VPN (fig8-36).
+
+  "Tổng quan" và "Loại sự kiện thiết bị" ở hàng tab lớn là LINK quay lại
+  04-3-quan-ly-su-kien.html — giữ đủ 4 tab lớn hiển thị ở cả 2 file.
+
+  Tab lớn nào active khi mở file phụ thuộc vào #hash trên URL
+  (#lienket-ai mặc định nếu không có hash) — để link từ file 1 trỏ thẳng
+  đúng tab, script đọc location.hash lúc load.
+
+  GIẢ ĐỊNH:
+  - Wizard bước 1 dùng lại chính 8 kênh camera đã lập ở file 1 (không
+    bịa thêm thiết bị/nhóm mới) để nhất quán toàn bộ mockup.
+  - "Gửi lệnh xuống thiết bị" (fig8-47) là 1 form Liên kết cục bộ độc
+    lập, không thuộc luồng wizard 3 bước — tách sub-tab riêng đúng như
+    2 khối tách biệt trong ảnh gốc.
+  - Kế hoạch thông minh (fig8-53) trong ảnh gốc chỉ có khung nội dung
+    xám trống bên dưới mỗi thẻ tính năng (placeholder có sẵn từ chính
+    phần mềm gốc) — giữ nguyên tinh thần đó (khung trống + mô tả ngắn)
+    thay vì bịa thêm nội dung để tránh vi phạm nguyên tắc "placeholder
+    trung thực hơn nội dung giả".
+  ═══════════════════════════════════════════════════════════════════════
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ═══ Cùng bộ pattern scoped như file 04-3-quan-ly-su-kien.html ═══ */
+  .bigtabs{display:flex;gap:2px;border-bottom:2px solid var(--navy);margin-bottom:18px;}
+  .bigtabs a, .bigtabs button{
+    appearance:none;border:none;background:none;font-family:inherit;text-decoration:none;
+    padding:10px 6px;margin-right:26px;font-size:14px;font-weight:700;
+    color:var(--text-faint);cursor:pointer;border-bottom:3px solid transparent;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .bigtabs a.ext::after{content:"↗";font-size:11px;font-weight:600;color:var(--text-faint);}
+  .bigtabs .active{color:var(--primary);border-bottom-color:var(--primary);}
+  .bigtabs a:hover, .bigtabs button:hover{color:var(--primary);}
+  .bigpanel{display:none;}
+  .bigpanel.active{display:block;}
+
+  .subnav{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .subnav button{
+    appearance:none;border:1px solid var(--line-strong);background:var(--bg);
+    color:var(--text-muted);font-family:inherit;font-size:12.5px;font-weight:600;
+    padding:7px 14px;border-radius:999px;cursor:pointer;
+  }
+  .subnav button.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .subnav button:hover:not(.active){border-color:var(--primary);color:var(--primary);}
+  .subpanel{display:none;}
+  .subpanel.active{display:block;}
+
+  .toggle{position:relative;display:inline-block;width:36px;height:20px;flex:none;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle .slider{position:absolute;inset:0;background:var(--line-strong);border-radius:20px;cursor:pointer;transition:.15s;}
+  .toggle .slider::before{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.3);}
+  .toggle input:checked + .slider{background:var(--primary);}
+  .toggle input:checked + .slider::before{transform:translateX(16px);}
+  .radio-row{display:flex;gap:20px;align-items:center;}
+  .radio-row label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text);cursor:pointer;}
+
+  .local-linkage{border-top:1px solid var(--line);margin-top:18px;padding-top:16px;}
+  .local-linkage h3{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--navy);margin:0 0 12px;}
+  .local-linkage .ll-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;}
+  .local-linkage .ll-row:last-child{border-bottom:none;}
+  .local-linkage .ll-row .ll-label{width:150px;font-weight:600;color:var(--text);}
+  .ll-enabled{color:#1D8A4E;font-weight:700;}
+  .actions-row{display:flex;gap:8px;margin-top:20px;}
+
+  /* Wizard: bố cục step 1 & 2 (cây kênh trái + panel phải) */
+  .wiz-layout{display:grid;grid-template-columns:260px 1fr;gap:0;border:1px solid var(--line);background:var(--bg);min-height:420px;}
+  .chan-pick{border-right:1px solid var(--line);padding:12px;max-height:560px;overflow-y:auto;}
+  .chan-pick .cp-search{width:100%;border:1px solid var(--line-strong);border-radius:3px;padding:6px 9px;font-size:12px;font-family:inherit;margin-bottom:10px;}
+  .chan-pick .cp-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:3px;cursor:pointer;font-size:12px;color:var(--text);margin-bottom:2px;}
+  .chan-pick .cp-item:hover{background:var(--bg-soft);}
+  .chan-pick .cp-item.active{background:#E9F0FC;color:var(--primary);font-weight:700;}
+  .chan-pick .cp-item .cp-no{color:var(--text-faint);font-weight:600;width:16px;flex:none;}
+  .chan-pick .cp-item .cp-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wiz-panel{padding:20px 24px;}
+
+  .ai-type-list{border:1px solid var(--line);max-height:420px;overflow-y:auto;}
+  .ai-type{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12.5px;cursor:pointer;}
+  .ai-type:last-child{border-bottom:none;}
+  .ai-type:hover{background:var(--bg-soft);}
+  .ai-type .ai-ico{width:22px;text-align:center;color:var(--text-muted);}
+  .ai-type.selected{background:#E9F0FC;}
+  .ai-type.selected .ai-name{color:var(--primary);font-weight:700;}
+
+  .preview-box{position:relative;height:230px;border:1px solid var(--line-strong);overflow:hidden;background:linear-gradient(135deg,#0B1626,#182840);}
+  .preview-box .grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);background-size:22px 22px;}
+  .preview-box .region{position:absolute;border:2px dashed var(--accent2);}
+  .preview-box .tag{position:absolute;top:9px;left:10px;font-size:11px;font-weight:700;color:#fff;background:rgba(0,10,30,.55);padding:3px 9px;border-radius:3px;}
+  .preview-box .hint{position:absolute;bottom:9px;left:10px;right:10px;font-size:11px;color:rgba(255,255,255,.62);}
+
+  .thresh-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;margin-top:10px;}
+  .thresh-row input[type=range]{width:100%;accent-color:var(--primary);}
+  .thresh-row .tr-val{width:46px;text-align:center;}
+
+  .accordion{border:1px solid var(--line);margin-top:16px;}
+  .accordion summary{list-style:none;cursor:pointer;padding:10px 14px;font-size:12.5px;font-weight:700;color:var(--navy);background:var(--bg-soft);display:flex;align-items:center;gap:8px;}
+  .accordion summary::-webkit-details-marker{display:none;}
+  .accordion summary::before{content:"▸";font-size:10px;color:var(--text-faint);}
+  .accordion[open] summary::before{content:"▾";}
+  .accordion .acc-body{padding:16px;}
+
+  .progress-lg{position:relative;height:14px;background:var(--bg-soft2);border-radius:8px;overflow:hidden;}
+  .progress-lg .fill{position:absolute;left:0;top:0;bottom:0;background:#2E9E5B;border-radius:8px;}
+  .counts{display:flex;gap:18px;font-size:12.5px;color:var(--text-muted);}
+  .counts b{color:var(--text);}
+  .counts .c-ok{color:#1D8A4E;font-weight:700;}
+  .counts .c-err{color:var(--error);font-weight:700;}
+
+  /* Disarming: checklist liên kết */
+  .link-check-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 16px;padding:14px 16px;}
+  .link-check-grid label{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);}
+
+  /* Smart plan cards */
+  .smart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .smart-card{border:1px solid var(--line);}
+  .smart-card .sc-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;font-weight:700;color:var(--text);}
+  .smart-card .sc-head .sc-name{display:flex;align-items:center;gap:7px;}
+  .smart-card .sc-body{height:100px;background:var(--bg-soft);}
+  .smart-card .sc-body.has-list{height:auto;padding:8px 12px;background:var(--bg);}
+  .smart-card .sc-body.has-list .sl-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:11.5px;color:var(--text-muted);}
+
+  .rule-card{border:1px solid var(--line);margin-top:14px;}
+  .rule-card .rc-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-soft);border-bottom:1px solid var(--line);}
+  .rule-card .rc-head .rc-name{font-size:12.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
+  .rule-card .rc-body{padding:16px;}
+
+  .octet-inline{display:flex;align-items:center;gap:6px;}
+  .octet-inline input{width:56px;text-align:center;padding:8px 4px;border:1px solid var(--line-strong);border-radius:3px;font-family:var(--mono);}
+
+  @media (max-width:1180px){
+    .wiz-layout{grid-template-columns:1fr;}
+    .chan-pick{border-right:none;border-bottom:1px solid var(--line);max-height:none;}
+    .link-check-grid{grid-template-columns:repeat(2,1fr);}
+    .smart-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Cấu hình &nbsp;/&nbsp; <b>Quản lý sự kiện</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane" style="padding:22px 28px 48px;">
+
+      <div class="panel-heading">
+        <h1>Quản lý sự kiện</h1>
+        <span class="scope">Cấu hình liên kết sự kiện, trí tuệ AI và ngưỡng phát hiện cho toàn hệ thống camera</span>
+      </div>
+
+      <nav class="bigtabs">
+        <a class="ext" href="04-3-quan-ly-su-kien.html">Tổng quan</a>
+        <a class="ext" href="04-3-quan-ly-su-kien.html#device-events">Loại sự kiện thiết bị</a>
+        <button id="btn-lienket-ai" onclick="switchBig(event,'tab-lienket-ai')">Liên kết AI</button>
+        <button id="btn-lichtruc" onclick="switchBig(event,'tab-lichtruc')">Lịch trực &amp; VPN</button>
+      </nav>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- TAB LỚN 3 · LIÊN KẾT AI -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="bigpanel" id="tab-lienket-ai">
+
+        <div class="subnav">
+          <button class="active" onclick="switchSub(event,'sub-wizard')">Thiết lập AI theo bước</button>
+          <button onclick="switchSub(event,'sub-sendcmd')">Gửi lệnh xuống thiết bị</button>
+        </div>
+
+        <!-- ─────── Wizard 3 bước ─────── -->
+        <div class="subpanel active" id="sub-wizard">
+          <div class="card" style="padding-bottom:0;">
+            <div class="wizard-rail" id="wiz-rail">
+              <div class="step done" data-step="1"><span class="num">✓</span> Chọn kênh &amp; trí tuệ AI</div>
+              <div class="rail-line"></div>
+              <div class="step active" data-step="2"><span class="num">2</span> Cấu hình AI</div>
+              <div class="rail-line"></div>
+              <div class="step" data-step="3"><span class="num">3</span> Gửi thuật toán</div>
+            </div>
+          </div>
+
+          <!-- Bước 1 -->
+          <div class="wiz-step" id="wiz-1" style="display:none;">
+            <div class="wiz-layout">
+              <div class="chan-pick">
+                <input class="cp-search" placeholder="Tìm theo tên kênh/IP">
+                <div class="cp-item active"><span class="cp-no">1</span><span class="cp-name">Cổng chính Toà nhà Cầu Giấy</span></div>
+                <div class="cp-item"><span class="cp-no">2</span><span class="cp-name">Ngã tư Nguyễn Trãi - KDT</span></div>
+                <div class="cp-item"><span class="cp-no">3</span><span class="cp-name">Sảnh chờ ga Cầu Giấy</span></div>
+                <div class="cp-item"><span class="cp-no">4</span><span class="cp-name">Vòng xuyến Cầu Giấy - XT</span></div>
+                <div class="cp-item"><span class="cp-no">5</span><span class="cp-name">Cổng chính KCN Bắc Thăng Long</span></div>
+                <div class="cp-item"><span class="cp-no">6</span><span class="cp-name">Kho vận số 3</span></div>
+                <div class="cp-item"><span class="cp-no">7</span><span class="cp-name">Trạm cân xe tải</span></div>
+                <div class="cp-item"><span class="cp-no">8</span><span class="cp-name">Bãi đỗ xe nhà máy Canon</span></div>
+              </div>
+              <div class="wiz-panel">
+                <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:18px;">
+                  <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                  <label style="text-transform:none;font-size:13px;color:var(--text);">Trí tuệ AI xử lý tại đầu ghi (AI by Recorder)</label>
+                </div>
+                <div class="field" style="margin-bottom:10px;"><label>Chọn loại trí tuệ AI</label></div>
+                <div class="ai-type-list">
+                  <div class="ai-type selected"><span class="ai-ico">◉</span><span class="ai-name">Nhận diện khuôn mặt</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Nhận dạng khuôn mặt (đối chiếu)</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Metadata video</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Cảnh báo theo văn bản</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">IVS — phân tích hành vi thông minh</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Đối chiếu biển số</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Phát hiện đồ bảo hộ (PPE)</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Phát hiện xe công trình</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Phát hiện khói &amp; nhiệt</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Phân tích hành vi làm việc</span></div>
+                  <div class="ai-type"><span class="ai-ico">○</span><span class="ai-name">Phân tích hành vi người</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="actions-row" style="justify-content:flex-end;">
+              <button class="btn">Huỷ</button>
+              <button class="btn btn-primary" onclick="goStep(2)">Tiếp theo</button>
+            </div>
+          </div>
+
+          <!-- Bước 2 -->
+          <div class="wiz-step" id="wiz-2">
+            <div class="wiz-layout">
+              <div class="chan-pick">
+                <input class="cp-search" placeholder="Tìm theo tên kênh/IP">
+                <div class="cp-item active"><span class="cp-no">1</span><span class="cp-name">Cổng chính Toà nhà Cầu Giấy</span></div>
+              </div>
+              <div class="wiz-panel">
+                <div class="field" style="margin-bottom:10px;"><label>Thiết lập vùng phát hiện</label></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
+                  <div class="preview-box">
+                    <div class="grid-overlay"></div>
+                    <div class="region" style="left:10%;top:16%;width:52%;height:62%;"></div>
+                    <div class="tag">Kênh 1 · Nhận diện khuôn mặt</div>
+                    <div class="hint">Placeholder trừu tượng — nhấn để vẽ vùng phát hiện (minh hoạ)</div>
+                  </div>
+                  <div>
+                    <div class="field" style="margin-bottom:14px;">
+                      <label>Chế độ chụp ảnh</label>
+                      <select><option>Tối ưu (Optimized)</option><option>Chụp nhiều lần</option></select>
+                    </div>
+                    <details class="accordion" open>
+                      <summary>Nâng cao</summary>
+                      <div class="acc-body">
+                        <div class="warn-box" style="margin:0 0 14px;">
+                          <span class="wi">ℹ</span>
+                          <span>Khi tất cả góc = 0°, khuôn mặt ở vị trí chính diện. Góc tối đa 90°.</span>
+                        </div>
+                        <div class="field"><label>Góc ngẩng</label><div class="thresh-row"><input type="range" min="0" max="90" value="45"><input class="tr-val" value="≤45°"></div></div>
+                        <div class="field" style="margin-top:10px;"><label>Góc quay trái/phải</label><div class="thresh-row"><input type="range" min="0" max="90" value="45"><input class="tr-val" value="≤45°"></div></div>
+                        <div class="field" style="margin-top:10px;"><label>Góc nghiêng đầu</label><div class="thresh-row"><input type="range" min="0" max="90" value="45"><input class="tr-val" value="≤45°"></div></div>
+                        <div class="field" style="margin-top:10px;"><label>Độ nhạy chụp ảnh</label><div class="thresh-row"><input type="range" min="0" max="100" value="80"><input class="tr-val" value="80"></div></div>
+                        <div class="field" style="margin-top:10px;"><label>Thời lượng tối ưu</label><input type="text" value="2"><span class="hint">giây (1–255s)</span></div>
+                      </div>
+                    </details>
+                  </div>
+                </div>
+                <div class="form-grid" style="margin-top:16px;max-width:520px;">
+                  <div class="field full">
+                    <label>Lịch áp dụng</label>
+                    <select><option>Lịch mặc định (24/7)</option></select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="actions-row" style="justify-content:flex-end;">
+              <button class="btn">Sao chép sang kênh khác</button>
+              <button class="btn" onclick="goStep(1)">Quay lại</button>
+              <button class="btn btn-primary" onclick="goStep(3)">Tiếp theo</button>
+            </div>
+          </div>
+
+          <!-- Bước 3 -->
+          <div class="wiz-step" id="wiz-3" style="display:none;">
+            <div class="card">
+              <div class="field" style="margin-bottom:8px;"><label>Tiến trình gửi thuật toán xuống thiết bị</label></div>
+              <div class="progress-lg"><div class="fill" style="width:100%;"></div></div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px;">
+                <b style="font-size:12.5px;color:var(--navy);">Danh sách thiết bị</b>
+                <div class="counts"><span>Thất bại <span class="c-err">0</span></span><span>Thành công <b class="c-ok">1</b></span><span>Đang chờ <b>0</b></span></div>
+              </div>
+
+              <div class="table-scroll">
+                <table class="devices" style="min-width:0;">
+                  <thead><tr><th>Kênh</th><th>Tên kênh</th><th>Loại trí tuệ</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td class="tabular">1</td><td class="chname">Cổng chính Toà nhà Cầu Giấy</td><td>Nhận diện khuôn mặt</td>
+                      <td><span class="chip c-ok"><i class="dot ok"></i>Thành công</span></td>
+                      <td><span style="color:var(--text-faint);">--</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="actions-row" style="justify-content:flex-end;">
+              <button class="btn" onclick="goStep(2)">Quay lại</button>
+              <button class="btn btn-primary">Hoàn tất</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ─────── Gửi lệnh xuống thiết bị ─────── -->
+        <div class="subpanel" id="sub-sendcmd">
+          <div class="card" style="max-width:640px;">
+            <h2>🔗 Liên kết cục bộ — Gửi lệnh</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label>Lệnh (command)</label>
+                <input type="text" placeholder="VD: reboot, ptz_preset_1...">
+              </div>
+              <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-top:20px;">
+                <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                <label style="text-transform:none;font-size:13px;color:var(--text);">Yêu cầu xác thực</label>
+              </div>
+              <div class="field">
+                <label>Tài khoản</label>
+                <input type="text" placeholder="admin01">
+              </div>
+              <div class="field">
+                <label>Mật khẩu xác thực</label>
+                <input type="password" placeholder="••••••••">
+              </div>
+            </div>
+            <div class="actions-row">
+              <button class="btn btn-primary">Lưu</button>
+              <button class="btn">Làm mới</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- TAB LỚN 4 · LỊCH TRỰC & VPN -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="bigpanel" id="tab-lichtruc">
+
+        <div class="subnav">
+          <button class="active" onclick="switchSub(event,'sub-disarm')">Hủy vũ trang</button>
+          <button onclick="switchSub(event,'sub-smartplan')">Kế hoạch thông minh</button>
+          <button onclick="switchSub(event,'sub-entries')">Tần suất ra vào</button>
+          <button onclick="switchSub(event,'sub-vpn')">VPN</button>
+        </div>
+
+        <!-- ─────── Hủy vũ trang ─────── -->
+        <div class="subpanel active" id="sub-disarm">
+          <div class="card" style="max-width:820px;">
+            <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:16px;">
+              <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+              <label style="text-transform:none;font-size:13px;color:var(--text);">Hủy vũ trang một chạm (One-click Disarm)</label>
+            </div>
+
+            <div style="border-top:1px solid var(--line);padding-top:16px;">
+              <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:10px;">
+                <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+                <label style="text-transform:none;font-size:13px;color:var(--text);">Hủy vũ trang theo khung giờ</label>
+              </div>
+              <div class="warn-box" style="margin:0 0 16px;">
+                <span class="wi">⚠</span>
+                <span>Chỉ có hiệu lực sau khi tắt Hủy vũ trang một chạm.</span>
+              </div>
+
+              <div class="form-grid" style="margin-bottom:16px;">
+                <div class="field">
+                  <label>Lịch áp dụng</label>
+                  <select><option>Danh sách lịch trực 1</option><option>Danh sách lịch trực 2</option></select>
+                </div>
+                <div class="field" style="justify-content:flex-end;">
+                  <a class="op-link" style="font-weight:700;">＋ Thêm lịch trực mới</a>
+                </div>
+              </div>
+
+              <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:18px;">
+                <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                <label style="text-transform:none;font-size:13px;color:var(--text);">Thông báo sự kiện khi hủy vũ trang</label>
+              </div>
+
+              <details class="accordion" open>
+                <summary>Hành động liên kết khi hủy vũ trang</summary>
+                <div class="link-check-grid">
+                  <label><input type="checkbox" checked> Chọn tất cả</label>
+                  <label><input type="checkbox" checked> Còi báo động</label>
+                  <label><input type="checkbox" checked> Gửi email</label>
+                  <label><input type="checkbox" checked> Báo động cục bộ</label>
+                  <label><input type="checkbox" checked> Cổng báo động ra</label>
+                  <label><input type="checkbox" checked> Liên kết âm thanh</label>
+                  <label><input type="checkbox" checked> Preset camera</label>
+                  <label><input type="checkbox" checked> Thiết bị điều khiển từ xa</label>
+                  <label><input type="checkbox" checked> Tự động camera</label>
+                  <label><input type="checkbox" checked> Cảnh báo từ xa</label>
+                  <label><input type="checkbox" checked> Kiểm soát ra vào</label>
+                </div>
+              </details>
+
+              <details class="accordion">
+                <summary>Hủy vũ trang kênh từ xa</summary>
+                <div class="acc-body">
+                  <div class="field">
+                    <label>Thiết bị áp dụng</label>
+                    <input type="text" placeholder="Chọn thiết bị/nhóm kênh cần hủy vũ trang từ xa">
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn btn-primary">Áp dụng</button>
+              <button class="btn">Làm mới</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── Kế hoạch thông minh ─────── -->
+        <div class="subpanel" id="sub-smartplan">
+          <div class="card">
+            <h2>Kế hoạch thông minh</h2>
+            <p style="margin:-6px 0 16px;font-size:12px;color:var(--text-muted);">Bật/tắt gói trí tuệ AI theo cụm tính năng, áp dụng nhanh cho nhiều kênh cùng lúc. Bấm mũi tên để mở rộng cấu hình chi tiết từng cụm.</p>
+
+            <div class="smart-grid">
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">👤 Nhận diện khuôn mặt</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">🙂 Đối chiếu khuôn mặt</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">🧍 Khuôn mặt &amp; dáng người</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">📊 Metadata — Khuôn mặt</span><span>▾</span></div><div class="sc-body"></div></div>
+
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">🚗 Metadata — Xe cơ giới</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">🚲 Metadata — Xe thô sơ</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card">
+                <div class="sc-head"><span class="sc-name">🎥 IVS — phân tích hành vi</span><span>▾</span></div>
+                <div class="sc-body has-list">
+                  <div class="sl-row"><span>2 · Ngã tư Nguyễn Trãi - KDT</span><span class="chip c-ok"><i class="dot ok"></i>Đang chạy</span></div>
+                  <div class="sl-row"><span>7 · Trạm cân xe tải</span><span class="chip c-ok"><i class="dot ok"></i>Đang chạy</span></div>
+                </div>
+              </div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">🚙 Biển số — ANPR</span><span>▾</span></div><div class="sc-body"></div></div>
+
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">🔁 Biển số — Đối chiếu</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">👥 Bản đồ mật độ đám đông</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">📵 Phát hiện cuộc gọi</span><span>▾</span></div><div class="sc-body"></div></div>
+              <div class="smart-card"><div class="sc-head"><span class="sc-name">🚬 Phát hiện hút thuốc</span><span>▾</span></div><div class="sc-body"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── Tần suất ra vào ─────── -->
+        <div class="subpanel" id="sub-entries">
+          <div class="card" style="max-width:760px;">
+            <div class="form-grid" style="margin-bottom:14px;">
+              <div class="field">
+                <label>Lịch áp dụng</label>
+                <select><option>Lịch mặc định (24/7)</option></select>
+              </div>
+              <div class="field" style="justify-content:flex-end;">
+                <a class="op-link" style="font-weight:700;">＋ Thêm lịch mới</a>
+              </div>
+              <div class="field full">
+                <label>Cài đặt kích hoạt</label>
+                <button class="btn">＋ Chọn cơ sở dữ liệu khuôn mặt mục tiêu</button>
+              </div>
+            </div>
+
+            <div class="rule-card">
+              <div class="rc-head">
+                <span class="rc-name"><i class="dot ok" style="display:inline-block;width:7px;height:7px;border-radius:50%;"></i> Nhóm khách VIP · b14444</span>
+                <div style="display:flex;align-items:center;gap:14px;">
+                  <a class="op-link">Sao chép</a>
+                  <a class="op-link danger">Xoá</a>
+                  <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+              </div>
+              <div class="rc-body">
+                <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:14px;">
+                  <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                  <label style="text-transform:none;font-size:13px;color:var(--text);">Bật đếm số lượt vào</label>
+                </div>
+                <div class="form-grid">
+                  <div class="field"><label>Chu kỳ thống kê</label><input type="text" value="7"><span class="hint">ngày (1–180)</span></div>
+                  <div class="field"><label>Số lượt phát hiện tối đa</label><input type="text" value="21"><span class="hint">lần (1–1200)</span></div>
+                </div>
+                <button class="btn" style="margin-top:12px;">Đặt lại bộ đếm</button>
+                <div class="field" style="margin-top:16px;max-width:320px;">
+                  <label>Liên kết sự kiện</label>
+                  <button class="btn">＋ Chọn</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn btn-primary">Lưu</button>
+              <button class="btn">Làm mới</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── VPN ─────── -->
+        <div class="subpanel" id="sub-vpn">
+          <div class="card" style="max-width:560px;">
+            <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:16px;">
+              <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+              <label style="text-transform:none;font-size:13px;color:var(--text);">Bật kết nối VPN</label>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label>Loại IP</label>
+                <select><option>IPv4</option><option>IPv6</option></select>
+              </div>
+              <div class="field">
+                <label>Cổng (port)</label>
+                <input type="text" value="38796"><span class="hint">phạm vi 1–65535</span>
+              </div>
+              <div class="field full">
+                <label>Địa chỉ máy chủ VPN</label>
+                <div class="octet-inline">
+                  <input value="10"><span>.</span><input value="20"><span>.</span><input value="1"><span>.</span><input value="5">
+                </div>
+              </div>
+              <div class="field full">
+                <label>Device ID</label>
+                <input type="text" value="0" disabled style="background:var(--bg-soft2);">
+              </div>
+            </div>
+
+            <div class="warn-box">
+              <span class="wi">ℹ</span>
+              <span>Device ID trùng với Device ID đã đăng ký. Muốn đổi, sửa tại giao diện Đăng ký thiết bị.</span>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn btn-primary">Áp dụng</button>
+              <button class="btn">Làm mới</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function switchBig(ev, id){
+    document.querySelectorAll('.bigtabs > button, .bigtabs > a').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.bigpanel').forEach(p=>p.classList.remove('active'));
+    ev.currentTarget.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  function switchSub(ev, id){
+    const nav = ev.currentTarget.closest('.subnav');
+    nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    ev.currentTarget.classList.add('active');
+    const container = nav.parentElement;
+    container.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function goStep(n){
+    document.querySelectorAll('.wiz-step').forEach(s=>s.style.display='none');
+    document.getElementById('wiz-'+n).style.display='block';
+    document.querySelectorAll('#wiz-rail .step').forEach(s=>{
+      const step = parseInt(s.dataset.step,10);
+      s.classList.remove('done','active');
+      if(step < n){ s.classList.add('done'); s.querySelector('.num').textContent='✓'; }
+      else if(step === n){ s.classList.add('active'); s.querySelector('.num').textContent=step; }
+      else { s.querySelector('.num').textContent=step; }
+    });
+  }
+
+  // Mở đúng tab lớn theo #hash khi điều hướng từ file 1
+  (function initFromHash(){
+    const hash = location.hash.replace('#','');
+    const map = { 'lienket-ai':'btn-lienket-ai', 'lichtruc':'btn-lichtruc' };
+    const btnId = map[hash] || 'btn-lienket-ai';
+    document.getElementById(btnId).click();
+  })();
+</script>
+
+</body>
+</html>

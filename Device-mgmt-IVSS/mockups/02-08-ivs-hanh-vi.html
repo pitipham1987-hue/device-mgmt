@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giám sát hành vi (IVS) · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 08-ivs-hanh-vi.
+  Ảnh tham khảo: refs/02-van-hanh-ai/08-ivs-hanh-vi/fig6-56_human.png,
+  fig6-57_motor-vehicle.png (2 ảnh này thực chất là dialog "AI Display" —
+  cấu hình hiển thị thuộc tính overlay, KHÔNG phải màn vẽ vùng quy tắc).
+  Theo chỉ định của người dùng (không suy đoán thêm khỏi brief), màn này được
+  dựng lại theo đúng mô tả nghiệp vụ IVS chuẩn của Dahua IVSS (rule-based
+  behavior analysis: tripwire/intrusion/loitering/crowd/parking/wrong-way...)
+  — kiến trúc thông tin suy ra từ cấu trúc "G · Form (vẽ vùng)" ở refs/INDEX.md
+  và từ các màn rule-config tương tự đã thấy ở nhóm 02-07 (fig6-52 Rule config).
+  Giả định: preview camera thay bằng khối xám + overlay vùng vẽ dạng viền nét
+  đứt (không dùng ảnh camera thật, không vẽ SVG người/xe).
+  Kế thừa nguyên vẹn shared.css (hướng "Thiết kế sư hàng đầu" đã chốt
+  15/09/2026) — không sửa token, chỉ thêm CSS scoped cho pattern mới
+  (toggle switch, khung camera giả lập, overlay vùng vẽ, danh sách quy tắc).
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ───────── Scoped: toggle switch (pattern mới, chưa có trong shared.css) ───────── */
+  .toggle{position:relative;display:inline-block;width:36px;height:20px;flex:none;}
+  .toggle input{opacity:0;width:0;height:0;position:absolute;}
+  .toggle .slider{position:absolute;inset:0;background:var(--line-strong);border-radius:20px;cursor:pointer;transition:background .15s;}
+  .toggle .slider::before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3);}
+  .toggle input:checked + .slider{background:var(--primary);}
+  .toggle input:checked + .slider::before{transform:translateX(16px);}
+  .toggle-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);font-weight:600;}
+
+  /* ───────── Scoped: khung camera giả lập + overlay vùng vẽ ───────── */
+  .cam-wrap{background:var(--bg);border:1px solid var(--line);}
+  .cam-frame{position:relative;background:#232B33;aspect-ratio:16/9;overflow:hidden;}
+  .cam-frame .cam-tag{position:absolute;top:8px;left:10px;font-size:11px;color:#fff;background:rgba(0,0,0,.42);padding:2px 8px;border-radius:2px;letter-spacing:.2px;}
+  .cam-frame .cam-time{position:absolute;top:8px;right:10px;font-size:11px;color:#fff;font-family:var(--mono);background:rgba(0,0,0,.42);padding:2px 8px;border-radius:2px;}
+  .cam-frame .cam-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#7B8794;text-align:center;padding:0 20px;}
+  .region-box{position:absolute;border:1.5px dashed var(--accent);background:rgba(2,170,250,.10);}
+  .region-box .rb-tag{position:absolute;top:-19px;left:-1.5px;font-size:10px;font-weight:700;color:#00173D;background:var(--accent);padding:1.5px 6px;border-radius:2px;white-space:nowrap;}
+  .region-line{position:absolute;border-top:2.5px dashed var(--warning);}
+  .region-line .rl-tag{position:absolute;top:-19px;left:0;font-size:10px;font-weight:700;color:#fff;background:var(--warning);padding:1.5px 6px;border-radius:2px;white-space:nowrap;}
+  .cam-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--line);background:var(--bg-soft);}
+  .cam-toolbar .btn{font-size:12px;padding:6px 11px;}
+
+  /* ───────── Scoped: danh sách quy tắc hành vi ───────── */
+  .rule-list{border:1px solid var(--line);background:var(--line);display:flex;flex-direction:column;gap:1px;}
+  .rule-row{background:#fff;padding:9px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+  .rule-row:hover{background:var(--bg-soft);}
+  .rule-row.active{background:#E9F0FC;}
+  .rule-row .r-toggle{flex:none;}
+  .rule-row .r-text{min-width:0;}
+  .rule-row .r-name{font-weight:600;font-size:12.5px;color:var(--text);}
+  .rule-row.active .r-name{color:var(--primary);}
+  .rule-row .r-desc{font-size:11px;color:var(--text-faint);margin-top:1px;}
+  .rule-row .r-area{margin-left:auto;flex:none;font-size:10.5px;color:var(--text-muted);text-align:right;white-space:nowrap;max-width:110px;}
+  .rule-row .r-area.unassigned{color:var(--text-faint);font-style:italic;}
+
+  .rule-detail{border:1px solid var(--line);border-top:none;padding:16px;background:var(--bg);}
+  .rule-detail h3{margin:0 0 12px;font-size:12.5px;font-weight:700;color:var(--navy);}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Giám sát hành vi (IVS)</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Giám sát hành vi (IVS)</h1>
+        <span class="scope">Vẽ vùng phát hiện trên khung hình camera và gán quy tắc hành vi theo từng loại đối tượng</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event,'tab-human')">Người</button>
+        <button class="tab-btn" onclick="switchTab(event,'tab-vehicle')">Phương tiện</button>
+      </div>
+
+      <!-- ═══════════ TAB: NGƯỜI ═══════════ -->
+      <div class="tab-panel active" id="tab-human">
+
+        <div class="toolbar">
+          <div class="field" style="max-width:340px;">
+            <label>Camera áp dụng</label>
+            <select><option>Camera Cổng chính KCN Bắc Thăng Long</option><option>Camera Kho vận số 3</option><option>Camera Sảnh chờ ga Cầu Giấy (BRT)</option></select>
+          </div>
+          <div class="fill"></div>
+          <div class="toggle-row"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Bật giám sát hành vi · Người</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start;">
+
+          <!-- Camera preview + vẽ vùng -->
+          <div class="cam-wrap">
+            <div class="cam-frame">
+              <span class="cam-tag">Camera Sảnh chờ ga Cầu Giấy (BRT)</span>
+              <span class="cam-time tabular">15/09/2026 14:22:07</span>
+              <div class="region-box" style="left:8%;top:22%;width:34%;height:58%;">
+                <span class="rb-tag">Vùng 1 · Khu vực kho vận</span>
+              </div>
+              <div class="region-box" style="left:52%;top:14%;width:40%;height:70%;">
+                <span class="rb-tag">Vùng 2 · Sảnh chờ ga BRT</span>
+              </div>
+              <span class="cam-label">Xem trước camera (giả lập) — vùng phát hiện đã khoanh hiển thị dưới dạng khối viền nét đứt màu accent</span>
+            </div>
+            <div class="cam-toolbar">
+              <button class="btn">＋ Vẽ vùng mới</button>
+              <button class="btn">╱ Vẽ đường vượt rào</button>
+              <button class="btn">Xoá vùng đã chọn</button>
+              <button class="btn">Xoá tất cả</button>
+              <div class="fill"></div>
+              <span style="font-size:11px;color:var(--text-faint);">2 vùng đã vẽ</span>
+            </div>
+          </div>
+
+          <!-- Danh sách quy tắc -->
+          <div>
+            <div class="rule-list">
+              <div class="rule-row active" onclick="selectRule('human',this,'tu-tap')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Tụ tập đông người</div><div class="r-desc">Cảnh báo khi số người trong vùng vượt ngưỡng đặt trước</div></div>
+                <span class="r-area">Vùng 2 · Sảnh chờ ga BRT</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('human',this,'vuot-rao')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Xâm nhập khu vực cấm</div><div class="r-desc">Cảnh báo khi người đi vào vùng không được phép có mặt</div></div>
+                <span class="r-area">Vùng 1 · Khu vực kho vận</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('human',this,'lang-vang')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox"><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Lảng vảng bất thường</div><div class="r-desc">Cảnh báo khi một người ở lại trong vùng quá thời gian quy định</div></div>
+                <span class="r-area">Vùng 1 · Khu vực kho vận</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('human',this,'nga-nguoi')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Phát hiện ngã / té ngã</div><div class="r-desc">Cảnh báo khi phát hiện tư thế ngã trong toàn khung hình</div></div>
+                <span class="r-area">Toàn khung hình</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('human',this,'nguoc-chieu')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox"><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Di chuyển ngược hướng quy định</div><div class="r-desc">Áp dụng cho lối đi một chiều — hành lang, cầu thang thoát hiểm</div></div>
+                <span class="r-area unassigned">Chưa gán vùng</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('human',this,'bo-vat')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox"><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Bỏ lại vật thể khả nghi</div><div class="r-desc">Cảnh báo khi vật thể xuất hiện và không di chuyển quá ngưỡng thời gian</div></div>
+                <span class="r-area unassigned">Chưa gán vùng</span>
+              </div>
+            </div>
+
+            <div class="rule-detail">
+              <h3 id="human-detail-title">Cấu hình quy tắc: Tụ tập đông người</h3>
+              <div class="form-grid">
+                <div class="field"><label>Vùng gán</label><select id="human-detail-area"><option>Vùng 2 · Sảnh chờ ga BRT</option><option>Vùng 1 · Khu vực kho vận</option></select></div>
+                <div class="field"><label>Độ nhạy</label><select id="human-detail-sens"><option>Cao</option><option selected>Trung bình</option><option>Thấp</option></select></div>
+                <div class="field"><label>Ngưỡng số người</label><input id="human-detail-threshold" type="text" value="≥ 8 người trong vùng"></div>
+                <div class="field"><label>Lịch áp dụng</label><select><option>Cả ngày (00:00–24:00)</option><option>Giờ cao điểm (06:00–09:00, 17:00–20:00)</option></select></div>
+                <div class="field full"><label>Liên kết sự kiện</label><input id="human-detail-link" type="text" value="Còi báo khu vực, ghi hình kênh 33, gửi cảnh báo về NOC"></div>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-primary">Lưu quy tắc</button><button class="btn">Làm mới</button></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════════ TAB: PHƯƠNG TIỆN ═══════════ -->
+      <div class="tab-panel" id="tab-vehicle">
+
+        <div class="toolbar">
+          <div class="field" style="max-width:340px;">
+            <label>Camera áp dụng</label>
+            <select><option>Camera Km12+400 cao tốc HN - Hải Phòng</option><option>Camera Nút giao Km22 cao tốc HN-HP</option><option>Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ</option></select>
+          </div>
+          <div class="fill"></div>
+          <div class="toggle-row"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Bật giám sát hành vi · Phương tiện</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start;">
+
+          <div class="cam-wrap">
+            <div class="cam-frame">
+              <span class="cam-tag">Camera Km12+400 cao tốc HN - Hải Phòng</span>
+              <span class="cam-time tabular">15/09/2026 14:23:41</span>
+              <div class="region-box" style="left:6%;top:60%;width:88%;height:22%;">
+                <span class="rb-tag">Vùng 1 · Làn khẩn cấp Km12+400</span>
+              </div>
+              <div class="region-line" style="left:4%;top:38%;width:92%;transform:rotate(-2deg);">
+                <span class="rl-tag">Đường vượt rào · Làn chính hướng Hải Phòng</span>
+              </div>
+              <span class="cam-label">Xem trước camera (giả lập) — đường vượt rào hiển thị dạng nét đứt màu cảnh báo, vùng phát hiện dạng khối viền nét đứt màu accent</span>
+            </div>
+            <div class="cam-toolbar">
+              <button class="btn">＋ Vẽ vùng mới</button>
+              <button class="btn">╱ Vẽ đường vượt rào</button>
+              <button class="btn">Xoá vùng đã chọn</button>
+              <button class="btn">Xoá tất cả</button>
+              <div class="fill"></div>
+              <span style="font-size:11px;color:var(--text-faint);">1 vùng · 1 đường vượt rào</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="rule-list">
+              <div class="rule-row active" onclick="selectRule('vehicle',this,'nguoc-chieu-pt')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Đi ngược chiều</div><div class="r-desc">Cảnh báo khi phương tiện di chuyển ngược hướng lưu thông quy định</div></div>
+                <span class="r-area">Đường vượt rào · Làn chính HP</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('vehicle',this,'vuot-rao-pt')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Vượt rào / lấn làn khẩn cấp</div><div class="r-desc">Cảnh báo khi phương tiện đi vào làn khẩn cấp hoặc vượt vạch cấm</div></div>
+                <span class="r-area">Vùng 1 · Làn khẩn cấp Km12+400</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('vehicle',this,'dung-do')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Dừng đỗ trái phép</div><div class="r-desc">Cảnh báo khi phương tiện dừng quá thời gian cho phép trong vùng cấm</div></div>
+                <span class="r-area">Vùng 1 · Làn khẩn cấp Km12+400</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('vehicle',this,'un-tac')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox"><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Ùn tắc giao thông</div><div class="r-desc">Cảnh báo khi mật độ phương tiện vượt ngưỡng liên tục trong khoảng thời gian</div></div>
+                <span class="r-area">Toàn khung hình</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('vehicle',this,'toc-do')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox"><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Tốc độ bất thường</div><div class="r-desc">Ước lượng tốc độ tương đối, cảnh báo khi quá nhanh hoặc quá chậm</div></div>
+                <span class="r-area unassigned">Chưa gán vùng</span>
+              </div>
+              <div class="rule-row" onclick="selectRule('vehicle',this,'sai-lan')">
+                <label class="toggle r-toggle" onclick="event.stopPropagation()"><input type="checkbox"><span class="slider"></span></label>
+                <div class="r-text"><div class="r-name">Đi sai làn đường quy định</div><div class="r-desc">Cảnh báo khi xe tải trọng lớn đi vào làn xe con hoặc ngược lại</div></div>
+                <span class="r-area unassigned">Chưa gán vùng</span>
+              </div>
+            </div>
+
+            <div class="rule-detail">
+              <h3 id="vehicle-detail-title">Cấu hình quy tắc: Đi ngược chiều</h3>
+              <div class="form-grid">
+                <div class="field"><label>Vùng / đường gán</label><select id="vehicle-detail-area"><option>Đường vượt rào · Làn chính hướng Hải Phòng</option><option>Vùng 1 · Làn khẩn cấp Km12+400</option></select></div>
+                <div class="field"><label>Độ nhạy</label><select id="vehicle-detail-sens"><option selected>Cao</option><option>Trung bình</option><option>Thấp</option></select></div>
+                <div class="field"><label>Ngưỡng thời gian</label><input id="vehicle-detail-threshold" type="text" value="Xác nhận ngay khi vượt qua đường"></div>
+                <div class="field"><label>Lịch áp dụng</label><select><option>Cả ngày (00:00–24:00)</option><option>Ban đêm (22:00–05:00)</option></select></div>
+                <div class="field full"><label>Liên kết sự kiện</label><input id="vehicle-detail-link" type="text" value="Ghi hình kênh 12/13, gửi cảnh báo VEC-NOC, bật đèn cảnh báo biến LED"></div>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-primary">Lưu quy tắc</button><button class="btn">Làm mới</button></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function switchTab(ev, id){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  const ruleData = {
+    human: {
+      'tu-tap':      {title:'Tụ tập đông người',            area:'Vùng 2 · Sảnh chờ ga BRT',        sens:'Trung bình', threshold:'≥ 8 người trong vùng',                link:'Còi báo khu vực, ghi hình kênh 33, gửi cảnh báo về NOC'},
+      'vuot-rao':    {title:'Xâm nhập khu vực cấm',         area:'Vùng 1 · Khu vực kho vận',         sens:'Cao',         threshold:'Xác nhận ngay khi phát hiện',          link:'Còi báo kho vận, ghi hình kênh 18, gửi SMS bảo vệ trực ca'},
+      'lang-vang':   {title:'Lảng vảng bất thường',         area:'Vùng 1 · Khu vực kho vận',         sens:'Trung bình', threshold:'Ở lại quá 120 giây',                    link:'Ghi hình kênh 18, đánh dấu sự kiện xem lại'},
+      'nga-nguoi':   {title:'Phát hiện ngã / té ngã',       area:'Toàn khung hình',                  sens:'Cao',         threshold:'Xác nhận ngay khi phát hiện tư thế ngã', link:'Gửi cảnh báo khẩn NOC, ghi hình kênh 33'},
+      'nguoc-chieu': {title:'Di chuyển ngược hướng quy định',area:'Chưa gán vùng',                    sens:'Trung bình', threshold:'—',                                     link:'Chưa cấu hình'},
+      'bo-vat':      {title:'Bỏ lại vật thể khả nghi',      area:'Chưa gán vùng',                    sens:'Thấp',        threshold:'Tĩnh quá 300 giây',                     link:'Chưa cấu hình'},
+    },
+    vehicle: {
+      'nguoc-chieu-pt': {title:'Đi ngược chiều',              area:'Đường vượt rào · Làn chính hướng Hải Phòng', sens:'Cao',         threshold:'Xác nhận ngay khi vượt qua đường',   link:'Ghi hình kênh 12/13, gửi cảnh báo VEC-NOC, bật đèn cảnh báo biến LED'},
+      'vuot-rao-pt':    {title:'Vượt rào / lấn làn khẩn cấp',  area:'Vùng 1 · Làn khẩn cấp Km12+400',              sens:'Cao',         threshold:'Xác nhận ngay khi phát hiện',        link:'Ghi hình kênh 12, gửi cảnh báo VEC-NOC'},
+      'dung-do':        {title:'Dừng đỗ trái phép',            area:'Vùng 1 · Làn khẩn cấp Km12+400',              sens:'Trung bình', threshold:'Dừng quá 60 giây',                    link:'Ghi hình kênh 12, thông báo đội tuần đường'},
+      'un-tac':         {title:'Ùn tắc giao thông',            area:'Toàn khung hình',                             sens:'Trung bình', threshold:'Mật độ cao liên tục quá 180 giây',    link:'Cảnh báo trung tâm điều hành cao tốc'},
+      'toc-do':         {title:'Tốc độ bất thường',            area:'Chưa gán vùng',                               sens:'Thấp',        threshold:'—',                                  link:'Chưa cấu hình'},
+      'sai-lan':        {title:'Đi sai làn đường quy định',    area:'Chưa gán vùng',                               sens:'Thấp',        threshold:'—',                                  link:'Chưa cấu hình'},
+    }
+  };
+
+  function selectRule(tab, rowEl, key){
+    rowEl.parentElement.querySelectorAll('.rule-row').forEach(r=>r.classList.remove('active'));
+    rowEl.classList.add('active');
+    const d = ruleData[tab][key];
+    document.getElementById(tab+'-detail-title').textContent = 'Cấu hình quy tắc: ' + d.title;
+    document.getElementById(tab+'-detail-area').innerHTML = '<option>'+d.area+'</option>';
+    document.getElementById(tab+'-detail-sens').innerHTML = ['Cao','Trung bình','Thấp'].map(s=>'<option'+(s===d.sens?' selected':'')+'>'+s+'</option>').join('');
+    document.getElementById(tab+'-detail-threshold').value = d.threshold;
+    document.getElementById(tab+'-detail-link').value = d.link;
+  }
+</script>
+
+</body>
+</html>

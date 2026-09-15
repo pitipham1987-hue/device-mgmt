@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tìm kiếm nâng cao · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 04-tim-kiem-nang-cao.
+  Ảnh tham khảo: refs/02-van-hanh-ai/04-tim-kiem-nang-cao/
+    fig6-18_set-the-image-source.png, p97_single-configuration.png — bảng
+      "AI Config / Event Snapshot / Scheduled Snapshot / Interval" theo từng
+      kênh (cấu hình đơn lẻ).
+    fig6-20_batch-configuration.png — modal "Batch Config": Interval, chọn
+      khoảng kênh (from-to), lưới số kênh dạng chip.
+    fig6-21_advanced-search.png — thanh danh mục (Person/Vehicle/Bicycle/
+      Animal/Object) + input tìm kiếm tự nhiên + tab thuộc tính (Top/Bottom/
+      Hat/Backpack/Behavior/Gender/Age/Name) + lưới swatch màu.
+    fig6-22_search-results.png — lưới kết quả dạng ảnh, mỗi ô có % tương đồng
+      (progress bar) và nhãn nguồn ảnh (Scheduled/Event Snapshot).
+
+  Kế thừa shared.css — form đặt nguồn ảnh dùng .tabs (Cấu hình đơn lẻ / Cấu
+  hình hàng loạt) + table.devices; form tìm kiếm nâng cao dùng .card +
+  .form-grid tinh thần tương tự, danh mục đối tượng và thuộc tính triển khai
+  bằng .tab-btn tái dùng (không tạo thêm biến thể màu ngoài bảng đã duyệt —
+  nút Tìm kiếm dùng gradient primary→accent thay vì tím/hồng như ảnh gốc).
+  Kết quả tìm kiếm dùng khối xám placeholder có nhãn, KHÔNG vẽ ảnh khuôn mặt/
+  biển số giả, đúng nguyên tắc dự án.
+
+  Giả định: bối cảnh camera giao thông/an ninh Hà Nội - KCN Bắc Thăng Long -
+  cao tốc HN-HP nhất quán với các màn 02-01..02-03; dữ liệu tìm kiếm mẫu là
+  "người mặc áo đen, đội mũ bảo hiểm" khớp gợi ý trong ảnh gốc.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* ── Pattern mới scoped riêng cho trang này ── */
+
+  .info-box{
+    display:flex;gap:10px;background:#E9F0FC;border:1px solid #C7D9F5;
+    border-left:3px solid var(--primary);padding:10px 13px;font-size:12px;
+    color:var(--navy2);line-height:1.55;margin-bottom:16px;
+  }
+  .info-box .wi{font-size:15px;flex:none;color:var(--primary);}
+
+  section.blk{margin-bottom:30px;}
+  section.blk .blk-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;}
+  section.blk .blk-h h2{font-size:15px;font-weight:700;color:var(--navy);margin:0;}
+  section.blk .blk-h .blk-sub{font-size:12px;color:var(--text-muted);}
+
+  /* Batch config: lưới chip số kênh */
+  .batch-row{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+  .batch-row .field{max-width:160px;}
+  .range-sep{align-self:center;color:var(--text-faint);font-weight:700;padding-bottom:9px;}
+  .ch-chip-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;max-width:620px;}
+  .ch-chip{
+    border:1px solid var(--line-strong);background:var(--bg-soft);text-align:center;
+    padding:7px 0;font-size:12px;font-weight:600;color:var(--text-muted);border-radius:3px;cursor:pointer;
+    font-variant-numeric:tabular-nums;
+  }
+  .ch-chip.sel{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  /* Danh mục đối tượng tìm kiếm */
+  .cat-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .cat-btn{
+    border:1px solid var(--line-strong);background:var(--bg-soft);color:var(--text-muted);
+    font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:4px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .cat-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .search-bar{
+    display:flex;gap:10px;border:1.5px solid var(--primary);border-radius:5px;padding:6px;margin-bottom:14px;
+  }
+  .search-bar input{
+    flex:1;border:none;outline:none;font-family:inherit;font-size:13.5px;padding:8px 10px;color:var(--text);
+  }
+  .search-btn{
+    border:none;border-radius:3px;padding:0 22px;font-weight:700;font-size:13px;color:#fff;cursor:pointer;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+  }
+
+  .attr-tabs{display:flex;gap:20px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap;}
+  .attr-tabs .at-btn{
+    border:none;background:none;font-family:inherit;padding:7px 2px;font-size:12.5px;font-weight:600;
+    color:var(--text-faint);cursor:pointer;border-bottom:2px solid transparent;
+  }
+  .attr-tabs .at-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+  .swatch-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;}
+  .swatch{
+    display:flex;align-items:center;gap:8px;background:var(--bg-soft);border:1px solid var(--line);
+    border-radius:3px;padding:8px 10px;font-size:12px;color:var(--text);cursor:pointer;
+  }
+  .swatch.sel{border-color:var(--primary);background:#F3F7FE;}
+  .swatch .dotc{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.12);}
+
+  .search-meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-muted);margin:8px 0 16px;flex-wrap:wrap;gap:8px;}
+  .search-meta .sm-left span{margin-right:16px;}
+  .search-meta b{color:var(--text);}
+
+  /* Kết quả tìm kiếm dạng lưới ảnh */
+  .result-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+  @media (max-width:1180px){ .result-grid{grid-template-columns:repeat(3,1fr);} }
+  .result-card{border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--bg);}
+  .result-card .rc-head{
+    display:flex;align-items:center;justify-content:space-between;padding:6px 8px;font-size:10.5px;color:var(--text-faint);
+  }
+  .result-card .rc-thumb{
+    aspect-ratio:4/3;background:var(--bg-soft2);color:var(--text-faint);font-size:10.5px;
+    display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.3;padding:6px;
+  }
+  .result-card .rc-sim{padding:6px 8px 3px;}
+  .result-card .rc-sim .strack{position:relative;height:6px;background:var(--bg-soft2);}
+  .result-card .rc-sim .sfill{position:absolute;left:0;top:0;bottom:0;background:var(--warning);}
+  .result-card .rc-sim .slabel{display:flex;justify-content:flex-end;font-size:10.5px;color:var(--text-muted);margin-top:2px;}
+  .result-card .rc-foot{padding:0 8px 8px;font-size:10.5px;color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Tìm kiếm nâng cao</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Tìm kiếm nâng cao</h1>
+        <span class="scope">Theo đặc điểm &amp; metadata trích xuất — <b>Toàn hệ thống</b></span>
+      </div>
+
+      <!-- ═══════════ 1. ĐẶT NGUỒN ẢNH ═══════════ -->
+      <section class="blk" id="blk-source">
+        <div class="blk-h"><h2>① Đặt nguồn ảnh</h2><span class="blk-sub">Chọn kênh cung cấp ảnh chụp cho chỉ mục tìm kiếm nâng cao (WizSeek)</span></div>
+
+        <div class="card">
+          <div class="tabs" style="margin-bottom:16px;">
+            <button class="tab-btn active" onclick="switchTab(event,'src-single')">Cấu hình đơn lẻ</button>
+            <button class="tab-btn" onclick="switchTab(event,'src-batch')">Cấu hình hàng loạt</button>
+          </div>
+
+          <div class="tab-panel active" id="src-single">
+            <div class="table-scroll">
+              <table class="devices" style="min-width:900px;">
+                <thead>
+                  <tr>
+                    <th>Kênh</th>
+                    <th>Tên camera</th>
+                    <th>WizSeek (AI Config)</th>
+                    <th>Ảnh khi có sự kiện</th>
+                    <th>Ảnh theo lịch</th>
+                    <th>Chu kỳ (180–3600s)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tabular">1</td>
+                    <td class="chname">Cổng chính Toà nhà VNPT Cầu Giấy</td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox"></td>
+                    <td class="mono-cell tabular">--</td>
+                  </tr>
+                  <tr>
+                    <td class="tabular">2</td>
+                    <td class="chname">Ngã tư Nguyễn Trãi - Khuất Duy Tiến</td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td class="mono-cell tabular">600</td>
+                  </tr>
+                  <tr>
+                    <td class="tabular">3</td>
+                    <td class="chname">Vòng xuyến Cầu Giấy - Xuân Thuỷ</td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td class="mono-cell tabular">600</td>
+                  </tr>
+                  <tr>
+                    <td class="tabular">4</td>
+                    <td class="chname">Cổng chính KCN Bắc Thăng Long</td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td class="mono-cell tabular">300</td>
+                  </tr>
+                  <tr>
+                    <td class="tabular">5</td>
+                    <td class="chname">Km12+400 cao tốc HN - Hải Phòng</td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox" checked></td>
+                    <td style="text-align:center;"><input type="checkbox"></td>
+                    <td class="mono-cell tabular">--</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-foot">
+              <span>Tổng <b class="tabular">16</b> kênh — đang hiển thị 5 dòng</span>
+            </div>
+            <div class="toolbar" style="margin-top:6px;">
+              <button class="btn btn-primary">Hoàn tất</button>
+              <button class="btn">Làm mới</button>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="src-batch">
+            <div class="batch-row">
+              <div class="field">
+                <label>Chu kỳ chụp (giây)</label>
+                <input type="text" placeholder="180–3600">
+              </div>
+              <div class="field">
+                <label>Từ kênh</label>
+                <input type="text" value="1">
+              </div>
+              <div class="range-sep">—</div>
+              <div class="field">
+                <label>Đến kênh</label>
+                <input type="text" value="16">
+              </div>
+              <button class="btn" style="height:35px;">Chọn</button>
+              <button class="btn" style="height:35px;">Bỏ chọn</button>
+            </div>
+
+            <label style="font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:8px;">Kênh áp dụng (1–16)</label>
+            <div class="ch-chip-grid">
+              <div class="ch-chip sel">1</div><div class="ch-chip sel">2</div><div class="ch-chip sel">3</div><div class="ch-chip sel">4</div>
+              <div class="ch-chip sel">5</div><div class="ch-chip">6</div><div class="ch-chip">7</div><div class="ch-chip">8</div>
+              <div class="ch-chip">9</div><div class="ch-chip">10</div><div class="ch-chip">11</div><div class="ch-chip">12</div>
+              <div class="ch-chip">13</div><div class="ch-chip">14</div><div class="ch-chip">15</div><div class="ch-chip">16</div>
+            </div>
+
+            <div class="toolbar" style="margin-top:18px;">
+              <button class="btn btn-primary">OK</button>
+              <button class="btn">Huỷ</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ 2. TÌM KIẾM NÂNG CAO ═══════════ -->
+      <section class="blk" id="blk-search">
+        <div class="blk-h"><h2>② Tìm kiếm nâng cao</h2><span class="blk-sub">Tìm theo mô tả tự nhiên hoặc lọc theo thuộc tính đặc điểm</span></div>
+
+        <div class="card">
+          <div class="cat-row">
+            <button class="cat-btn active">👤 Người</button>
+            <button class="cat-btn">🚗 Phương tiện</button>
+            <button class="cat-btn">🚲 Xe đạp</button>
+            <button class="cat-btn">🐾 Động vật</button>
+            <button class="cat-btn">📦 Đồ vật</button>
+          </div>
+
+          <div class="search-bar">
+            <input type="text" value="Người mặc áo đen, đội mũ bảo hiểm">
+            <button class="search-btn">Tìm kiếm</button>
+          </div>
+
+          <div class="attr-tabs">
+            <button class="at-btn active">Áo trên</button>
+            <button class="at-btn">Áo dưới</button>
+            <button class="at-btn">Mũ</button>
+            <button class="at-btn">Balo</button>
+            <button class="at-btn">Hành vi</button>
+            <button class="at-btn">Giới tính</button>
+            <button class="at-btn">Độ tuổi</button>
+            <button class="at-btn">Tên</button>
+          </div>
+
+          <div class="swatch-grid">
+            <div class="swatch sel"><span class="dotc" style="background:#000;"></span>Đen</div>
+            <div class="swatch"><span class="dotc" style="background:#fff;border-color:#ccc;"></span>Trắng</div>
+            <div class="swatch"><span class="dotc" style="background:#1E56D8;"></span>Xanh dương</div>
+            <div class="swatch"><span class="dotc" style="background:#8A93A0;"></span>Xám</div>
+            <div class="swatch"><span class="dotc" style="background:#2E8B4E;"></span>Xanh lá</div>
+            <div class="swatch"><span class="dotc" style="background:#C0392B;"></span>Đỏ</div>
+            <div class="swatch"><span class="dotc" style="background:#F4A8C0;"></span>Hồng</div>
+            <div class="swatch"><span class="dotc" style="background:#7A4A2B;"></span>Nâu</div>
+            <div class="swatch"><span class="dotc" style="background:#7D3C98;"></span>Tím</div>
+            <div class="swatch"><span class="dotc" style="background:#F1C40F;"></span>Vàng</div>
+          </div>
+
+          <div class="search-meta">
+            <div class="sm-left">
+              <span>🕐 <b>Hôm nay</b></span>
+              <span>📹 <b>Tất cả kênh</b></span>
+              <span>▤ <b>Tất cả sự kiện</b></span>
+            </div>
+            <span>Tìm kiếm xu hướng: <span style="color:var(--text-faint);">người bỏ lại vật thể, xe máy vượt đèn đỏ</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ 3. KẾT QUẢ TÌM KIẾM ═══════════ -->
+      <section class="blk" id="blk-results">
+        <div class="blk-h"><h2>③ Kết quả tìm kiếm</h2><span class="blk-sub">"Người mặc áo đen, đội mũ bảo hiểm" — 16/06/2026 00:00 → 23:59</span></div>
+
+        <div class="toolbar">
+          <span class="selcount">✦ Tổng <b class="tabular">1.000</b> kết quả</span>
+          <div class="fill"></div>
+          <span style="font-size:12px;color:var(--text-muted);">Độ tương đồng ≥</span>
+          <input type="range" min="0" max="100" value="60" style="width:120px;accent-color:var(--primary);">
+          <span style="font-size:12px;font-weight:700;color:var(--navy);width:32px;">60%</span>
+          <button class="btn">☆ Yêu thích</button>
+          <button class="btn">Xuất kết quả</button>
+        </div>
+
+        <div class="result-grid">
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH9 · Cầu Giấy</span><span>17:44:50</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:87%"></div></div><div class="slabel tabular">87%</div></div>
+            <div class="rc-foot">Ảnh theo lịch</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH3 · Vòng xuyến</span><span>14:53:27</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:86%"></div></div><div class="slabel tabular">86%</div></div>
+            <div class="rc-foot">Ảnh theo lịch</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH9 · Cầu Giấy</span><span>08:04:48</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:86%"></div></div><div class="slabel tabular">86%</div></div>
+            <div class="rc-foot">Ảnh sự kiện</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH12 · KCN Bắc TL</span><span>08:04:48</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:86%"></div></div><div class="slabel tabular">86%</div></div>
+            <div class="rc-foot">Ảnh sự kiện</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH12 · KCN Bắc TL</span><span>11:52:37</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:86%"></div></div><div class="slabel tabular">86%</div></div>
+            <div class="rc-foot">Ảnh theo lịch</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH3 · Vòng xuyến</span><span>15:18:04</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:86%"></div></div><div class="slabel tabular">86%</div></div>
+            <div class="rc-foot">Ảnh theo lịch</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH1 · Cổng KCN</span><span>06:31:12</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:81%"></div></div><div class="slabel tabular">81%</div></div>
+            <div class="rc-foot">Ảnh sự kiện</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH70 · Nút giao Km22</span><span>17:02:55</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:79%"></div></div><div class="slabel tabular">79%</div></div>
+            <div class="rc-foot">Ảnh theo lịch</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH71 · Trạm thu phí 5B</span><span>18:11:40</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:76%"></div></div><div class="slabel tabular">76%</div></div>
+            <div class="rc-foot">Ảnh sự kiện</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH2 · Kho vận số 3</span><span>09:47:03</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:74%"></div></div><div class="slabel tabular">74%</div></div>
+            <div class="rc-foot">Ảnh theo lịch</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH4 · Bãi đỗ Canon</span><span>13:20:19</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:68%"></div></div><div class="slabel tabular">68%</div></div>
+            <div class="rc-foot">Ảnh sự kiện</div>
+          </div>
+
+          <div class="result-card">
+            <div class="rc-head"><span>CH1 · Cổng KCN</span><span>20:05:52</span></div>
+            <div class="rc-thumb">Ảnh trích xuất<br>người · mũ bảo hiểm</div>
+            <div class="rc-sim"><div class="strack"><div class="sfill" style="width:62%"></div></div><div class="slabel tabular">62%</div></div>
+            <div class="rc-foot">Ảnh theo lịch</div>
+          </div>
+
+        </div>
+
+        <div class="table-foot">
+          <span>Đang hiển thị 12 / <b class="tabular">1.000</b> kết quả</span>
+          <div class="pager">
+            <button disabled>‹</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>…</button>
+            <button>84</button>
+            <button>›</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  function switchTab(ev, id){
+    const card = ev.target.closest('.card');
+    card.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    card.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    card.querySelector('#'+id).classList.add('active');
+  }
+
+  document.querySelectorAll('.cat-btn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.at-btn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('.at-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.swatch').forEach(b=>{
+    b.addEventListener('click', ()=>{ b.classList.toggle('sel'); });
+  });
+  document.querySelectorAll('.ch-chip').forEach(b=>{
+    b.addEventListener('click', ()=>{ b.classList.toggle('sel'); });
+  });
+</script>
+
+</body>
+</html>

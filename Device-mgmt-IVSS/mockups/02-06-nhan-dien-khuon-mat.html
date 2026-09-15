@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý CSDL khuôn mặt · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm tham chiếu: refs/02-van-hanh-ai/06-nhan-dien-khuon-mat/
+    - fig6-30_remote-face-databases.png            → mục con "CSDL từ xa"
+    - fig6-32_batch-import.png                     → modal "Nhập ảnh hàng loạt" (trong CSDL cục bộ)
+    - fig6-33_attribute-display.png                → dùng chung modal thuộc tính với 02-05/02-07, không lặp lại ở đây
+    - fig6-36_local-face-database.png              → mục con "CSDL cục bộ"
+    - fig6-37_add-local-face-database.png          → modal "Tạo CSDL cục bộ" (wizard 2 bước)
+    - fig6-39_local-passerby-database.png          → mục con "CSDL người qua đường"
+    - fig6-40_passerby-database.png                → modal "Tạo CSDL người qua đường"
+    - fig6-43_configure-face-comparison-by-recorder.png → mục con "Cấu hình đối sánh qua đầu ghi"
+    - fig6-48_snapshot-mode.png                    → mục con "Chế độ chụp nhanh"
+    - p118/p128/p134_face-database.png             → chú giải icon số người/đã dựng mô hình/trạng thái vũ trang trên card CSDL
+    - p136_time-appeared.png                       → hồ sơ khuôn mặt trong CSDL cục bộ + liên kết "Số lần xuất hiện"
+
+  Nhóm này lớn (13 ảnh, 5 khối chức năng) → gộp thành 1 trang "Quản lý CSDL
+  khuôn mặt" với thanh điều hướng phụ bên trái (không phải tree-pane địa bàn
+  — đây là điều hướng theo loại CSDL/tính năng nên dùng pattern mới scoped
+  .subnav-pane), mỗi mục con dùng lại table.devices / card / form-grid /
+  wizard-rail của shared.css.
+
+  Giả định thiết kế:
+  - "Thời gian xuất hiện" (p136) được hiện thực là liên kết "N lần ▸" trong
+    bảng hồ sơ khuôn mặt của CSDL cục bộ, mở modal danh sách các lần xuất
+    hiện (thời gian + camera) — không tách thành màn riêng vì đây vốn là một
+    trường trong thẻ hồ sơ, không phải một trang độc lập.
+  - fig6-33 (thuộc tính hiển thị) dùng chung modal "Cấu hình hiển thị thuộc
+    tính AI" đã dựng ở 02-05-phat-hien-khuon-mat.html, không lặp lại UI ở
+    đây để tránh trùng lặp — ghi chú điều hướng chéo trong mục "CSDL từ xa".
+  - Ảnh khuôn mặt trong toàn bộ CSDL dùng khối màu xám placeholder, không
+    vẽ SVG mặt người — dữ liệu khuôn mặt là dữ liệu cá nhân nhạy cảm theo
+    Nghị định 13/2023/NĐ-CP.
+  - Camera nguồn tái dùng danh sách thiết bị đã thiết lập ở màn neo quản lý
+    thiết bị để giữ nhất quán bối cảnh Cầu Giấy / KCN Bắc Thăng Long / cao
+    tốc HN-Hải Phòng.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .notice-box{
+    display:flex;gap:10px;background:#E9F4FF;border:1px solid #BFE0FC;
+    border-left:3px solid var(--accent2);padding:10px 13px;font-size:12px;
+    color:#0A3D66;line-height:1.55;margin:0 0 16px;
+  }
+  .notice-box .ni{font-size:14px;flex:none;}
+
+  .mgmt-shell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 52px);}
+
+  .subnav-pane{background:var(--bg);border-right:1px solid var(--line);padding:16px 0;}
+  .subnav-pane .sp-heading{padding:0 16px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint);border-bottom:1px solid var(--line);margin-bottom:6px;}
+  .subnav-pane .sp-item{display:flex;flex-direction:column;gap:2px;padding:10px 16px;cursor:pointer;border-left:3px solid transparent;}
+  .subnav-pane .sp-item:hover{background:var(--bg-soft);}
+  .subnav-pane .sp-item.active{background:#E9F0FC;border-left-color:var(--primary);}
+  .subnav-pane .sp-item.active .sp-title{color:var(--primary);}
+  .subnav-pane .sp-title{font-size:12.5px;font-weight:700;color:var(--text);}
+  .subnav-pane .sp-sub{font-size:11px;color:var(--text-faint);line-height:1.4;}
+
+  .mgmt-section{display:none;}
+  .mgmt-section.active{display:block;}
+
+  .mini-res{background:var(--bg);border:1px solid var(--line);padding:12px 18px;display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-bottom:16px;}
+
+  .thumb-mini{width:40px;height:40px;background:#D8DEE6;color:#6B7480;font-size:8.5px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;}
+  .thumb-sq{width:64px;height:64px;background:#D8DEE6;color:#6B7480;font-size:9.5px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;padding:4px;}
+
+  .badge.b-armed{background:#E9F0FC;color:var(--primary);}
+  .badge.b-disarm{background:var(--bg-soft2);color:var(--text-muted);}
+  .badge.b-sync{background:#E9F0FC;color:var(--primary);}
+  .badge.b-syncing{background:var(--warning-bg);color:var(--warning);}
+
+  .stat-icons{display:flex;gap:10px;font-size:11px;color:var(--text-muted);}
+  .stat-icons b{color:var(--navy);}
+
+  .picker-panel{border:1px solid var(--line);background:var(--bg);margin-top:10px;padding:12px 14px;display:none;}
+  .picker-panel.open{display:block;}
+  .picker-tabs{display:flex;gap:16px;margin-bottom:10px;border-bottom:1px solid var(--line);padding-bottom:8px;}
+  .picker-tabs span{font-size:12px;font-weight:600;color:var(--text-faint);cursor:pointer;}
+  .picker-tabs span.active{color:var(--primary);}
+  .picker-list label{display:block;padding:6px 4px;font-size:12.5px;cursor:pointer;}
+  .picker-list label:hover{background:var(--bg-soft);}
+
+  .rule-row{display:flex;align-items:center;gap:16px;padding:11px 14px;border:1px solid var(--line);border-top:none;font-size:12.5px;}
+  .rule-row:first-of-type{border-top:1px solid var(--line);}
+  .rule-row .rn{font-weight:700;color:var(--navy);width:190px;flex:none;}
+  .rule-row .rf{display:flex;align-items:center;gap:6px;color:var(--text-muted);}
+  .rule-row .rf input[type=text],.rule-row .rf input[type=number]{width:64px;border:1px solid var(--line-strong);border-radius:3px;padding:5px 7px;font-size:12.5px;}
+  .rule-row .fill{flex:1;}
+  .rule-row .rm{color:var(--error);cursor:pointer;font-size:14px;}
+
+  .cam-preview{aspect-ratio:16/10;background:#26313F;position:relative;display:flex;align-items:center;justify-content:center;color:#9FB0C4;font-size:12px;text-align:center;padding:16px;}
+  .cam-preview .draw-box{position:absolute;inset:14%;border:2px dashed var(--accent2);}
+  .cam-tools{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .cam-tools button{appearance:none;border:none;background:var(--bg);padding:9px;font-size:13px;cursor:pointer;color:var(--text-muted);}
+  .cam-tools button:hover{color:var(--primary);}
+  .cam-wrap{display:grid;grid-template-columns:1fr 36px;gap:0;max-width:460px;}
+
+  .adv-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .adv-row .al{width:170px;flex:none;font-size:12.5px;color:var(--text-muted);}
+  .adv-row input[type=range]{flex:1;accent-color:var(--primary);}
+  .adv-row .av{width:96px;flex:none;display:flex;align-items:center;gap:6px;font-size:12.5px;}
+  .adv-row .av input{width:56px;border:1px solid var(--line-strong);border-radius:3px;padding:5px 7px;font-size:12.5px;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Quản lý CSDL khuôn mặt</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="mgmt-shell">
+
+    <!-- ─────── LEFT: subnav ─────── -->
+    <nav class="subnav-pane">
+      <div class="sp-heading">Quản lý CSDL khuôn mặt</div>
+      <div class="sp-item active" onclick="switchSection(event,'sec-remote')">
+        <span class="sp-title">CSDL từ xa</span>
+        <span class="sp-sub">Đồng bộ từ CSDL trên đầu ghi/camera</span>
+      </div>
+      <div class="sp-item" onclick="switchSection(event,'sec-local')">
+        <span class="sp-title">CSDL cục bộ</span>
+        <span class="sp-sub">Danh sách đen, nhân sự, VIP...</span>
+      </div>
+      <div class="sp-item" onclick="switchSection(event,'sec-passerby')">
+        <span class="sp-title">CSDL người qua đường</span>
+        <span class="sp-sub">Mẫu thu thập tự động, không định danh</span>
+      </div>
+      <div class="sp-item" onclick="switchSection(event,'sec-match')">
+        <span class="sp-title">Cấu hình đối sánh qua đầu ghi</span>
+        <span class="sp-sub">Vũ trang CSDL theo từng đầu ghi</span>
+      </div>
+      <div class="sp-item" onclick="switchSection(event,'sec-snapshot')">
+        <span class="sp-title">Chế độ chụp nhanh</span>
+        <span class="sp-sub">Vùng chụp, ngưỡng chất lượng</span>
+      </div>
+    </nav>
+
+    <!-- ─────── RIGHT: content ─────── -->
+    <main class="main-pane">
+
+      <div class="notice-box">
+        <span class="ni">ⓘ</span>
+        <span>Đảm bảo ảnh khuôn mặt được tạo/nhập vào CSDL là hợp pháp, có sự đồng ý của chủ thể dữ liệu, tuân thủ <b>Nghị định 13/2023/NĐ-CP</b>. Không sử dụng CSDL khuôn mặt cho mục đích giám sát hàng loạt ngoài phạm vi an ninh đã đăng ký. Ảnh trong màn hình này là khối placeholder minh hoạ, không phải dữ liệu thật.</span>
+      </div>
+
+      <!-- ═══════════ SEC: CSDL từ xa ═══════════ -->
+      <section class="mgmt-section active" id="sec-remote">
+        <div class="panel-heading">
+          <h1>CSDL khuôn mặt từ xa</h1>
+          <span class="scope">Đồng bộ CSDL khuôn mặt đã cấu hình sẵn trên đầu ghi/camera AI — nhấn <b>Cấu hình hiển thị thuộc tính</b> ở màn <a class="op-link" href="02-05-phat-hien-khuon-mat.html">Phát hiện khuôn mặt</a> để đổi thuộc tính hiển thị trên khung nhận diện.</span>
+        </div>
+
+        <div class="mini-res">
+          <div class="bullet">
+            <span class="b-label">Số lượng ảnh</span>
+            <span class="b-track"><span class="b-fill" style="width:41%"></span></span>
+            <span class="b-figure tabular">4.120 <small>/ 10.000 · đã dùng 41,2%</small></span>
+          </div>
+          <div class="bullet">
+            <span class="b-label">Dung lượng dữ liệu</span>
+            <span class="b-track"><span class="b-fill" style="width:37%"></span></span>
+            <span class="b-figure tabular">1,48 GB <small>/ 4 GB · đã dùng 37%</small></span>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary">＋ Tạo mới</button>
+          <button class="btn">Thêm thủ công</button>
+          <button class="btn" disabled>Thêm hàng loạt</button>
+          <button class="btn" disabled>Xoá</button>
+          <button class="btn" disabled>Dựng mô hình</button>
+          <div class="fill"></div>
+          <select style="border:1px solid var(--line-strong);border-radius:3px;padding:7px 10px;font-size:12.5px;font-family:inherit;">
+            <option>Tất cả camera</option>
+            <option>Camera Cổng chính KCN Bắc Thăng Long</option>
+            <option>Camera Cổng chính Toà nhà VNPT Cầu Giấy</option>
+          </select>
+          <button class="btn">Làm mới</button>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices" style="min-width:1080px;">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Tên CSDL</th>
+                <th>Camera nguồn</th>
+                <th>Số lượng ảnh</th>
+                <th>Trạng thái đồng bộ</th>
+                <th>Cập nhật gần nhất</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">CSDL nhân sự Toà nhà VNPT Cầu Giấy</td>
+                <td>Camera Cổng chính Toà nhà VNPT Cầu Giấy</td>
+                <td class="tabular">128</td>
+                <td><span class="badge b-sync">Đã đồng bộ</span></td>
+                <td class="mono-cell tabular">15/09/2026 06:02:11</td>
+                <td><a class="op-link">Xem</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">CSDL nhân viên KCN Bắc Thăng Long</td>
+                <td>Camera Cổng chính KCN Bắc Thăng Long</td>
+                <td class="tabular">342</td>
+                <td><span class="badge b-syncing">Đang đồng bộ</span></td>
+                <td class="mono-cell tabular">15/09/2026 07:18:45</td>
+                <td><a class="op-link">Xem</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">CSDL lái xe vận tải cao tốc HN-HP</td>
+                <td>Camera Trạm thu phí Quốc lộ 5B Km9</td>
+                <td class="tabular">96</td>
+                <td><span class="badge b-sync">Đã đồng bộ</span></td>
+                <td class="mono-cell tabular">14/09/2026 22:40:03</td>
+                <td><a class="op-link">Xem</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════ SEC: CSDL cục bộ ═══════════ -->
+      <section class="mgmt-section" id="sec-local">
+        <div class="panel-heading">
+          <h1>CSDL khuôn mặt cục bộ</h1>
+          <span class="scope">CSDL lưu trực tiếp trên máy chủ NOC — danh sách đen, nhân sự nội bộ, khách VIP</span>
+        </div>
+
+        <div class="mini-res">
+          <div class="bullet">
+            <span class="b-label">Số lượng ảnh</span>
+            <span class="b-track"><span class="b-fill" style="width:23%"></span></span>
+            <span class="b-figure tabular">2.304 <small>/ 10.000 · đã dùng 23%</small></span>
+          </div>
+          <div class="bullet">
+            <span class="b-label">Dung lượng dữ liệu</span>
+            <span class="b-track"><span class="b-fill" style="width:19%"></span></span>
+            <span class="b-figure tabular">0,76 GB <small>/ 4 GB · đã dùng 19%</small></span>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="openModal('modal-local')">＋ Tạo mới</button>
+          <button class="btn" disabled>Xoá</button>
+          <button class="btn">Dựng mô hình</button>
+          <button class="btn">Xoá toàn bộ</button>
+          <div class="fill"></div>
+          <button class="btn">Làm mới</button>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices" style="min-width:1080px;">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Tên CSDL</th>
+                <th>Số người</th>
+                <th>Chống trùng lặp</th>
+                <th>Trạng thái vũ trang</th>
+                <th>Cập nhật gần nhất</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="selected">
+                <td><input type="checkbox" checked></td>
+                <td class="chname">Nhân sự nội bộ NOC Cầu Giấy</td>
+                <td class="tabular">54</td>
+                <td>10 phút</td>
+                <td><span class="badge b-armed">Đã vũ trang</span></td>
+                <td class="mono-cell tabular">15/09/2026 08:10:22</td>
+                <td><a class="op-link">Sửa</a><a class="op-link">Đăng ký ảnh</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Danh sách đen an ninh KCN Bắc Thăng Long</td>
+                <td class="tabular">18</td>
+                <td>Không</td>
+                <td><span class="badge b-armed">Đã vũ trang</span></td>
+                <td class="mono-cell tabular">14/09/2026 19:22:07</td>
+                <td><a class="op-link">Sửa</a><a class="op-link">Đăng ký ảnh</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Khách VIP đoàn kiểm tra cao tốc HN-HP</td>
+                <td class="tabular">7</td>
+                <td>30 phút</td>
+                <td><span class="badge b-disarm">Chưa vũ trang</span></td>
+                <td class="mono-cell tabular">10/09/2026 14:05:51</td>
+                <td><a class="op-link">Sửa</a><a class="op-link">Đăng ký ảnh</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+          <h2>Hồ sơ khuôn mặt trong CSDL: Nhân sự nội bộ NOC Cầu Giấy</h2>
+          <div class="table-scroll">
+            <table class="devices" style="min-width:900px;">
+              <thead>
+                <tr>
+                  <th>Ảnh</th>
+                  <th>Họ tên</th>
+                  <th>Ngày sinh</th>
+                  <th>Loại giấy tờ</th>
+                  <th>Số giấy tờ</th>
+                  <th>Đơn vị công tác</th>
+                  <th>Số lần xuất hiện</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="thumb-sq">Ảnh khuôn mặt #NV-014</div></td>
+                  <td class="chname">Trần Minh Khoa</td>
+                  <td class="mono-cell tabular">12/03/1990</td>
+                  <td>CCCD</td>
+                  <td class="mono-cell">001090xxxxxx</td>
+                  <td>Tổ vận hành NOC Cầu Giấy</td>
+                  <td><a class="op-link" onclick="openModal('modal-appear')">12 lần ▸</a></td>
+                  <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+                </tr>
+                <tr>
+                  <td><div class="thumb-sq">Ảnh khuôn mặt #NV-027</div></td>
+                  <td class="chname">Phạm Thị Hồng Nhung</td>
+                  <td class="mono-cell tabular">04/11/1994</td>
+                  <td>CCCD</td>
+                  <td class="mono-cell">001094xxxxxx</td>
+                  <td>Lễ tân toà nhà VNPT Cầu Giấy</td>
+                  <td><a class="op-link" onclick="openModal('modal-appear')">31 lần ▸</a></td>
+                  <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ SEC: CSDL người qua đường ═══════════ -->
+      <section class="mgmt-section" id="sec-passerby">
+        <div class="panel-heading">
+          <h1>CSDL người qua đường</h1>
+          <span class="scope">Mẫu khuôn mặt thu thập tự động phục vụ phân tích lưu lượng — không gắn định danh cá nhân</span>
+        </div>
+
+        <div class="mini-res">
+          <div class="bullet">
+            <span class="b-label">Số lượng ảnh</span>
+            <span class="b-track"><span class="b-fill" style="width:23%"></span></span>
+            <span class="b-figure tabular">2.304 <small>/ 10.000 · dùng chung với CSDL mẫu</small></span>
+          </div>
+          <div class="bullet">
+            <span class="b-label">Dung lượng dữ liệu</span>
+            <span class="b-track"><span class="b-fill" style="width:19%"></span></span>
+            <span class="b-figure tabular">0,76 GB <small>/ 4 GB · dùng chung với CSDL mẫu</small></span>
+          </div>
+        </div>
+
+        <div class="warn-box" style="margin:0 0 16px;">
+          <span class="wi">⚠</span>
+          <span>CSDL người qua đường dùng <b>chung dung lượng và số lượng ảnh</b> với CSDL mẫu (CSDL cục bộ). Vui lòng chừa đủ dung lượng cho CSDL mẫu khi đặt số lượng ảnh tối đa.</span>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="openModal('modal-passerby')">＋ Tạo mới</button>
+          <button class="btn" disabled>Xoá</button>
+          <button class="btn">Dựng mô hình</button>
+          <button class="btn">Xoá toàn bộ</button>
+          <div class="fill"></div>
+          <button class="btn">Làm mới</button>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices" style="min-width:1080px;">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Tên CSDL</th>
+                <th>Số ảnh tối đa</th>
+                <th>Đã thu thập</th>
+                <th>Trạng thái vũ trang</th>
+                <th>Cập nhật gần nhất</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Người qua đường Cổng KCN Bắc Thăng Long</td>
+                <td class="tabular">50.000</td>
+                <td class="tabular">12.480</td>
+                <td><span class="badge b-armed">Đã vũ trang</span></td>
+                <td class="mono-cell tabular">15/09/2026 07:55:00</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Người qua đường trạm thu phí QL5B Km9</td>
+                <td class="tabular">30.000</td>
+                <td class="tabular">6.912</td>
+                <td><span class="badge b-disarm">Chưa vũ trang</span></td>
+                <td class="mono-cell tabular">13/09/2026 21:11:38</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════ SEC: Cấu hình đối sánh qua đầu ghi ═══════════ -->
+      <section class="mgmt-section" id="sec-match">
+        <div class="panel-heading">
+          <h1>Cấu hình đối sánh khuôn mặt qua đầu ghi</h1>
+          <span class="scope">Vũ trang CSDL khuôn mặt cho từng đầu ghi/kênh camera cụ thể</span>
+        </div>
+
+        <div class="card">
+          <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:16px;">
+            <input type="checkbox" checked style="width:auto;">
+            <label style="text-transform:none;font-weight:600;font-size:13px;color:var(--text);">Bật đối sánh khuôn mặt qua đầu ghi</label>
+          </div>
+
+          <div class="form-grid" style="margin-bottom:18px;">
+            <div class="field">
+              <label>Lịch áp dụng</label>
+              <select><option>Lịch mặc định (24/7)</option><option>Giờ hành chính</option><option>Ngoài giờ hành chính</option></select>
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <a class="op-link" style="padding-top:8px;">＋ Thêm lịch mới</a>
+            </div>
+          </div>
+
+          <h2 style="font-size:12.5px;">Cài đặt vũ trang</h2>
+          <button class="btn" onclick="togglePicker()" style="margin-bottom:10px;">＋ Thêm CSDL mục tiêu</button>
+
+          <div class="picker-panel" id="picker-panel">
+            <div class="picker-tabs">
+              <span class="active">CSDL khuôn mặt</span>
+              <span>CSDL người qua đường</span>
+            </div>
+            <div class="picker-list">
+              <label><input type="checkbox"> Nhân sự nội bộ NOC Cầu Giấy</label>
+              <label><input type="checkbox" checked> Danh sách đen an ninh KCN Bắc Thăng Long</label>
+              <label><input type="checkbox"> Khách VIP đoàn kiểm tra cao tốc HN-HP</label>
+            </div>
+          </div>
+
+          <div class="rule-row">
+            <span class="rn">Cảnh báo người lạ</span>
+            <span class="rf">Bật</span>
+            <span class="rf"><input type="checkbox" checked></span>
+            <div class="fill"></div>
+            <span class="rm" title="Gỡ">🗑</span>
+          </div>
+          <div class="rule-row">
+            <span class="rn">Danh sách đen an ninh KCN Bắc Thăng Long</span>
+            <span class="rf">Độ tương đồng <input type="number" value="82">%</span>
+            <span class="rf"><input type="checkbox"> Alarm Rule</span>
+            <span class="rf"><input type="checkbox" checked> Hiển thị bảng thuộc tính</span>
+            <div class="fill"></div>
+            <span class="rm" title="Gỡ">🗑</span>
+          </div>
+
+          <h2 style="font-size:12.5px;margin-top:22px;">Liên kết cục bộ</h2>
+          <div class="form-grid">
+            <div class="field" style="flex-direction:row;align-items:center;gap:8px;">
+              <input type="checkbox" checked style="width:auto;">
+              <label style="text-transform:none;font-weight:600;font-size:12.5px;color:var(--text);">Ghi hình liên kết</label>
+            </div>
+            <div class="field">
+              <label>Thời gian ghi sau cảnh báo (giây)</label>
+              <input type="text" value="10">
+              <span class="hint">Khoảng hợp lệ: 10–300 giây</span>
+            </div>
+            <div class="field full">
+              <label>Thiết bị bắt đầu ghi</label>
+              <input type="text" value="Camera Cổng chính KCN Bắc Thăng Long, Camera Kho vận số 3">
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-top:16px;">
+          <button class="btn btn-primary">Lưu</button>
+          <button class="btn">Làm mới</button>
+        </div>
+      </section>
+
+      <!-- ═══════════ SEC: Chế độ chụp nhanh ═══════════ -->
+      <section class="mgmt-section" id="sec-snapshot">
+        <div class="panel-heading">
+          <h1>Chế độ chụp nhanh</h1>
+          <span class="scope">Cấu hình vùng chụp và ngưỡng chất lượng ảnh khuôn mặt cho camera đang chọn</span>
+        </div>
+
+        <div class="card">
+          <div class="form-grid" style="grid-template-columns:auto 1fr;gap:22px;align-items:start;">
+            <div class="cam-wrap">
+              <div class="cam-preview">
+                <div class="draw-box"></div>
+                Xem trước camera<br>Cổng chính KCN Bắc Thăng Long
+              </div>
+              <div class="cam-tools">
+                <button title="Vẽ vùng chụp">▭</button>
+                <button title="Vùng chụp lớn nhất">⬚</button>
+                <button title="Xoá vùng">🗑</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="field" style="max-width:320px;margin-bottom:18px;">
+                <label>Chế độ chụp nhanh</label>
+                <select><option>Ưu tiên chất lượng</option><option>Ưu tiên tốc độ</option></select>
+              </div>
+
+              <h2 style="font-size:12.5px;">Nâng cao</h2>
+              <div class="adv-row">
+                <span class="al">Góc chụp tối đa</span>
+                <input type="range" min="1" max="90" value="45">
+                <span class="av"><input type="text" value="45">° (1–90)</span>
+              </div>
+              <div class="adv-row">
+                <span class="al">Độ nhạy chụp</span>
+                <input type="range" min="0" max="100" value="80">
+                <span class="av"><input type="text" value="80">(0–100)</span>
+              </div>
+              <div class="adv-row">
+                <span class="al">Ngưỡng chất lượng</span>
+                <input type="range" min="1" max="100" value="15">
+                <span class="av"><input type="text" value="15">(1–100)</span>
+              </div>
+              <div class="adv-row">
+                <span class="al">Thời gian tối ưu ảnh</span>
+                <span class="av" style="width:auto;"><input type="text" value="2"> giây (1–255)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-top:16px;">
+          <button class="btn btn-primary">Lưu</button>
+          <button class="btn">Làm mới</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ═══════════ MODAL: Tạo CSDL cục bộ (wizard) ═══════════ -->
+  <div class="overlay" id="modal-local">
+    <div class="modal w-narrow">
+      <div class="modal-head">
+        <h2>Tạo CSDL khuôn mặt cục bộ</h2>
+        <button class="x" onclick="closeModal('modal-local')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="wizard-rail">
+          <div class="step active"><span class="num">1</span>CSDL khuôn mặt</div>
+          <div class="rail-line"></div>
+          <div class="step"><span class="num">2</span>Đăng ký khuôn mặt</div>
+        </div>
+
+        <div class="field" style="margin-bottom:18px;">
+          <label>Tên CSDL</label>
+          <input type="text" placeholder="VD: Nhân sự nội bộ NOC Cầu Giấy">
+        </div>
+
+        <h2 style="font-size:12.5px;">Chiến lược chống trùng lặp</h2>
+        <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:12px;">
+          <input type="checkbox" checked style="width:auto;">
+          <label style="text-transform:none;font-weight:600;font-size:12.5px;color:var(--text);">Bật chống trùng lặp</label>
+        </div>
+        <div class="form-grid" style="margin-bottom:8px;">
+          <div class="field">
+            <label>Kiểu chống trùng</label>
+            <select><option>Theo khoảng thời gian</option><option>Theo phiên xuất hiện</option></select>
+          </div>
+          <div class="field">
+            <label>Khoảng thời gian (phút)</label>
+            <input type="text" value="10">
+            <span class="hint">Khoảng hợp lệ: 1–1440 phút</span>
+          </div>
+        </div>
+
+        <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:8px;">
+          <input type="checkbox" style="width:auto;">
+          <label style="text-transform:none;font-weight:600;font-size:12.5px;color:var(--text);">Báo cáo sự kiện trong thời gian chống trùng lặp</label>
+        </div>
+        <div class="hint">Khi tắt, các kết quả nhận diện khuôn mặt phát sinh trong thời gian chống trùng lặp sẽ không được báo cáo.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-local')">Huỷ</button>
+        <button class="btn">Đăng ký ảnh</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-local')">Lưu &amp; đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Tạo CSDL người qua đường ═══════════ -->
+  <div class="overlay" id="modal-passerby">
+    <div class="modal w-narrow">
+      <div class="modal-head">
+        <h2>Tạo CSDL người qua đường</h2>
+        <button class="x" onclick="closeModal('modal-passerby')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid" style="margin-bottom:8px;">
+          <div class="field">
+            <label>Tên CSDL</label>
+            <input type="text" placeholder="VD: Người qua đường Cổng KCN">
+          </div>
+          <div class="field">
+            <label>Số lượng ảnh tối đa</label>
+            <input type="text" value="50000">
+            <span class="hint">Khoảng hợp lệ: 10.000–500.000</span>
+          </div>
+        </div>
+
+        <div class="warn-box" style="margin:8px 0 18px;">
+          <span class="wi">⚠</span>
+          <span>CSDL người qua đường dùng chung dung lượng và số lượng ảnh với CSDL mẫu (cục bộ). Vui lòng chừa đủ dung lượng cho CSDL mẫu.</span>
+        </div>
+
+        <h2 style="font-size:12.5px;">Yêu cầu chất lượng ảnh</h2>
+        <div class="adv-row">
+          <span class="al">Góc ngẩng đầu</span>
+          <input type="range" min="1" max="90" value="45">
+          <span class="av">≤ <input type="text" value="45">° (1–90)</span>
+        </div>
+        <div class="adv-row">
+          <span class="al">Góc quay trái/phải</span>
+          <input type="range" min="1" max="90" value="45">
+          <span class="av">≤ <input type="text" value="45">° (1–90)</span>
+        </div>
+        <div class="adv-row">
+          <span class="al">Góc nghiêng đầu</span>
+          <input type="range" min="1" max="90" value="45">
+          <span class="av">≤ <input type="text" value="45">° (1–90)</span>
+        </div>
+        <div class="form-grid" style="margin-bottom:14px;">
+          <div class="field">
+            <label>Ngưỡng chất lượng</label>
+            <input type="text" value="15">
+            <span class="hint">≥ 15 (1–100)</span>
+          </div>
+          <div class="field">
+            <label>Khi đầy dung lượng</label>
+            <div style="display:flex;gap:16px;align-items:center;padding-top:8px;font-size:12.5px;">
+              <label style="display:flex;align-items:center;gap:5px;font-weight:400;text-transform:none;"><input type="radio" name="full"> Dừng lại</label>
+              <label style="display:flex;align-items:center;gap:5px;font-weight:400;text-transform:none;"><input type="radio" name="full" checked> Ghi đè</label>
+            </div>
+          </div>
+        </div>
+
+        <h2 style="font-size:12.5px;">Chiến lược chống trùng lặp</h2>
+        <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:12px;">
+          <input type="checkbox" checked style="width:auto;">
+          <label style="text-transform:none;font-weight:600;font-size:12.5px;color:var(--text);">Bật chống trùng lặp</label>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Kiểu chống trùng</label>
+            <select><option>Theo khoảng thời gian</option></select>
+          </div>
+          <div class="field">
+            <label>Khoảng thời gian (phút)</label>
+            <input type="text" value="10">
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-passerby')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-passerby')">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Thời gian xuất hiện ═══════════ -->
+  <div class="overlay" id="modal-appear">
+    <div class="modal w-narrow">
+      <div class="modal-head">
+        <h2>Hồ sơ &amp; thời gian xuất hiện</h2>
+        <button class="x" onclick="closeModal('modal-appear')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-grid" style="display:grid;grid-template-columns:96px 1fr;gap:16px;margin-bottom:18px;">
+          <div class="thumb-sq" style="width:96px;height:96px;">Ảnh khuôn mặt #NV-014</div>
+          <div style="font-size:12.5px;line-height:1.9;">
+            <div><b>Họ tên:</b> Trần Minh Khoa</div>
+            <div><b>Ngày sinh:</b> 12/03/1990</div>
+            <div><b>Loại giấy tờ:</b> CCCD &nbsp;·&nbsp; <b>Số:</b> 001090xxxxxx</div>
+            <div><b>Đơn vị:</b> Tổ vận hành NOC Cầu Giấy</div>
+          </div>
+        </div>
+
+        <h2 style="font-size:12.5px;">Số lần xuất hiện (12 lần, 7 ngày gần nhất)</h2>
+        <table class="scan-table">
+          <thead><tr><th>Thời gian</th><th>Camera</th><th>Độ tương đồng</th></tr></thead>
+          <tbody>
+            <tr><td class="mono-cell tabular">15/09/2026 07:58:14</td><td>Cổng chính Toà nhà VNPT Cầu Giấy</td><td class="tabular">96%</td></tr>
+            <tr><td class="mono-cell tabular">14/09/2026 08:02:47</td><td>Cổng chính Toà nhà VNPT Cầu Giấy</td><td class="tabular">95%</td></tr>
+            <tr><td class="mono-cell tabular">14/09/2026 17:31:09</td><td>Cổng chính Toà nhà VNPT Cầu Giấy</td><td class="tabular">94%</td></tr>
+            <tr><td class="mono-cell tabular">13/09/2026 08:11:52</td><td>Cổng chính Toà nhà VNPT Cầu Giấy</td><td class="tabular">97%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-primary" onclick="closeModal('modal-appear')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  function switchSection(ev, id){
+    document.querySelectorAll('.subnav-pane .sp-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.mgmt-section').forEach(p=>p.classList.remove('active'));
+    ev.currentTarget.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  function togglePicker(){
+    document.getElementById('picker-panel').classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>

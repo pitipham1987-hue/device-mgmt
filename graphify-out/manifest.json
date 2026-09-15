@@ -2334,9 +2334,9 @@
     "semantic_hash": ""
   },
   "Device-mgmt-IVSS/refs/INDEX.md": {
-    "mtime": 1789444150.6428692,
-    "seen": 1789445515.402713,
-    "ast_hash": "ebaaaa93589814343e47bfd0cf0260b9",
+    "mtime": 1789446438.7427394,
+    "seen": 1789450637.3646507,
+    "ast_hash": "c41fb7e1ca678d1d238ad8eb39180193",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/assets/vnptai-brand/about.html": {
@@ -2357,70 +2357,46 @@
     "ast_hash": "acae102b3b8de52c4f9c925cf1c3b8d1",
     "semantic_hash": ""
   },
-  "aicam-device-mgmt/design-demos/1-banh-xe-giay.html": {
-    "mtime": 1789379653.793,
-    "seen": 1789445515.402713,
-    "ast_hash": "209a4003441ac05c4efe6b06260b7725",
-    "semantic_hash": ""
-  },
   "aicam-device-mgmt/design-demos/2-hien-thuc-tham-chieu.html": {
-    "mtime": 1789379348.6002505,
-    "seen": 1789445515.402713,
-    "ast_hash": "99f17dc61ea9fe4fc1e7cdbb241e93a5",
-    "semantic_hash": ""
-  },
-  "aicam-device-mgmt/design-demos/3-terminal-mat-do-cao.html": {
-    "mtime": 1789379270.6220806,
-    "seen": 1789445515.402713,
-    "ast_hash": "211630531fa2207a7f476438ff5b0031",
+    "mtime": 1789447012.591776,
+    "seen": 1789450637.3646507,
+    "ast_hash": "b55852c9e6c397aac9cb0ab07593d0ca",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/direction-approved.md": {
-    "mtime": 1789444812.8570254,
-    "seen": 1789445515.402713,
-    "ast_hash": "7b35da9ef581c2a70a785909139e4173",
+    "mtime": 1789450417.4635766,
+    "seen": 1789450637.3646507,
+    "ast_hash": "7a6426c88fa7f886827fe09510e102e8",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M1-trang-chu.html": {
-    "mtime": 1789445479.064686,
-    "seen": 1789445515.402713,
-    "ast_hash": "ae23a5c5e0cb62e505df470cb7cbf2d2",
-    "semantic_hash": ""
-  },
-  "aicam-device-mgmt/mockups/M2-danh-sach-thiet-bi.html": {
-    "mtime": 1789445137.4865127,
-    "seen": 1789445515.402713,
-    "ast_hash": "621aa5260476d0c0a5b8d7d3796ea7cb",
+    "mtime": 1789450480.3378067,
+    "seen": 1789450637.3646507,
+    "ast_hash": "e52b81035089689c66de8aeaf075b7fb",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M3-them-thiet-bi.html": {
-    "mtime": 1789445238.2039464,
-    "seen": 1789445515.402713,
-    "ast_hash": "88ac6ed35b9e6373fd017b3dd43f92cc",
+    "mtime": 1789450514.696138,
+    "seen": 1789450637.3646507,
+    "ast_hash": "9fe5236bd93e5687ee06a8c10e538d1b",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M4-chi-tiet-camera.html": {
-    "mtime": 1789445293.1116052,
-    "seen": 1789445515.402713,
-    "ast_hash": "37e483865118e43ff2bb76c506d9634a",
+    "mtime": 1789450544.9599304,
+    "seen": 1789450637.3646507,
+    "ast_hash": "806bea80b1f02737253698304159ba9a",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M5-cau-hinh-ai.html": {
-    "mtime": 1789445382.325164,
-    "seen": 1789445515.402713,
-    "ast_hash": "43878c51a5eb17c3a5ca6ad6d9fb73d9",
-    "semantic_hash": ""
-  },
-  "aicam-device-mgmt/reference-design.md": {
-    "mtime": 1789378965.7926793,
-    "seen": 1789445515.402713,
-    "ast_hash": "160c5a18b74b2e7d19bdcc84da368f31",
+    "mtime": 1789450583.1336818,
+    "seen": 1789450637.3646507,
+    "ast_hash": "efa5b7ea21b14d7a2b1e26ffb7023a33",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/spec.md": {
-    "mtime": 1789378916.413231,
-    "seen": 1789445515.402713,
-    "ast_hash": "ee0212c4337ce9540783ea8e5dc561ba",
+    "mtime": 1789446897.7351398,
+    "seen": 1789450637.3646507,
+    "ast_hash": "9bccad82e320cb502beb2848c48a43b6",
     "semantic_hash": ""
   },
   "doc/reference-ivss-design.md": {
@@ -2693,24 +2669,6 @@
     "ast_hash": "715e0565f289405542044f47a1c408b9",
     "semantic_hash": ""
   },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/05-phat-hien-khuon-mat/p105_face-record.png": {
-    "mtime": 1789394614.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "7edd52641b0233c80421bc089587e782",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/05-phat-hien-khuon-mat/p106_set-the-search-conditions.png": {
-    "mtime": 1789394614.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "7edd52641b0233c80421bc089587e782",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/05-phat-hien-khuon-mat/p110_search-by-image.png": {
-    "mtime": 1789394614.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "7edd52641b0233c80421bc089587e782",
-    "semantic_hash": ""
-  },
   "Device-mgmt-IVSS/refs/02-van-hanh-ai/06-nhan-dien-khuon-mat/fig6-30_remote-face-databases.png": {
     "mtime": 1789394544.0,
     "seen": 1789445515.402713,
@@ -2879,12 +2837,6 @@
     "ast_hash": "7edd52641b0233c80421bc089587e782",
     "semantic_hash": ""
   },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/11-mat-do-dam-dong/p173_live-view-of-crowd-distribution.png": {
-    "mtime": 1789394616.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "ec341adad9dcf4aee5699623a4223192",
-    "semantic_hash": ""
-  },
   "Device-mgmt-IVSS/refs/02-van-hanh-ai/12-canh-bao-khac/fig6-69_smart-motion-detection.png": {
     "mtime": 1789394549.0,
     "seen": 1789445515.402713,
@@ -2903,72 +2855,6 @@
     "ast_hash": "5edb64b45542a92f5103e70fb143c54e",
     "semantic_hash": ""
   },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/fig6-72_ai-search.png": {
-    "mtime": 1789394551.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "524825185c610bce9e1eb9c4243ff6f3",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/fig6-73_create-the-combination.png": {
-    "mtime": 1789394552.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "cca52c9446bf64ffe97e3d1b79376208",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/fig6-74_orchestrate-a-combination.png": {
-    "mtime": 1789394552.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "45ecc61e875ce5d5e37ab4d76af3ccbd",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/fig6-78_condition-node.png": {
-    "mtime": 1789394552.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "300a278dc85bde3fdeed226269815a5b",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/fig6-79_select-the-ai-function.png": {
-    "mtime": 1789394554.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "5380fd967f7473a38f159d41cc3dfde7",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/fig6-80_live-screen.png": {
-    "mtime": 1789394554.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "3662e9225a5a144c9aa62c6a483564ad",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/fig6-82_text-defined-alarms.png": {
-    "mtime": 1789394554.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "64905aa45a0d209c56f688cef2fc7edd",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/p183_ai-analysis-node.png": {
-    "mtime": 1789394616.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "e876a42e6021c2b1b4c9ab1bb6130a6a",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/p184_custom-alarm-node.png": {
-    "mtime": 1789394616.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "77f82038319fc3b8538358030a412701",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/p184_general-event-node.png": {
-    "mtime": 1789394616.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "0b004c9b4f97830b3c3ee2570c1526ae",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/02-van-hanh-ai/13-dan-dung-thuat-toan/p189_smart-combination.png": {
-    "mtime": 1789394616.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "4af4ed490ad991a5255e65a011ab0a64",
-    "semantic_hash": ""
-  },
   "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-01_device-management.png": {
     "mtime": 1789394563.0,
     "seen": 1789445515.402713,
@@ -2981,24 +2867,6 @@
     "ast_hash": "0d247aae49704a5f71ba32d82565b84e",
     "semantic_hash": ""
   },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-04_scheduling-mode.png": {
-    "mtime": 1789394563.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "9015d669f01eec202d781835ac567b26",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-05_access-mode.png": {
-    "mtime": 1789394563.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "fa1340ca9fbfa50ef7b7fc431b9310e7",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-06_compression-status.png": {
-    "mtime": 1789394563.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "205e8099ff6ea2c2ee30f59473ce22c2",
-    "semantic_hash": ""
-  },
   "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-07_remote-device.png": {
     "mtime": 1789394564.0,
     "seen": 1789445515.402713,
@@ -3009,12 +2877,6 @@
     "mtime": 1789394564.0,
     "seen": 1789445515.402713,
     "ast_hash": "1183ec819992d76153c0170e763507fc",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-09_modify-ip-2.png": {
-    "mtime": 1789394564.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "1c3adfb3d0efef73c40db6b2377f3006",
     "semantic_hash": ""
   },
   "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-11_device-list.png": {
@@ -3033,72 +2895,6 @@
     "mtime": 1789394565.0,
     "seen": 1789445515.402713,
     "ast_hash": "917c43f6d8dcd99fe9a8115b64aa93a8",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/fig8-14_audio.png": {
-    "mtime": 1789394565.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "7f20404106af320c5871a2f6d716ffc4",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/p236_attributes.png": {
-    "mtime": 1789394617.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "6169bd986e38522ce897eabce120ebef",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/1-quan-ly-thiet-bi/p242_export.png": {
-    "mtime": 1789394618.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "58a07a802b075b78efb68dd89144781a",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-16_edit-ethernet-network.png": {
-    "mtime": 1789394566.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "90427b91bd81f605edcfb14fd175b6e8",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-17_nic-bonding.png": {
-    "mtime": 1789394566.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "773e323b57d5d171061c2356d6b8e982",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-18_edit-load-balance.png": {
-    "mtime": 1789394566.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "1972b29061f46786ba6375949990c4ba",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-19_unbind.png": {
-    "mtime": 1789394566.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "da4f1665e5366a00acc4770c003dd704",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-20_port.png": {
-    "mtime": 1789394567.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "ec9363fbaac2c1cc1ce157794d66109b",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-21_p2p.png": {
-    "mtime": 1789394567.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "e3536297ac00cdf6441330404514ac9b",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-22_gb28181-server.png": {
-    "mtime": 1789394567.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "a7d51a79df3b377c0197c976b934aef0",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-23_add.png": {
-    "mtime": 1789394567.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "dbb299c10b6aed43a5b37489de10c028",
     "semantic_hash": ""
   },
   "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-24_gb28181-client.png": {
@@ -3147,12 +2943,6 @@
     "mtime": 1789394569.0,
     "seen": 1789445515.402713,
     "ast_hash": "1ae42064c16aa48da70f7a9e59b378bc",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/fig8-35_add-route-table.png": {
-    "mtime": 1789394569.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "d57cef039fa080dcf6e67d154aea4529",
     "semantic_hash": ""
   },
   "Device-mgmt-IVSS/refs/04-cau-hinh/2-quan-ly-mang/p258_register.png": {
@@ -3279,90 +3069,6 @@
     "mtime": 1789394619.0,
     "seen": 1789445515.402713,
     "ast_hash": "f7ad83c5fabbd74f8dc21fd06ef7f401",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-61_storage-management.png": {
-    "mtime": 1789394573.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "38bd7048c711d5d86cb9416917964abc",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-62_s-m-a-r-t.png": {
-    "mtime": 1789394574.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "5c5eb4be5010b5b46151138a42c22705",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-63_manual-create.png": {
-    "mtime": 1789394574.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "80cee1433ac0e2bf7e80f34482aeb034",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-64_one-click-create.png": {
-    "mtime": 1789394574.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "82390b10e8ea207632d89e6ec5833031",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-65_global-hot-standby.png": {
-    "mtime": 1789394574.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "f4b9c583e78eb0e836f8f68e57f366ca",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-66_private-hot-standby.png": {
-    "mtime": 1789394574.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "770f6d758524c45f75c30df1932bd087",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-67_hot-standby.png": {
-    "mtime": 1789394574.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "dd01e4c7f796928d9bada2b9be4f2a55",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-68_add-iscsi.png": {
-    "mtime": 1789394574.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "923e7726c8a5ded00ab3785db132efca",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-69_sftp.png": {
-    "mtime": 1789394575.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "47fa5ff8193dcf4f11e6bdcaad4d87a7",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-70_disk-group.png": {
-    "mtime": 1789394575.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "6f83f849fecf4350d9bb8388e2ddf6ee",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-71_add-channels.png": {
-    "mtime": 1789394575.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "10f00e6d20738c3f2c956b957309d3c6",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-72_recording-mode.png": {
-    "mtime": 1789394575.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "d59cea009d7602e502204ae59c677a51",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/fig8-73_set-a-recording-schedule.png": {
-    "mtime": 1789394575.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "53025f4332ee3f72e60dc61fea5eb140",
-    "semantic_hash": ""
-  },
-  "Device-mgmt-IVSS/refs/04-cau-hinh/4-quan-ly-luu-tru/p311_storage-mode.png": {
-    "mtime": 1789394619.0,
-    "seen": 1789445515.402713,
-    "ast_hash": "0f4b2c19c99f152f08c5c5f21cbe9c03",
     "semantic_hash": ""
   },
   "Device-mgmt-IVSS/refs/04-cau-hinh/6-quan-ly-he-thong/fig8-100_sync-time.png": {
@@ -3629,58 +3335,58 @@
     "ast_hash": "5b2a834497450a15b6924e0769ee3595",
     "semantic_hash": ""
   },
-  "aicam-device-mgmt/design-demos/1-banh-xe-giay-full.png": {
-    "mtime": 1789379677.3724897,
-    "seen": 1789445515.402713,
-    "ast_hash": "9252d4c7ca982031a89882f8e28a14e0",
-    "semantic_hash": ""
-  },
-  "aicam-device-mgmt/design-demos/1-banh-xe-giay.png": {
-    "mtime": 1789379636.2165954,
-    "seen": 1789445515.402713,
-    "ast_hash": "e4b929622f0bba2d79a2825607d345cd",
-    "semantic_hash": ""
-  },
   "aicam-device-mgmt/design-demos/2-hien-thuc-tham-chieu.png": {
-    "mtime": 1789379358.5044692,
-    "seen": 1789445515.402713,
-    "ast_hash": "27ea42b7b9baa8db9220558f8b360c32",
-    "semantic_hash": ""
-  },
-  "aicam-device-mgmt/design-demos/3-terminal-mat-do-cao.png": {
-    "mtime": 1789379280.8212557,
-    "seen": 1789445515.402713,
-    "ast_hash": "d449d3ad982d0248d2db68e9328fd36f",
+    "mtime": 1789447125.6136775,
+    "seen": 1789450637.3646507,
+    "ast_hash": "c8dcdd1f06657bfbf7084c21329ec3dd",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M1-trang-chu.png": {
-    "mtime": 1789445489.476418,
-    "seen": 1789445515.402713,
-    "ast_hash": "d3f2782ec7ef7671741a7617319dc442",
-    "semantic_hash": ""
-  },
-  "aicam-device-mgmt/mockups/M2-danh-sach-thiet-bi.png": {
-    "mtime": 1789445433.9514823,
-    "seen": 1789445515.402713,
-    "ast_hash": "4dcdbc6f1a9eb0eb4aa9e242174f1b55",
+    "mtime": 1789450600.3112726,
+    "seen": 1789450637.3646507,
+    "ast_hash": "b0df4fd11e10c830c097bdc9aae28cc0",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M3-them-thiet-bi.png": {
-    "mtime": 1789445437.8909197,
-    "seen": 1789445515.402713,
-    "ast_hash": "260dcff21b970812d7698518186420b5",
+    "mtime": 1789450604.3547091,
+    "seen": 1789450637.3646507,
+    "ast_hash": "dcebaf175a4db1b6cc2ddf762ce5bee6",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M4-chi-tiet-camera.png": {
-    "mtime": 1789445441.7225323,
-    "seen": 1789445515.402713,
-    "ast_hash": "3b9529799b9d3fc4efef874f221982a5",
+    "mtime": 1789450608.2710943,
+    "seen": 1789450637.3646507,
+    "ast_hash": "7aa3eee7c8685dea28cc903b63649cf6",
     "semantic_hash": ""
   },
   "aicam-device-mgmt/mockups/M5-cau-hinh-ai.png": {
-    "mtime": 1789445445.5975194,
-    "seen": 1789445515.402713,
-    "ast_hash": "e42411c171277d99b30b6fc3e23da1cb",
+    "mtime": 1789450612.153978,
+    "seen": 1789450637.3646507,
+    "ast_hash": "b928af5619418e45a530de6d14656e9a",
+    "semantic_hash": ""
+  },
+  "aicam-device-mgmt/design-demos/1-the-trang-thai-than-thien.html": {
+    "mtime": 1789447143.5416532,
+    "seen": 1789450637.3646507,
+    "ast_hash": "c7ad8e0853de8d5313b5ac67c8bd0c38",
+    "semantic_hash": ""
+  },
+  "aicam-device-mgmt/design-demos/3-trung-tam-dieu-hanh.html": {
+    "mtime": 1789447072.902329,
+    "seen": 1789450637.3646507,
+    "ast_hash": "f94262326b22a8b40abb9f7d293d2db0",
+    "semantic_hash": ""
+  },
+  "aicam-device-mgmt/design-demos/1-the-trang-thai-than-thien.png": {
+    "mtime": 1789447155.5387864,
+    "seen": 1789450637.3646507,
+    "ast_hash": "50fdf4be5b1da30797a8821ecbf29ae5",
+    "semantic_hash": ""
+  },
+  "aicam-device-mgmt/design-demos/3-trung-tam-dieu-hanh.png": {
+    "mtime": 1789447129.5016584,
+    "seen": 1789450637.3646507,
+    "ast_hash": "23a6781801cfd4459589d426457f3217",
     "semantic_hash": ""
   }
 }

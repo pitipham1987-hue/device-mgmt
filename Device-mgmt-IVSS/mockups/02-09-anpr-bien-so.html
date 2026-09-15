@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANPR biển số · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 09-anpr-bien-so.
+  Ảnh tham khảo: refs/02-van-hanh-ai/09-anpr-bien-so/fig6-59_motor-vehicle.png
+  (ảnh này là dialog "AI Display" cấu hình overlay thuộc tính, không phải màn
+  console trực tiếp). Theo brief người dùng, dựng lại đúng công năng "console
+  xem trực tiếp luồng nhận diện biển số theo thời gian thực" — khuôn "B · Console
+  Live" đã ghi ở refs/INDEX.md, tương tự cấu trúc live-view NOC thường thấy
+  (video lớn bên trái + feed sự kiện cuộn bên phải).
+  Giả định: video preview = khối xám giả lập (không dùng ảnh camera thật),
+  biển số dùng định dạng biển Việt Nam thật (VD 30A-123.45), dữ liệu feed là
+  ví dụ minh hoạ, không phải log thật.
+  Kế thừa nguyên vẹn shared.css — không sửa token, chỉ thêm CSS scoped cho
+  pattern mới (khung camera giả lập, danh sách feed sự kiện, chip biển số).
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ───────── Scoped: khung camera giả lập (console live) ───────── */
+  .cam-wrap{background:var(--bg);border:1px solid var(--line);}
+  .cam-frame{position:relative;background:#232B33;aspect-ratio:16/9;overflow:hidden;}
+  .cam-frame .cam-tag{position:absolute;top:8px;left:10px;font-size:11px;color:#fff;background:rgba(0,0,0,.42);padding:2px 8px;border-radius:2px;}
+  .cam-frame .cam-time{position:absolute;top:8px;right:10px;font-size:11px;color:#fff;font-family:var(--mono);background:rgba(0,0,0,.42);padding:2px 8px;border-radius:2px;}
+  .cam-frame .cam-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#7B8794;text-align:center;padding:0 30px;}
+  .cam-frame .cam-catch{position:absolute;left:18%;top:32%;width:26%;height:30%;border:2px solid var(--accent);}
+  .cam-frame .cam-catch::after{content:"Đang đọc biển…";position:absolute;top:-19px;left:-2px;font-size:10px;font-weight:700;color:#00173D;background:var(--accent);padding:1.5px 6px;border-radius:2px;white-space:nowrap;}
+  .cam-foot{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--bg-soft);flex-wrap:wrap;}
+  .cam-foot .btn{font-size:12px;padding:6px 11px;}
+
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:14px;}
+  .stat-cell{background:#fff;padding:11px 14px;}
+  .stat-cell .s-label{font-size:10.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;font-weight:600;}
+  .stat-cell .s-value{font-size:19px;font-weight:800;color:var(--navy);margin-top:3px;}
+  .stat-cell .s-value.err{color:var(--error);}
+  .stat-cell .s-value.ok{color:var(--primary);}
+
+  /* ───────── Scoped: feed sự kiện nhận diện biển số ───────── */
+  .feed-wrap{background:var(--bg);border:1px solid var(--line);display:flex;flex-direction:column;height:100%;}
+  .feed-head{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);}
+  .feed-head h2{margin:0;font-size:13px;font-weight:700;color:var(--navy);}
+  .feed-head .live-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+  .feed-list{flex:1;overflow-y:auto;max-height:588px;}
+  .feed-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);}
+  .feed-row:first-child{background:#F5FAFF;}
+  .plate-chip{font-family:var(--mono);font-weight:800;font-size:15px;letter-spacing:.3px;color:var(--navy);border:2px solid var(--navy);border-radius:3px;padding:4px 9px;background:#FFF9E0;white-space:nowrap;flex:none;min-width:118px;text-align:center;}
+  .feed-mid{min-width:0;flex:1;}
+  .feed-mid .f-vehicle{font-size:12px;font-weight:600;color:var(--text);}
+  .feed-mid .f-cam{font-size:11px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .feed-right{flex:none;text-align:right;}
+  .feed-right .f-time{font-size:11px;font-family:var(--mono);color:var(--text-muted);}
+  .feed-status{margin-top:3px;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>ANPR biển số</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>ANPR biển số · Console trực tiếp</h1>
+        <span class="scope">Xem luồng nhận diện biển số theo thời gian thực — cập nhật liên tục khi có phương tiện đi qua vùng phát hiện</span>
+      </div>
+
+      <div class="toolbar">
+        <div class="field" style="max-width:320px;">
+          <label>Camera đang xem</label>
+          <select><option>Camera Km12+400 cao tốc HN - Hải Phòng</option><option>Camera Trạm thu phí QL5B Km9</option><option>Camera Cổng chính KCN Bắc Thăng Long</option></select>
+        </div>
+        <div class="field" style="max-width:220px;">
+          <label>Lọc theo loại xe</label>
+          <select><option>Tất cả loại xe</option><option>Ô tô con</option><option>Xe tải</option><option>Xe khách</option><option>Container</option></select>
+        </div>
+        <div class="fill"></div>
+        <button class="btn">⏸ Tạm dừng luồng</button>
+        <button class="btn">Xuất nhật ký hôm nay</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start;">
+
+        <div>
+          <div class="cam-wrap">
+            <div class="cam-frame">
+              <span class="cam-tag">Camera Km12+400 cao tốc HN - Hải Phòng</span>
+              <span class="cam-time tabular">15/09/2026 14:31:52</span>
+              <div class="cam-catch"></div>
+              <span class="cam-label">Xem trực tiếp camera (giả lập) — khung màu accent đánh dấu vùng biển số vừa được nhận diện</span>
+            </div>
+            <div class="cam-foot">
+              <button class="btn">Phóng to</button>
+              <button class="btn">Chụp ảnh</button>
+              <button class="btn">Xem lại 30 giây trước</button>
+            </div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-cell"><div class="s-label">Lượt qua hôm nay</div><div class="s-value tabular">4.286</div></div>
+            <div class="stat-cell"><div class="s-label">Trong danh sách cho phép</div><div class="s-value ok tabular">3.912</div></div>
+            <div class="stat-cell"><div class="s-label">Trong danh sách chặn</div><div class="s-value err tabular">14</div></div>
+            <div class="stat-cell"><div class="s-label">Tỉ lệ đọc thành công</div><div class="s-value tabular">98,4%</div></div>
+          </div>
+        </div>
+
+        <div class="feed-wrap">
+          <div class="feed-head"><span class="live-dot"></span><h2>Sự kiện nhận diện gần đây</h2></div>
+          <div class="feed-list">
+
+            <div class="feed-row">
+              <span class="plate-chip">30A-123.45</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Ô tô con · Trắng</div>
+                <div class="f-cam">Camera Km12+400 cao tốc HN - Hải Phòng</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:31:52</div><div class="feed-status"><span class="chip c-ok"><i class="dot ok"></i>Cho phép</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">16A-234.56</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Container · Xanh dương</div>
+                <div class="f-cam">Camera Km12+400 cao tốc HN - Hải Phòng</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:31:38</div><div class="feed-status"><span class="chip c-neutral"><i class="dot neutral"></i>Không trong CSDL</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">29H1-678.90</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Xe khách 45 chỗ · Trắng</div>
+                <div class="f-cam">Camera Trạm thu phí QL5B Km9</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:31:21</div><div class="feed-status"><span class="chip c-ok"><i class="dot ok"></i>Cho phép</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">89C-045.12</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Xe tải · Xanh lá</div>
+                <div class="f-cam">Camera Trạm cân xe tải</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:30:57</div><div class="feed-status"><span class="chip c-err"><i class="dot err"></i>Trong DS chặn</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">30E-891.23</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Ô tô con · Đen</div>
+                <div class="f-cam">Camera Cổng chính KCN Bắc Thăng Long</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:30:44</div><div class="feed-status"><span class="chip c-ok"><i class="dot ok"></i>Cho phép</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">99A-567.89</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Xe bán tải · Bạc</div>
+                <div class="f-cam">Camera Nút giao Km22 cao tốc HN-HP</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:30:12</div><div class="feed-status"><span class="chip c-neutral"><i class="dot neutral"></i>Không trong CSDL</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">29B2-456.78</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Xe tải · Trắng</div>
+                <div class="f-cam">Camera Kho vận số 3</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:29:58</div><div class="feed-status"><span class="chip c-ok"><i class="dot ok"></i>Cho phép</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">15C-112.34</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Ô tô con · Đỏ</div>
+                <div class="f-cam">Camera Trạm thu phí QL5B Km9</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:29:33</div><div class="feed-status"><span class="chip c-neutral"><i class="dot neutral"></i>Không trong CSDL</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">30A-778.02</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Ô tô con · Xám</div>
+                <div class="f-cam">Camera Km12+400 cao tốc HN - Hải Phòng</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:29:10</div><div class="feed-status"><span class="chip c-ok"><i class="dot ok"></i>Cho phép</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">16H-901.56</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Xe khách 16 chỗ · Trắng</div>
+                <div class="f-cam">Camera Cổng chính KCN Bắc Thăng Long</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:28:47</div><div class="feed-status"><span class="chip c-ok"><i class="dot ok"></i>Cho phép</span></div></div>
+            </div>
+
+            <div class="feed-row">
+              <span class="plate-chip">30G-334.91</span>
+              <div class="feed-mid">
+                <div class="f-vehicle">Ô tô con · Trắng</div>
+                <div class="f-cam">Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ</div>
+              </div>
+              <div class="feed-right"><div class="f-time tabular">14:28:19</div><div class="feed-status"><span class="chip c-err"><i class="dot err"></i>Trong DS chặn</span></div></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

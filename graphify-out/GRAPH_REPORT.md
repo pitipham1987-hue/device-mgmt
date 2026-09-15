@@ -1,16 +1,16 @@
 # Graph Report - EdgeDeviceManagementPlatform  (2026-09-15)
 
 ## Corpus Check
-- 164 files · ~1,827,615 words
+- 163 files · ~1,661,215 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1338 nodes · 1349 edges · 90 communities (69 shown, 20 thin omitted)
+- 1320 nodes · 1332 edges · 90 communities (69 shown, 20 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 10 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8b870db2`
+- Built from commit: `257d1d1f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,9 +42,9 @@
 - macos_window.jsx
 - narration_stage.jsx
 - Huashu Design
-- Xuất Video: Animation HTML sang MP4/GIF
-- Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực
 - Quy trình Launch Film: Viết director's notes vạn chữ trước, làm animation sau
+- Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực
+- Animations: Engine Hoạt ảnh Trục thời gian (Timeline Animation Engine)
 - Hoa Chú Design · Huashu-Design
 - Huashu Design
 - Mục lục tra nhanh
@@ -99,7 +99,7 @@
 - .claude/CLAUDE.md
 - extraction-spec.md
 - AICAM — Quản lý thiết bị · Bản đặc tả thiết kế hoàn chỉnh
-- 4. Ngôn ngữ thiết kế tham chiếu
+- Xuất Video: Animation HTML sang MP4/GIF
 - reference-ivss-design.md
 - AICAM — Quản lý thiết bị · SPEC
 - 🎨 Tài sản hỗ trợ
@@ -182,17 +182,17 @@ Nodes (4): main(), parse_viewport(), verify.py — Playwright封装，用于验�
 Cohesion: 0.05
 Nodes (38): 5-Dimension Expert Critique, Anti AI-slop Rules, Available Languages, Connect · Huasheng (Huashu), Core Asset Protocol, Core Asset Protocol · 5-step hard process, Core Mechanics, Demo Gallery (+30 more)
 
-### Community 27 - "Xuất Video: Animation HTML sang MP4/GIF"
+### Community 27 - "Quy trình Launch Film: Viết director's notes vạn chữ trước, làm animation sau"
 Cohesion: 0.05
-Nodes (35): 1. **expoOut làm easing chính, không phải cubicOut**, 2. **Màu nền cảm giác giấy + Accent cam đất nung (Dòng máu Anthropic)**, 3. **Shadow hai nấc mô phỏng độ sâu, không dùng 3D thật**, 4. **Thay đổi độ đậm chữ (font-variation-settings) mang lại cảm giác điện ảnh hơn thay đổi cỡ chữ**, 5. **Corner Brand chữ ký duy trì cường độ thấp**, 5 Pattern có thể tái sử dụng (Chắt lọc từ lịch sử lặp v6→v9), Công thức kỹ thuật (Tham số thực chiến v9), Cấu trúc 4-Layer (+27 more)
+Nodes (34): 1. **expoOut làm easing chính, không phải cubicOut**, 2. **Màu nền cảm giác giấy + Accent cam đất nung (Dòng máu Anthropic)**, 3. **Shadow hai nấc mô phỏng độ sâu, không dùng 3D thật**, 4. **Thay đổi độ đậm chữ (font-variation-settings) mang lại cảm giác điện ảnh hơn thay đổi cỡ chữ**, 5. **Corner Brand chữ ký duy trì cường độ thấp**, 5 Pattern có thể tái sử dụng (Chắt lọc từ lịch sử lặp v6→v9), Công thức kỹ thuật (Tham số thực chiến v9), Cấu trúc 4-Layer (+26 more)
 
 ### Community 28 - "Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực"
 Cohesion: 0.05
 Nodes (40): §0.1 Neo giữ Thân phận, §0.2 Niềm tin cốt lõi (3 điều), §0.3 Tiêu chuẩn Thẩm mỹ · Thế nào là đẹp, §0.4 Tự kiểm tra · Phương pháp phản ứng đầu tiên của khán giả, §0.5 Mối quan hệ giữa Thân phận và Quy tắc, §0 · Bạn là ai · Thân phận và Thẩm mỹ, 1. Nhịp điệu tự sự · Cấu trúc 5 đoạn Slow-Fast-Boom-Stop, 2. Triết lý Easing · Từ chối linear, đón nhận vật lý (+32 more)
 
-### Community 29 - "Quy trình Launch Film: Viết director's notes vạn chữ trước, làm animation sau"
-Cohesion: 0.05
-Nodes (38): 1. Có nội dung/câu chuyện trước, rồi mới có hoạt ảnh, 1. Fade In / Fade Out, 2. Phân chia Scene viết trục thời gian, 2. Slide In, 3. Hiệu ứng gõ chữ (⚠️ Phân biệt 2 kịch bản trước, đừng dùng nhảy từng từ), 3. Tài nguyên đi trước, 4. Đếm số, 5. Giải thích phân đoạn (Hoạt ảnh giảng dạy điển hình) (+30 more)
+### Community 29 - "Animations: Engine Hoạt ảnh Trục thời gian (Timeline Animation Engine)"
+Cohesion: 0.09
+Nodes (22): 1. Có nội dung/câu chuyện trước, rồi mới có hoạt ảnh, 1. Fade In / Fade Out, 2. Phân chia Scene viết trục thời gian, 2. Slide In, 3. Hiệu ứng gõ chữ (⚠️ Phân biệt 2 kịch bản trước, đừng dùng nhảy từng từ), 3. Tài nguyên đi trước, 4. Đếm số, 5. Giải thích phân đoạn (Hoạt ảnh giảng dạy điển hình) (+14 more)
 
 ### Community 30 - "Hoa Chú Design · Huashu-Design"
 Cohesion: 0.05
@@ -386,9 +386,9 @@ Nodes (3): Các điểm cần lưu ý khi viết Notes, Speaker Notes, Định d
 Cohesion: 0.05
 Nodes (40): 10. Nguồn, 1. Cách chạy, 2. SPEC — copy phần này vào `spec.md`, 3.1 Khung màn quản lý thiết bị, 3.2 Trang chủ kiểu tile, 3.3 Màn xem trực tiếp, 3.4 Năm đường thêm thiết bị, 3. Kiến trúc thông tin trích từ IVSS (+32 more)
 
-### Community 84 - "4. Ngôn ngữ thiết kế tham chiếu"
-Cohesion: 0.11
-Nodes (17): 3.1 Khung màn quản lý thiết bị, 3.2 Trang chủ kiểu tile, 3.3 Màn xem trực tiếp, 3.4 Năm đường thêm thiết bị, 3. Kiến trúc thông tin trích từ IVSS, 4.1 Phát hiện nền tảng, 4.2 Token tham chiếu, 4.3 Ba chi tiết quyết định "cảm giác", đừng bỏ qua (+9 more)
+### Community 84 - "Xuất Video: Animation HTML sang MP4/GIF"
+Cohesion: 0.12
+Nodes (17): 1. `render-video.js` — HTML → MP4, 2. `add-music.sh` — MP4 + BGM → MP4, 3. `convert-formats.sh` — MP4 → 60fps MP4 + GIF, 4. `render-video-seek.js` — 60fps Thật / Render Xác định (Khuyến nghị giao hàng chất lượng cao), Bẫy của Playwright recordVideo, Chi tiết kỹ thuật (Dùng để gỡ lỗi), Chuỗi công cụ (Toolchain), Khi nào xuất video (+9 more)
 
 ### Community 85 - "reference-ivss-design.md"
 Cohesion: 0.11
@@ -396,7 +396,7 @@ Nodes (16): 1. Phát hiện nền tảng, 2. Token thiết kế tham chiếu, 3.
 
 ### Community 86 - "AICAM — Quản lý thiết bị · SPEC"
 Cohesion: 0.13
-Nodes (14): AICAM — Quản lý thiết bị · SPEC, Ba hướng thiết kế bắt buộc (vòng 1, chỉ M2), Kích thước và thích ứng, Mô hình trạng thái — bắt buộc thống nhất trên cả 5 màn, Mô-típ thị giác — trả lời trước khi thiết kế, Mật độ thông tin — CAO, Ngôn ngữ, Người dùng và bối cảnh (+6 more)
+Nodes (14): AICAM — Quản lý thiết bị · SPEC, Ba hướng thiết kế bắt buộc (vòng 1, chỉ M2), Kích thước và thích ứng, Mô hình trạng thái — bắt buộc thống nhất, Mô-típ thị giác — trả lời trước khi thiết kế (form suy ra từ nội dung), Mật độ thông tin — CAO, Ngôn ngữ, Người dùng và bối cảnh (+6 more)
 
 ### Community 87 - "🎨 Tài sản hỗ trợ"
 Cohesion: 0.17
@@ -407,21 +407,21 @@ Cohesion: 0.40
 Nodes (4): Ba bản đã trình bày (vòng 1, M2 · Danh sách thiết bị), Hướng thiết kế đã chốt, Lựa chọn của người dùng, Áp dụng cho phần còn lại
 
 ## Knowledge Gaps
-- **941 isolated node(s):** `androidFrameStyles`, `browserWindowStyles`, `CursorEasing`, `CURSOR_PATHS`, `canvasStyles` (+936 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1028 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **928 isolated node(s):** `androidFrameStyles`, `browserWindowStyles`, `CursorEasing`, `CURSOR_PATHS`, `canvasStyles` (+923 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1014 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` connect `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` to `Xuất Video: Animation HTML sang MP4/GIF`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
-- **Why does `Quy tắc Thiết kế Âm thanh · huashu-design` connect `Quy tắc Thiết kế Âm thanh · huashu-design` to `Xuất Video: Animation HTML sang MP4/GIF`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
-- **Why does `Apple Gallery Showcase · Phong cách Animation Tường Trưng bày Phòng tranh` connect `Apple Gallery Showcase · Phong cách Animation Tường Trưng bày Phòng tranh` to `Xuất Video: Animation HTML sang MP4/GIF`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+- **Why does `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` connect `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` to `Quy trình Launch Film: Viết director's notes vạn chữ trước, làm animation sau`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `Apple Gallery Showcase · Phong cách Animation Tường Trưng bày Phòng tranh` connect `Apple Gallery Showcase · Phong cách Animation Tường Trưng bày Phòng tranh` to `Quy trình Launch Film: Viết director's notes vạn chữ trước, làm animation sau`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `Quy tắc Thiết kế Âm thanh · huashu-design` connect `Quy tắc Thiết kế Âm thanh · huashu-design` to `Quy trình Launch Film: Viết director's notes vạn chữ trước, làm animation sau`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `androidFrameStyles`, `browserWindowStyles`, `CursorEasing` to the rest of the system?**
-  _941 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _928 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `render-video-seek.js` be split into smaller, more focused modules?**
   _Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected._
 - **Should `html2pptx.js` be split into smaller, more focused modules?**

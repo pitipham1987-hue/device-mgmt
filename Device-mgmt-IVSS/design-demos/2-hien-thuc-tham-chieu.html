@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Device-mgmt-IVSS · Quản lý thiết bị · 🏆 Hiện thực tham chiếu</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  HƯỚNG THIẾT KẾ: 🏆 Hiện thực tham chiếu (standard migration)
+  Dự án: Device-mgmt-IVSS — màn neo "Quản lý thiết bị" (1 trong 3 hướng song song)
+
+  THAM CHIẾU ĐÃ CHỌN: Datadog — Infrastructure Monitoring / Host List (Infrastructure List)
+  (Không chọn Ant Design Pro vì dự án chị em aicam-device-mgmt đã dùng hướng đó cho M2.)
+
+  XÁC MINH (WebSearch, 15/09/2026):
+  - Datadog là sản phẩm giám sát hạ tầng có thật, đang vận hành, nổi tiếng vì chất lượng
+    trực quan hoá dữ liệu — được Information is Beautiful Awards vinh danh cho hạng mục
+    "Modern monitoring & security" (informationisbeautifulawards.com/showcase/4682).
+  - Trang Infrastructure/Host List (docs.datadoghq.com/infrastructure/list/) là bảng dữ
+    liệu mật độ cao: danh sách host/thiết bị, mỗi dòng có nhiều cột trạng thái độc lập
+    (host status, agent status...), có bộ lọc theo facet/tag bên trái, có thể lưu view,
+    sort theo cột — đúng bối cảnh "vận hành hạ tầng mật độ cao, nhiều thiết bị, nhiều
+    trạng thái độc lập" mà Device-mgmt-IVSS cần.
+  - datadoghq.com/blog/infrastructure-list-update-datadog: xác nhận bản cập nhật Host List
+    tập trung vào "live inventory... health and performance", filter theo tag, lưu view.
+  Nguồn: informationisbeautifulawards.com/showcase/4682-datadog-modern-monitoring-security ;
+         docs.datadoghq.com/infrastructure/list/ ;
+         datadoghq.com/blog/infrastructure-list-update-datadog
+
+  DNA THỊ GIÁC RÚT RA TỪ DATADOG (áp dụng, đổi màu sang VNPT AI):
+  1. Bố cục 2 cột: dải facet lọc bên trái (theo nhóm thuộc tính + số lượng từng giá trị,
+     KHÔNG phải cây địa bàn — khác hẳn hướng Ant Design Pro của aicam) + bảng dữ liệu bên phải.
+  2. Dải KPI mỏng trên cùng: vài "widget" số liệu nhỏ, số lớn dùng tabular-nums, có progress
+     bar mảnh — giống các query-value widget trên dashboard Datadog.
+  3. Bảng mật độ cao: hàng thấp (~40px), header sticky, 2 cột đầu (checkbox + mã kênh) và
+     cột Thao tác được ghim (sticky) khi cuộn ngang — kiểu Datadog ghim cột hostname.
+  4. Trạng thái hiển thị bằng pill nhỏ "chấm màu + nhãn chữ", KHÔNG chỉ 1 chấm đơn — mỗi
+     trục trạng thái (kết nối / ghi hình) là 1 pill riêng, độc lập, đặt cạnh nhau.
+  5. Facet đang chọn nổi thành "chip" có thể gỡ, đặt ngay trên bảng — cách Datadog hiển thị
+     bộ lọc đang áp dụng.
+  6. Typography: số liệu kỹ thuật (IP, cổng, SN) dùng font tabular căn phải/monospace-hoá;
+     nhãn dùng Be Vietnam Pro thường theo brand-spec.
+  7. Màu sắc: thay toàn bộ palette xanh dương/tím của Datadog bằng #0047BB (primary) /
+     #02AAFA-#00B3FF (accent) / nền #FFFFFF-#F7F8F9 của VNPT AI; giữ nguyên vai trò ngữ nghĩa
+     của màu trạng thái (xanh lá=tốt, hổ phách=cảnh báo, đỏ=lỗi, xám=trung tính) vì đây là
+     màu hệ thống không phải màu thương hiệu Datadog.
+  ═══════════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#0047BB;
+    --primary-hover:#003A99;
+    --primary-tint:#EAF0FC;
+    --navy:#00173D;
+    --accent:#02AAFA;
+    --accent2:#00B3FF;
+    --bg:#FFFFFF;
+    --bg-subtle:#F7F8F9;
+    --bg-muted:#F0F2F5;
+    --border:#E4E8EE;
+    --border-strong:#D2D9E2;
+    --text:#151B2B;
+    --text-secondary:#5B6472;
+    --text-muted:#8A93A3;
+    --green:#177A4C; --green-bg:#E4F5EC; --green-dot:#22A866;
+    --amber:#8A5B00; --amber-bg:#FCF1DA; --amber-dot:#DB9A16;
+    --red:#B0231F; --red-bg:#FBEAE9; --red-dot:#DD3B34;
+    --red-dark:#7A1613; --red-dark-bg:#F4D9D7; --red-dark-dot:#8E241F;
+    --gray:#5B6472; --gray-bg:#EDEFF3; --gray-dot:#9AA3B2;
+    --radius-sm:4px;
+    --radius:6px;
+    --shadow-modal: 0 24px 64px -12px rgba(0,23,61,.35), 0 4px 16px rgba(0,23,61,.12);
+    font-variant-numeric: tabular-nums;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Be Vietnam Pro',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:var(--bg-subtle);
+    color:var(--text);
+    font-size:13px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+  .mono{font-variant-numeric:tabular-nums; letter-spacing:.01em;}
+
+  /* ============ SVG icon helpers ============ */
+  svg.icon{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  svg.icon.fill{fill:currentColor;stroke:none;}
+
+  /* ============ App shell ============ */
+  .app{display:flex;flex-direction:column;min-height:100vh;}
+
+  /* ---- Top nav ---- */
+  .topnav{
+    height:52px;flex:none;display:flex;align-items:center;gap:16px;
+    padding:0 18px;background:var(--bg);border-bottom:1px solid var(--border);
+  }
+  .brandmark{display:flex;align-items:center;gap:9px;}
+  .brandmark svg{height:24px;width:auto;display:block;}
+  .brandmark .divider{width:1px;height:20px;background:var(--border-strong);}
+  .brandmark .app-name{font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;}
+  .breadcrumb{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-muted);white-space:nowrap;}
+  .breadcrumb b{color:var(--text);font-weight:600;}
+  .topnav-search{
+    flex:1;max-width:420px;display:flex;align-items:center;gap:8px;
+    background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius);
+    padding:0 10px;height:32px;color:var(--text-muted);
+  }
+  .topnav-search input{
+    border:0;background:transparent;outline:0;font-size:12.5px;color:var(--text);width:100%;
+    font-family:inherit;
+  }
+  .topnav-search input::placeholder{color:var(--text-muted);}
+  .topnav-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+  .icon-btn{
+    width:30px;height:30px;border-radius:var(--radius-sm);border:1px solid transparent;background:none;
+    display:flex;align-items:center;justify-content:center;color:var(--text-secondary);cursor:pointer;
+  }
+  .icon-btn:hover{background:var(--bg-subtle);color:var(--text);}
+  .avatar{
+    width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent2));
+    color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  }
+  .env-pill{
+    font-size:11px;font-weight:700;letter-spacing:.03em;color:var(--primary);background:var(--primary-tint);
+    padding:3px 8px;border-radius:999px;text-transform:uppercase;
+  }
+
+  /* ---- KPI strip ---- */
+  .kpi-strip{
+    flex:none;display:flex;gap:0;background:var(--bg);border-bottom:1px solid var(--border);
+    padding:0 10px;overflow-x:auto;
+  }
+  .kpi-tile{
+    flex:1;min-width:210px;padding:12px 16px;border-right:1px solid var(--border);
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .kpi-tile:last-child{border-right:none;}
+  .kpi-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+  .kpi-value-row{display:flex;align-items:baseline;gap:6px;}
+  .kpi-value{font-size:20px;font-weight:700;color:var(--navy);}
+  .kpi-value.alert{color:var(--red);}
+  .kpi-of{font-size:12px;color:var(--text-muted);}
+  .kpi-bar{height:5px;border-radius:3px;background:var(--bg-muted);overflow:hidden;}
+  .kpi-bar > span{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent2));}
+  .kpi-sub{font-size:11px;color:var(--text-muted);}
+  .kpi-tile.alert-tile .kpi-sub{color:var(--red);}
+  .kpi-tile.alert-tile{background:var(--red-bg);}
+
+  /* ---- Workspace: facet sidebar + main ---- */
+  .workspace{flex:1;display:flex;min-height:0;}
+  .facets{
+    width:236px;flex:none;background:var(--bg);border-right:1px solid var(--border);
+    padding:14px 12px 20px;overflow-y:auto;
+  }
+  .facets-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;
+    letter-spacing:.05em;margin:0 4px 10px;display:flex;align-items:center;justify-content:space-between;}
+  .facets-title button{border:0;background:none;color:var(--primary);font-size:11.5px;font-weight:600;cursor:pointer;padding:0;}
+  .facet-group{margin-bottom:16px;}
+  .facet-group h4{font-size:12px;font-weight:700;color:var(--text);margin:0 4px 6px;display:flex;align-items:center;gap:6px;}
+  .facet-row{
+    display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:var(--radius-sm);cursor:pointer;
+    font-size:12.5px;color:var(--text-secondary);
+  }
+  .facet-row:hover{background:var(--bg-subtle);}
+  .facet-row input{accent-color:var(--primary);width:14px;height:14px;flex:none;}
+  .facet-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .facet-row .fname{flex:1;color:var(--text);}
+  .facet-row.checked .fname{font-weight:600;}
+  .facet-row .fcount{color:var(--text-muted);font-size:11.5px;}
+
+  /* ---- Main content ---- */
+  .content{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg-subtle);}
+  .toolbar{
+    flex:none;display:flex;align-items:center;gap:8px;padding:12px 16px 8px;flex-wrap:wrap;
+  }
+  .btn{
+    height:32px;padding:0 13px;border-radius:var(--radius);font-size:12.5px;font-weight:600;
+    display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid var(--border-strong);
+    background:var(--bg);color:var(--text);white-space:nowrap;
+  }
+  .btn:hover{background:var(--bg-subtle);border-color:var(--text-muted);}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .btn.primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);}
+  .btn.danger-outline{color:var(--red);border-color:var(--border-strong);}
+  .btn.danger-outline:hover{background:var(--red-bg);border-color:var(--red);}
+  .btn:disabled{opacity:.42;cursor:not-allowed;background:var(--bg);border-color:var(--border);color:var(--text-muted);}
+  .toolbar-spacer{flex:1;}
+  .toolbar-search{
+    display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--border-strong);
+    border-radius:var(--radius);background:var(--bg);color:var(--text-muted);width:220px;
+  }
+  .toolbar-search input{border:0;outline:0;background:transparent;font-size:12.5px;width:100%;font-family:inherit;color:var(--text);}
+
+  .chips-row{flex:none;padding:0 16px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;background:var(--primary-tint);color:var(--primary);
+    border-radius:999px;padding:4px 6px 4px 10px;font-size:11.5px;font-weight:600;
+  }
+  .chip button{border:0;background:none;color:var(--primary);cursor:pointer;display:flex;padding:2px;border-radius:50%;}
+  .chip button:hover{background:rgba(0,71,187,.15);}
+  .chips-row .clear-all{font-size:11.5px;color:var(--text-muted);background:none;border:0;cursor:pointer;text-decoration:underline;}
+
+  /* ---- Table ---- */
+  .table-wrap{
+    flex:1;margin:0 16px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:auto;min-height:0;
+  }
+  table.device-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1720px;font-size:12.5px;}
+  table.device-table thead th{
+    position:sticky;top:0;z-index:3;background:var(--bg-subtle);border-bottom:1px solid var(--border-strong);
+    text-align:left;padding:9px 12px;font-size:11px;font-weight:700;color:var(--text-secondary);
+    text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;
+  }
+  table.device-table th .th-inner{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;}
+  table.device-table th .th-inner:hover{color:var(--text);}
+  table.device-table td{
+    padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap;background:var(--bg);
+  }
+  table.device-table tbody tr:hover td{background:var(--bg-subtle);}
+  table.device-table tbody tr.row-selected td{background:var(--primary-tint);}
+  table.device-table td.num,table.device-table td.ip{font-variant-numeric:tabular-nums;color:var(--text-secondary);}
+  table.device-table td.name-cell{color:var(--text);font-weight:600;white-space:normal;min-width:230px;}
+  th.col-check,td.col-check{position:sticky;left:0;z-index:2;width:36px;min-width:36px;background:var(--bg);border-right:1px solid var(--border);}
+  thead th.col-check{background:var(--bg-subtle);z-index:4;}
+  tbody tr:hover td.col-check{background:var(--bg-subtle);}
+  tbody tr.row-selected td.col-check{background:var(--primary-tint);}
+  th.col-ch,td.col-ch{position:sticky;left:36px;z-index:2;background:var(--bg);border-right:1px solid var(--border);font-weight:700;color:var(--navy);}
+  thead th.col-ch{background:var(--bg-subtle);z-index:4;}
+  tbody tr:hover td.col-ch{background:var(--bg-subtle);}
+  tbody tr.row-selected td.col-ch{background:var(--primary-tint);}
+  th.col-op,td.col-op{background:var(--bg);border-left:1px solid var(--border);}
+  thead th.col-op{background:var(--bg-subtle);}
+  input[type=checkbox].row-check{accent-color:var(--primary);width:14px;height:14px;cursor:pointer;}
+
+  .status-pill{
+    display:inline-flex;align-items:center;gap:5px;padding:3px 8px 3px 7px;border-radius:4px;
+    font-size:11.5px;font-weight:700;white-space:nowrap;
+  }
+  .status-pill .dot{width:6px;height:6px;border-radius:50%;flex:none;}
+  .pill-ok{background:var(--green-bg);color:var(--green);} .pill-ok .dot{background:var(--green-dot);}
+  .pill-warn{background:var(--amber-bg);color:var(--amber);} .pill-warn .dot{background:var(--amber-dot);}
+  .pill-off{background:var(--red-bg);color:var(--red);} .pill-off .dot{background:var(--red-dot);}
+  .pill-fail{background:var(--red-dark-bg);color:var(--red-dark);} .pill-fail .dot{background:var(--red-dark-dot);}
+  .pill-muted{background:var(--gray-bg);color:var(--gray);} .pill-muted .dot{background:var(--gray-dot);}
+
+  .pw-cell{display:flex;align-items:center;gap:6px;}
+  .pw-mask{font-variant-numeric:tabular-nums;letter-spacing:1px;color:var(--text-secondary);}
+  .pw-toggle{border:0;background:none;color:var(--text-muted);cursor:pointer;display:flex;padding:2px;}
+  .pw-toggle:hover{color:var(--primary);}
+
+  .mfr-tag{
+    display:inline-block;padding:2px 7px;border-radius:4px;background:var(--bg-muted);color:var(--text-secondary);
+    font-size:11px;font-weight:600;
+  }
+
+  .op-links{display:flex;gap:12px;}
+  .op-links button{border:0;background:none;cursor:pointer;font-size:12px;font-weight:600;padding:0;display:flex;align-items:center;gap:4px;}
+  .op-links .edit{color:var(--primary);}
+  .op-links .edit:hover{color:var(--primary-hover);text-decoration:underline;}
+  .op-links .del{color:var(--red);}
+  .op-links .del:hover{color:var(--red-dark);text-decoration:underline;}
+
+  /* ---- Pagination ---- */
+  .pagination{
+    flex:none;display:flex;align-items:center;gap:14px;padding:0 16px 16px;font-size:12px;color:var(--text-secondary);
+  }
+  .pagination .total{font-weight:600;color:var(--text);}
+  .pagination-spacer{flex:1;}
+  .page-btn{
+    width:26px;height:26px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg);
+    display:flex;align-items:center;justify-content:center;color:var(--text-secondary);cursor:pointer;
+  }
+  .page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700;}
+  .page-size{
+    border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg);height:26px;
+    padding:0 8px;font-size:12px;color:var(--text-secondary);font-family:inherit;
+  }
+
+  /* ============ Modals ============ */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(10,20,40,.48);display:none;align-items:center;justify-content:center;
+    z-index:100;padding:24px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--bg);border-radius:10px;box-shadow:var(--shadow-modal);width:100%;display:flex;flex-direction:column;
+    max-height:92vh;
+  }
+  .modal.modal-add{max-width:980px;}
+  .modal.modal-ip{max-width:640px;}
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);
+    flex:none;
+  }
+  .modal-head h3{margin:0;font-size:16px;font-weight:700;color:var(--navy);}
+  .modal-close{border:0;background:none;color:var(--text-muted);cursor:pointer;padding:4px;display:flex;border-radius:6px;}
+  .modal-close:hover{background:var(--bg-subtle);color:var(--text);}
+  .modal-body{padding:0 22px;overflow-y:auto;flex:1;min-height:0;}
+  .modal-foot{
+    flex:none;display:flex;align-items:center;gap:14px;padding:14px 22px;border-top:1px solid var(--border);
+  }
+
+  .tabs{display:flex;gap:4px;padding:12px 22px 0;border-bottom:1px solid var(--border);}
+  .tab-btn{
+    border:0;background:none;padding:10px 4px;margin-right:22px;font-size:13px;font-weight:600;color:var(--text-muted);
+    cursor:pointer;border-bottom:2px solid transparent;
+  }
+  .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+  .tab-btn:hover:not(.active){color:var(--text);}
+  .tab-panel{display:none;padding:16px 0 18px;}
+  .tab-panel.active{display:block;}
+
+  .quick-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .pw-input{
+    display:flex;align-items:center;gap:6px;border:1px solid var(--border-strong);border-radius:var(--radius);
+    height:32px;padding:0 10px;color:var(--text-muted);width:200px;
+  }
+  .pw-input input{border:0;outline:0;background:transparent;font-size:12.5px;width:100%;font-family:inherit;color:var(--text);}
+
+  .scan-table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:auto;max-height:260px;}
+  table.scan-table{border-collapse:collapse;width:100%;min-width:760px;font-size:12.5px;}
+  table.scan-table thead th{
+    position:sticky;top:0;background:var(--bg-subtle);border-bottom:1px solid var(--border-strong);text-align:left;
+    padding:8px 10px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.03em;
+  }
+  table.scan-table td{padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  table.scan-table tbody tr:hover td{background:var(--bg-subtle);}
+  .init-badge{
+    display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;
+  }
+  .init-ok{background:var(--green-bg);color:var(--green);}
+  .init-pending{background:var(--amber-bg);color:var(--amber);}
+  .init-fail{background:var(--red-bg);color:var(--red);}
+  .scan-op{display:flex;gap:8px;color:var(--text-muted);}
+  .scan-op button{border:0;background:none;color:var(--primary);cursor:pointer;padding:3px;display:flex;border-radius:4px;}
+  .scan-op button:hover{background:var(--primary-tint);}
+
+  .bw-footer{display:flex;align-items:center;gap:10px;flex:1;}
+  .bw-footer .kpi-bar{width:150px;}
+  .bw-footer .bw-label{font-size:11.5px;color:var(--text-muted);white-space:nowrap;}
+  .bw-footer .bw-value{font-size:12px;font-weight:700;color:var(--navy);white-space:nowrap;}
+
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-bottom:6px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field.span-2{grid-column:1/-1;}
+  .field label{font-size:12px;font-weight:600;color:var(--text-secondary);}
+  .field input,.field select{
+    height:34px;border:1px solid var(--border-strong);border-radius:var(--radius);padding:0 10px;font-size:12.5px;
+    font-family:inherit;color:var(--text);background:var(--bg);
+  }
+  .field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--primary);}
+  .hint{font-size:11px;color:var(--text-muted);}
+
+  .octet-group{display:flex;align-items:center;gap:6px;}
+  .octet-group input{width:52px;text-align:center;height:34px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);
+    font-family:inherit;font-size:13px;font-variant-numeric:tabular-nums;}
+  .octet-group input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--primary);}
+  .octet-dot{color:var(--text-muted);font-weight:700;}
+
+  .ip-form-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px 24px;margin:18px 0 6px;}
+  .ip-select-table{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:6px;}
+  .ip-select-table table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .ip-select-table th{background:var(--bg-subtle);text-align:left;padding:7px 12px;font-size:11px;font-weight:700;
+    color:var(--text-secondary);text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--border-strong);}
+  .ip-select-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums;}
+  .ip-select-table tr:last-child td{border-bottom:0;}
+
+  .warn-callout{
+    display:flex;gap:10px;align-items:flex-start;background:var(--amber-bg);border:1px solid #F0D896;
+    border-radius:var(--radius);padding:10px 12px;margin:16px 0 4px;color:var(--amber);font-size:12px;line-height:1.5;
+  }
+  .warn-callout svg{flex:none;margin-top:1px;}
+
+  .batch-drop{
+    border:1.5px dashed var(--border-strong);border-radius:var(--radius);padding:34px 20px;text-align:center;
+    color:var(--text-muted);background:var(--bg-subtle);
+  }
+  .batch-drop b{color:var(--primary);cursor:pointer;}
+  .batch-drop .fname{margin-top:6px;font-size:11.5px;}
+  .batch-template{margin-top:12px;font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;}
+  .batch-template a{color:var(--primary);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px;}
+  .batch-template a:hover{text-decoration:underline;}
+
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:#C7CEDA;border-radius:6px;border:2px solid var(--bg);}
+  ::-webkit-scrollbar-track{background:transparent;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ Top nav ============ -->
+  <header class="topnav">
+    <div class="brandmark">
+      <svg viewBox="0 0 208 54" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M46.4686 34.5899C45.6546 34.127 44.7311 33.9359 43.8006 34.0342C42.5693 34.1598 41.3476 33.9017 40.2688 33.2873C38.9445 32.5349 37.9836 31.3265 37.5634 29.8859C37.232 28.7416 36.547 27.7531 35.6096 27.0266C36.583 26.2824 37.2833 25.2624 37.5981 24.1018C38.0252 22.6831 38.9806 21.4924 40.2882 20.7496C41.3657 20.1365 42.5859 19.8784 43.809 20.0027C44.745 20.1037 45.6726 19.9112 46.4908 19.4469C47.51 18.8666 48.2394 17.9313 48.5444 16.8116C48.8495 15.6919 48.6928 14.5217 48.1035 13.5181C46.8887 11.4453 44.1875 10.7325 42.0826 11.9301C41.2686 12.393 40.6376 13.0852 40.2591 13.9277C39.753 15.0406 38.9154 15.9527 37.8366 16.5658C36.5123 17.3195 34.9676 17.5353 33.4908 17.1721C32.319 16.8826 31.1071 16.9727 30.0005 17.4083C29.8327 16.2053 29.2864 15.0993 28.4225 14.25C27.3881 13.1754 26.8181 11.7662 26.8181 10.2792C26.8181 9.05439 27.2009 7.88555 27.9219 6.90379C28.4794 6.15551 28.7747 5.26933 28.7747 4.33944C28.7733 1.94715 26.7959 0 24.3665 0C21.9371 0 19.9597 1.94715 19.9597 4.33944C19.9597 5.26386 20.2537 6.14868 20.8055 6.89286C21.5308 7.88009 21.9149 9.05029 21.9149 10.2778C21.9149 11.784 21.3325 13.2081 20.2758 14.2868C19.4355 15.1416 18.9086 16.2203 18.738 17.3824C17.5968 16.9249 16.3502 16.8375 15.1715 17.1489C13.71 17.4943 12.1846 17.2745 10.877 16.5317C9.79957 15.9199 8.96341 15.0078 8.46005 13.9032C8.08149 13.0538 7.44779 12.3588 6.63104 11.8946C4.52608 10.6984 1.82485 11.4112 0.610134 13.4826C0.0221876 14.4862 -0.134506 15.6564 0.170561 16.7761C0.475628 17.8958 1.20501 18.8311 2.22421 19.4114C3.03819 19.8743 3.96309 20.0655 4.89355 19.9672C6.12491 19.8416 7.34656 20.0996 8.42539 20.7141C9.74965 21.4665 10.7106 22.6763 11.1308 24.1168C11.4622 25.2611 12.1472 26.2497 13.0832 26.9747C12.1098 27.7189 11.4095 28.7389 11.0933 29.8996C10.6662 31.3183 9.71083 32.509 8.4032 33.2531C7.32576 33.8649 6.10549 34.1229 4.88384 34C3.94645 33.899 3.02016 34.0915 2.20203 34.5558C0.0984543 35.7519 -0.625386 38.4105 0.589334 40.4833C1.40469 41.8747 2.88981 42.6516 4.41376 42.6516C5.16117 42.6516 5.91829 42.4646 6.61024 42.0713C7.42421 41.6084 8.05515 40.9161 8.43371 40.0736C8.93845 38.9608 9.77739 38.0487 10.8562 37.4356C12.1805 36.6832 13.7238 36.4674 15.2006 36.8293C16.3724 37.1188 17.5843 37.03 18.6909 36.5931C18.8587 37.7947 19.405 38.9021 20.2689 39.7514C21.3034 40.826 21.8733 42.2352 21.8733 43.7222C21.8733 44.947 21.4906 46.1158 20.7695 47.0976C20.2121 47.8459 19.9167 48.732 19.9167 49.6619C19.9167 52.0556 21.8941 54.0014 24.3235 54.0014C26.7543 54.0014 28.7303 52.0542 28.7303 49.6619C28.7303 48.7375 28.4364 47.8527 27.8845 47.1085C27.1593 46.1213 26.7751 44.9511 26.7751 43.7222C26.7751 42.216 27.3575 40.7919 28.4156 39.7132C29.2559 38.8584 29.7828 37.781 29.9534 36.619C31.0946 37.0764 32.3412 37.1638 33.5199 36.8525C34.9814 36.507 36.5068 36.7269 37.8144 37.4697C38.8918 38.0828 39.728 38.9936 40.2314 40.0982C40.6113 40.9475 41.2436 41.6426 42.0604 42.1068C42.7523 42.5001 43.5094 42.6871 44.2569 42.6871C45.7808 42.6871 47.2659 41.9088 48.0813 40.5188C49.296 38.4446 48.5735 35.7861 46.4686 34.5899ZM27.1509 28.6188C26.7793 29.2523 26.5533 29.9282 26.4521 30.6123C25.7948 30.3502 25.0779 30.2027 24.3249 30.2027C23.583 30.2027 22.8772 30.3474 22.2269 30.6028C22.1257 29.9009 21.8899 29.2182 21.5197 28.586C21.1536 27.962 20.678 27.4253 20.1205 26.9911C20.678 26.561 21.1647 26.0244 21.5405 25.384C21.9066 24.76 22.1395 24.0854 22.2435 23.3918C22.9008 23.6526 23.6163 23.8 24.3665 23.8C25.1084 23.8 25.8142 23.6553 26.4645 23.4013C26.5658 24.1032 26.8015 24.7859 27.1717 25.4181C27.5434 26.0517 28.0231 26.5842 28.5737 27.0116C28.0148 27.4404 27.5267 27.977 27.1509 28.6188ZM42.4986 14.9081C42.6677 14.5313 42.9464 14.2254 43.307 14.0206C43.6148 13.8458 43.949 13.7625 44.2818 13.7625C44.9585 13.7625 45.6172 14.108 45.9777 14.7252C46.5171 15.6441 46.1954 16.8239 45.2622 17.355C44.9003 17.5612 44.4884 17.6459 44.0669 17.6008C42.3405 17.4261 40.6321 17.7797 39.1192 18.6249C40.621 17.7551 41.7886 16.473 42.4986 14.9081ZM32.1041 19.4169C32.3676 19.4169 32.6324 19.4483 32.8945 19.5138L32.8973 19.5152C34.9731 20.0245 37.1391 19.731 39.0042 18.6891C37.1807 19.7446 35.8467 21.4214 35.238 23.445C35.0161 24.2629 34.4781 24.9498 33.7237 25.3785C32.1762 26.2592 30.1891 25.7349 29.2947 24.2097C28.8621 23.471 28.747 22.6107 28.9702 21.7873C29.1949 20.964 29.7315 20.2758 30.4803 19.8484C30.9837 19.563 31.5411 19.4169 32.1041 19.4169ZM24.3665 2.41551C25.4439 2.41551 26.3217 3.27848 26.3217 4.34081C26.3217 4.75318 26.1914 5.14507 25.939 5.4837C24.9239 6.86555 24.3804 8.49865 24.3651 10.2068C24.3499 8.49455 23.8063 6.86009 22.7871 5.47414C22.5403 5.14234 22.4099 4.75045 22.4099 4.34081C22.4113 3.27848 23.2877 2.41551 24.3665 2.41551ZM22.0355 15.9677L22.0383 15.9664C23.522 14.4521 24.3471 12.4612 24.3651 10.3529C24.3831 12.4339 25.1902 14.4056 26.6642 15.935C27.2716 16.533 27.6071 17.3359 27.6071 18.1921C27.6071 19.9522 26.1525 21.3845 24.3651 21.3845C22.5777 21.3845 21.1231 19.9522 21.1231 18.1921C21.1245 17.355 21.4476 16.5644 22.0355 15.9677ZM5.49952 17.5216C5.21248 17.5216 4.92405 17.5367 4.63563 17.5653C4.21963 17.609 3.80917 17.5244 3.45003 17.3195C2.99797 17.0628 2.67488 16.6477 2.53899 16.1507C2.40448 15.6537 2.47381 15.1348 2.73451 14.6897C2.9952 14.2445 3.41675 13.9264 3.92149 13.7926C4.42624 13.6601 4.95317 13.727 5.40523 13.9851C5.76715 14.1913 6.04725 14.4985 6.2192 14.8822C6.92779 16.4388 8.0912 17.7169 9.58603 18.5853C8.32416 17.8835 6.92917 17.5216 5.49952 17.5216ZM9.71499 18.6604C11.5537 19.6845 13.6919 19.9822 15.7733 19.4906C16.6039 19.2722 17.4762 19.3869 18.2305 19.8156C18.9807 20.2416 19.5173 20.9298 19.7406 21.7546C19.9652 22.5779 19.8501 23.4382 19.4161 24.1769C18.5217 25.7008 16.536 26.2251 14.9871 25.3457C14.2508 24.9265 13.7183 24.2561 13.4867 23.4559L13.4853 23.4532C12.8974 21.4282 11.5593 19.7296 9.71499 18.6604ZM6.19285 39.0919C6.02368 39.4687 5.74496 39.7746 5.38443 39.9794C4.4512 40.5106 3.25312 40.1938 2.71371 39.2748C2.17429 38.3559 2.496 37.1761 3.42923 36.645C3.72736 36.4756 4.05877 36.3882 4.40405 36.3882C4.47755 36.3882 4.55104 36.3923 4.62592 36.4005C6.35371 36.5739 8.06485 36.2203 9.57909 35.3737C8.07317 36.2435 6.90421 37.5257 6.19285 39.0919ZM15.7969 34.4862L15.7941 34.4848C13.7169 33.9741 11.5482 34.269 9.68171 35.3136C11.5079 34.2581 12.8433 32.5813 13.4534 30.555C13.6767 29.7371 14.2133 29.0502 14.9677 28.6215C15.4669 28.3375 16.0215 28.1927 16.5831 28.1927C16.8646 28.1927 17.1489 28.2296 17.4276 28.3033C18.2638 28.5245 18.9627 29.053 19.3967 29.7903C20.2911 31.3155 19.7586 33.2709 18.2097 34.1516C17.4734 34.5708 16.6178 34.6896 15.7969 34.4862ZM24.3249 51.5859C23.2475 51.5859 22.3697 50.7229 22.3697 49.6606C22.3697 49.2482 22.5001 48.8563 22.7524 48.5177C23.7675 47.1358 24.311 45.5027 24.3263 43.7945C24.3415 45.5068 24.8851 47.1399 25.9043 48.5272C26.1511 48.859 26.2815 49.2509 26.2815 49.6606C26.2801 50.7229 25.4037 51.5859 24.3249 51.5859ZM26.6559 38.0336L26.6531 38.0364C25.1694 39.5507 24.3443 41.5415 24.3263 43.6498C24.3083 41.5688 23.5012 39.5971 22.0272 38.0678C21.4198 37.4683 21.0843 36.6668 21.0843 35.8107C21.0843 34.0506 22.5389 32.6182 24.3263 32.6182C26.1137 32.6182 27.5683 34.0506 27.5683 35.8107C27.5669 36.6463 27.2438 37.4356 26.6559 38.0336ZM34.8941 34.28C34.2368 34.28 33.574 34.3564 32.9181 34.5121C32.0875 34.7306 31.2153 34.6159 30.4609 34.1871C28.9134 33.3064 28.3809 31.351 29.2739 29.8258C30.1683 28.3006 32.154 27.7776 33.7029 28.657C34.4393 29.0762 34.9717 29.7466 35.2033 30.5468L35.2047 30.5495C35.794 32.5718 37.1322 34.2704 38.9764 35.3396C37.7187 34.6405 36.3196 34.28 34.8941 34.28ZM45.9583 39.3103C45.4189 40.2293 44.2208 40.5461 43.2876 40.0149C42.9257 39.8087 42.6455 39.5015 42.4736 39.1178C41.765 37.5612 40.6016 36.2831 39.1068 35.4147C40.6196 36.2585 42.328 36.6108 44.0572 36.4347C44.4718 36.391 44.8822 36.4756 45.2428 36.6805C46.176 37.2116 46.4963 38.3914 45.9583 39.3103Z" fill="url(#topnav_g0)"/><path d="M14.2465 13.435C12.9486 13.435 11.7408 12.7482 11.0933 11.6435C10.6079 10.8147 10.479 9.84929 10.7299 8.92487C10.9809 8.00045 11.5827 7.2276 12.4245 6.74969C12.9777 6.43563 13.6059 6.26904 14.2396 6.26904C15.5375 6.26904 16.7453 6.95587 17.3929 8.06053C18.3954 9.77146 17.7978 11.9658 16.0617 12.9544C15.5098 13.2684 14.8816 13.435 14.2465 13.435Z" fill="#59CBE8"/><path d="M7.36595 28.8294C6.71699 29.9354 5.5092 30.6236 4.21267 30.6236C3.24061 30.6236 2.32819 30.2508 1.6404 29.5749C0.952613 28.899 0.575439 27.9992 0.575439 27.042C0.575439 26.4138 0.743226 25.7953 1.06077 25.2532C1.70973 24.1472 2.91752 23.459 4.21405 23.459C6.22056 23.459 7.85128 25.0661 7.85128 27.042C7.85128 27.6701 7.68349 28.2886 7.36595 28.8294Z" fill="#59CBE8"/><path d="M17.465 42.3952C18.1139 43.5013 18.1139 44.8749 17.4664 45.9809C16.981 46.8098 16.1962 47.4024 15.2574 47.6495C14.3186 47.8967 13.3383 47.7697 12.4966 47.2918C11.9433 46.9777 11.4829 46.5258 11.1654 45.9837C10.5164 44.8776 10.5164 43.504 11.164 42.398C12.1665 40.687 14.3963 40.0999 16.1338 41.0871C16.6871 41.4012 17.1474 41.8531 17.465 42.3952Z" fill="#59CBE8"/><path d="M34.4447 40.5654C35.7426 40.5654 36.9504 41.2523 37.598 42.3569C38.0833 43.1858 38.2123 44.1511 37.9613 45.0756C37.7103 46 37.1085 46.7728 36.2668 47.2507C35.7135 47.5648 35.0853 47.7314 34.4516 47.7314C33.1537 47.7314 31.9459 47.0446 31.2984 45.9399C30.2958 44.229 30.8934 42.0347 32.6296 41.0461C33.1814 40.732 33.8096 40.5654 34.4447 40.5654Z" fill="#59CBE8"/><path d="M41.3254 25.1712C41.9744 24.0651 43.1822 23.377 44.4787 23.377C45.4508 23.377 46.3632 23.7497 47.051 24.4256C47.7388 25.1015 48.1159 26.0014 48.1159 26.9586C48.1159 27.5867 47.9481 28.2052 47.6306 28.7473C46.9816 29.8533 45.7738 30.5415 44.4773 30.5415C42.4708 30.5415 40.8401 28.9344 40.8401 26.9586C40.8401 26.3318 41.0079 25.7133 41.3254 25.1712Z" fill="#59CBE8"/><path d="M31.2264 11.6066C30.5774 10.5006 30.5774 9.12692 31.225 8.0209C31.7103 7.19206 32.4952 6.59945 33.434 6.3523C34.3727 6.10515 35.3531 6.23214 36.1948 6.71005C36.7481 7.02411 37.2085 7.47608 37.526 8.01817C38.175 9.12419 38.175 10.4978 37.5274 11.6039C36.5248 13.3148 34.2951 13.902 32.5576 12.9147C32.0043 12.5993 31.5439 12.1473 31.2264 11.6066Z" fill="#59CBE8"/><path d="M208 13.5019V34.8918C208 37.5313 205.371 38.8312 203.323 38.1075H202.714C203.052 38.1075 203.323 37.8372 203.323 37.5081V16.9087C203.323 15.0243 204.873 13.5005 206.784 13.5005H208V13.5019Z" fill="#00A3E0"/><path fill-rule="evenodd" clip-rule="evenodd" d="M191.848 31.2474C192.365 33.5482 190.33 35.5527 187.993 35.042C186.816 34.7853 185.866 33.8486 185.605 32.6893C185.088 30.3885 187.124 28.384 189.46 28.8947C190.637 29.1528 191.587 30.0881 191.848 31.2474Z" fill="#00A3E0"/><path d="M188.142 20.0519C188.142 20.0519 188.757 18.6714 189.053 18.0119C189.793 16.3501 192.178 16.3378 192.941 17.9873L191.806 15.5295C191.338 14.5149 190.414 13.7434 189.298 13.5509C187.76 13.2846 186.275 14.0848 185.652 15.4407L174.131 40.497H176.75C178.123 40.497 179.365 39.6982 179.917 38.4611L188.142 20.0519Z" fill="#00A3E0"/><path d="M208 34.8906V35.8955C208 37.1681 207.476 38.3192 206.629 39.1508C205.784 39.9851 204.615 40.5012 203.323 40.5012V40.4985C200.312 40.4985 197.589 38.7494 196.377 36.0348L189.248 20.0753C189.035 19.6042 188.365 19.5987 188.142 20.0548C188.452 19.3584 188.757 18.6743 189.053 18.0148C189.793 16.353 192.178 16.3407 192.941 17.9902L197.502 27.8789L199.227 31.6175L201.387 36.3038C201.393 36.3188 201.4 36.3338 201.408 36.3461C201.84 37.2555 202.538 37.8318 203.324 38.1103C205.371 38.8299 208 37.5314 208 34.8906Z" fill="#00A3E0"/><path d="M119.644 34.0856V40.5006H120.856C122.767 40.5006 124.317 38.9754 124.317 37.0924V31.9883H121.774C120.598 31.9883 119.644 32.9277 119.644 34.0856Z" fill="#0047BB"/><path d="M126.424 13.5015H123.105C121.195 13.5015 119.644 15.0267 119.644 16.9097V17.6197V17.6211V22.747H120.833C122.743 22.747 124.294 21.2218 124.294 19.3388V17.6211V15.5988C124.294 14.4395 125.248 13.5015 126.424 13.5015Z" fill="#0047BB"/><path d="M138.829 16.0303C136.786 14.3521 133.962 13.5015 130.435 13.5015H126.424C125.248 13.5015 124.294 14.4409 124.294 15.5988V17.6211H130.32C132.605 17.6211 134.362 18.0976 135.538 19.0343C136.703 19.9628 137.269 20.976 137.269 22.7457C137.269 24.5139 136.703 25.5257 135.538 26.4543C134.362 27.3923 132.605 27.8675 130.32 27.8675H123.105C121.195 27.8675 119.644 29.3927 119.644 31.2757V34.0845C119.644 32.9266 120.598 31.9871 121.774 31.9871H130.435C133.962 31.9871 136.786 31.1364 138.829 29.4583C140.895 27.7624 141.945 25.7033 141.945 22.7443C141.945 19.7881 140.895 17.7248 138.829 16.0303Z" fill="#0047BB"/><path d="M72.6974 33.0699C72.4825 33.5478 71.7947 33.5465 71.5825 33.0686L72.5989 35.3516C73.3436 37.0257 75.755 37.0257 76.4996 35.353L86.2327 13.5015H83.7311C82.3611 13.5015 81.1186 14.2975 80.5654 15.5319L72.6974 33.0699Z" fill="#0047BB"/><path d="M72.5975 35.353L71.5811 33.0699L63.7797 15.5415C63.2278 14.3016 61.984 13.5015 60.6098 13.5015H57.8115L68.9645 38.4621C69.4221 39.4862 70.3484 40.2632 71.4688 40.4516C73.0011 40.7097 74.4709 39.9027 75.0755 38.5454L76.4982 35.3516C75.7536 37.0257 73.3422 37.0257 72.5975 35.353Z" fill="#0047BB"/><path d="M97.1388 19.2554L93.2575 14.505C92.7888 13.9301 92.1038 13.5437 91.3564 13.5041C89.8893 13.4276 88.6746 14.5773 88.6746 16.0056V40.4993H89.8893C91.8001 40.4993 93.3504 38.9741 93.3504 37.0911V21.817V20.5704C93.3504 18.5904 95.8783 17.7125 97.1388 19.2554Z" fill="#0047BB"/><path d="M108.59 33.2694L107.704 32.1852L97.1387 19.2556C95.8782 17.714 93.3503 18.5907 93.3503 20.5706V21.8173L107.853 39.5669C108.336 40.1582 109.065 40.5009 109.835 40.5009C111.24 40.5009 112.38 39.3799 112.38 37.9953V31.9545C112.378 33.9344 109.85 34.811 108.59 33.2694Z" fill="#0047BB"/><path d="M107.704 32.1851L108.59 33.2693C109.85 34.8109 112.378 33.9343 112.378 31.9543V13.5015H111.164C109.253 13.5015 107.702 15.0267 107.702 16.9097V32.1851H107.704Z" fill="#0047BB"/><path d="M153.763 13.5015C154.939 13.5015 155.893 14.4409 155.893 15.5988V17.6197H164.99V16.9097C164.99 15.0281 163.441 13.5015 161.529 13.5015H153.763Z" fill="#0047BB"/><path d="M153.763 13.5015H145.642H142.158V14.2115C142.158 16.0931 143.707 17.6197 145.619 17.6197H151.256V40.5008H152.432C154.343 40.5008 155.893 38.9756 155.893 37.0926V17.6197V15.5988C155.893 14.4395 154.94 13.5015 153.763 13.5015Z" fill="#0047BB"/><defs><radialGradient id="topnav_g0" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(24.3471 27.0003) scale(25.9289 25.5324)"><stop stop-color="#0047BB"/><stop offset="1" stop-color="#0072CE"/></radialGradient></defs></svg>
+      <div class="divider"></div>
+      <span class="app-name">Device-mgmt-IVSS</span>
+    </div>
+    <div class="breadcrumb">
+      <span>Cấu hình</span>
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      <b>Quản lý thiết bị</b>
+    </div>
+    <div class="topnav-search">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" placeholder="Tìm theo tên kênh, IP, SN…">
+    </div>
+    <div class="topnav-right">
+      <span class="env-pill">NOC · Miền Bắc</span>
+      <button class="icon-btn" title="Thông báo">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+      </button>
+      <button class="icon-btn" title="Trợ giúp">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.8.3-1.4 1-1.4 1.9v.3"/><path d="M12 17h.01"/></svg>
+      </button>
+      <div class="avatar">KT</div>
+    </div>
+  </header>
+
+  <!-- ============ KPI strip ============ -->
+  <div class="kpi-strip">
+    <div class="kpi-tile">
+      <div class="kpi-label">Kênh còn lại / Tổng kênh</div>
+      <div class="kpi-value-row"><span class="kpi-value mono">17</span><span class="kpi-of mono">/ 64 kênh</span></div>
+      <div class="kpi-bar"><span style="width:73%"></span></div>
+      <div class="kpi-sub">Đã cấp phát 47 kênh · còn trống 17</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Băng thông còn lại / Tổng băng thông</div>
+      <div class="kpi-value-row"><span class="kpi-value mono">187,4</span><span class="kpi-of mono">/ 512 Mbps</span></div>
+      <div class="kpi-bar"><span style="width:63%"></span></div>
+      <div class="kpi-sub">Đang sử dụng 324,6 Mbps</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Thiết bị đang hoạt động</div>
+      <div class="kpi-value-row"><span class="kpi-value mono">41</span><span class="kpi-of mono">/ 47 kênh</span></div>
+      <div class="kpi-sub">40 đang ghi hình liên tục</div>
+    </div>
+    <div class="kpi-tile alert-tile">
+      <div class="kpi-label">Cảnh báo đang mở</div>
+      <div class="kpi-value-row"><span class="kpi-value alert mono">6</span><span class="kpi-of mono">thiết bị</span></div>
+      <div class="kpi-sub">2 mất kết nối · 1 kết nối thất bại · 2 đang xuống cấp · 3 lỗi lưu trữ</div>
+    </div>
+  </div>
+
+  <!-- ============ Workspace ============ -->
+  <div class="workspace">
+
+    <!-- ---- Facet sidebar (Datadog-style filter facets) ---- -->
+    <aside class="facets">
+      <div class="facets-title">Bộ lọc <button type="button" id="clearFacets">Xoá hết</button></div>
+
+      <div class="facet-group">
+        <h4>Trạng thái kết nối</h4>
+        <label class="facet-row checked"><input type="checkbox" checked><span class="facet-dot" style="background:var(--green-dot)"></span><span class="fname">Trực tuyến</span><span class="fcount">41</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="facet-dot" style="background:var(--amber-dot)"></span><span class="fname">Đang xuống cấp</span><span class="fcount">2</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="facet-dot" style="background:var(--red-dot)"></span><span class="fname">Mất kết nối</span><span class="fcount">2</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="facet-dot" style="background:var(--red-dark-dot)"></span><span class="fname">Kết nối thất bại</span><span class="fcount">2</span></label>
+      </div>
+
+      <div class="facet-group">
+        <h4>Trạng thái ghi hình</h4>
+        <label class="facet-row"><input type="checkbox"><span class="facet-dot" style="background:var(--green-dot)"></span><span class="fname">Đang ghi</span><span class="fcount">40</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="facet-dot" style="background:var(--gray-dot)"></span><span class="fname">Không ghi</span><span class="fcount">4</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="facet-dot" style="background:var(--red-dot)"></span><span class="fname">Lỗi lưu trữ</span><span class="fcount">3</span></label>
+      </div>
+
+      <div class="facet-group">
+        <h4>Hãng sản xuất</h4>
+        <label class="facet-row"><input type="checkbox"><span class="fname">VNPT AI Cam</span><span class="fcount">28</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="fname">ONVIF chuẩn chung</span><span class="fcount">12</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="fname">Camera IP thế hệ 2</span><span class="fcount">7</span></label>
+      </div>
+
+      <div class="facet-group">
+        <h4>Khu vực</h4>
+        <label class="facet-row"><input type="checkbox"><span class="fname">KCN Bắc Thăng Long</span><span class="fcount">9</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="fname">Giao lộ nội thành Hà Nội</span><span class="fcount">14</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="fname">KCNC Hoà Lạc</span><span class="fcount">6</span></label>
+        <label class="facet-row"><input type="checkbox"><span class="fname">Hạ tầng nội bộ</span><span class="fcount">18</span></label>
+      </div>
+    </aside>
+
+    <!-- ---- Main content ---- -->
+    <main class="content">
+
+      <div class="toolbar">
+        <button class="btn primary" id="openAddDevice">
+          <svg class="icon" viewBox="0 0 24 24" stroke="white"><path d="M12 5v14M5 12h14"/></svg>
+          Thêm thiết bị
+        </button>
+        <button class="btn" id="openModifyIp">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 11h.01M11 11h2"/></svg>
+          Đổi IP
+        </button>
+        <button class="btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Xuất dữ liệu
+        </button>
+        <button class="btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
+          Nhập hàng loạt
+        </button>
+        <button class="btn danger-outline" id="btnDelete" disabled>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>
+          Xoá
+        </button>
+        <div class="toolbar-spacer"></div>
+        <div class="toolbar-search">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" placeholder="Lọc nhanh trong bảng…">
+        </div>
+        <button class="btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16l-6 8v6l-4 2v-8z"/></svg>
+          Bộ lọc
+        </button>
+      </div>
+
+      <div class="chips-row">
+        <span class="chip">Trạng thái kết nối: Trực tuyến <button aria-label="Gỡ lọc"><svg class="icon" style="width:10px;height:10px" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>
+        <button class="clear-all" id="clearChip">Xoá bộ lọc</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="device-table" id="deviceTable">
+          <thead>
+            <tr>
+              <th class="col-check"><input type="checkbox" class="row-check" id="selectAll"></th>
+              <th class="col-ch"><span class="th-inner">Kênh <svg class="icon" style="width:11px;height:11px" viewBox="0 0 24 24"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"/></svg></span></th>
+              <th>Trạng thái kết nối</th>
+              <th>Trạng thái ghi hình</th>
+              <th><span class="th-inner">Tên kênh <svg class="icon" style="width:11px;height:11px" viewBox="0 0 24 24"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"/></svg></span></th>
+              <th>Địa chỉ IP</th>
+              <th>Số đăng ký</th>
+              <th>Cổng</th>
+              <th>Tài khoản</th>
+              <th>Mật khẩu</th>
+              <th>Hãng sản xuất</th>
+              <th>Model</th>
+              <th>SN</th>
+              <th>Kênh remote</th>
+              <th class="col-op">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH01</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Cổng chính KCN Bắc Thăng Long</td>
+              <td class="ip mono">10.20.14.101</td>
+              <td class="mono">REG-081402</td>
+              <td class="num mono">37777</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">VNPT AI Cam</span></td>
+              <td class="mono">VAI-4MP-IR30</td>
+              <td class="mono">VNPTAI24081101</td>
+              <td class="num mono">1</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH02</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Cổng phụ số 2 KCN Bắc Thăng Long</td>
+              <td class="ip mono">10.20.14.102</td>
+              <td class="mono">REG-081403</td>
+              <td class="num mono">37777</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">VNPT AI Cam</span></td>
+              <td class="mono">VAI-4MP-IR30</td>
+              <td class="mono">VNPTAI24081102</td>
+              <td class="num mono">1</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr class="row-selected">
+              <td class="col-check"><input type="checkbox" class="row-check" checked></td>
+              <td class="col-ch mono">CH03</td>
+              <td><span class="status-pill pill-warn"><span class="dot"></span>Đang xuống cấp</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Ngã tư Nguyễn Trãi – Khuất Duy Tiến</td>
+              <td class="ip mono">10.20.22.14</td>
+              <td class="mono">REG-092210</td>
+              <td class="num mono">554</td>
+              <td class="mono">noc_vnpt</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">ONVIF chuẩn chung</span></td>
+              <td class="mono">IPC-2MP-B</td>
+              <td class="mono">ONVIF22091417</td>
+              <td class="num mono">2</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH04</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-muted"><span class="dot"></span>Không ghi</span></td>
+              <td class="name-cell">Camera Bãi đỗ xe tải Khu B</td>
+              <td class="ip mono">10.20.14.118</td>
+              <td class="mono">--</td>
+              <td class="num mono">37777</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">VNPT AI Cam</span></td>
+              <td class="mono">VAI-2MP-DOME</td>
+              <td class="mono">VNPTAI24081118</td>
+              <td class="num mono">1</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH05</td>
+              <td><span class="status-pill pill-off"><span class="dot"></span>Mất kết nối</span></td>
+              <td><span class="status-pill pill-off"><span class="dot"></span>Lỗi lưu trữ</span></td>
+              <td class="name-cell">Camera Hành lang kho vận trung tâm</td>
+              <td class="ip mono">10.20.14.126</td>
+              <td class="mono">REG-081426</td>
+              <td class="num mono">37777</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">VNPT AI Cam</span></td>
+              <td class="mono">VAI-4MP-IR30</td>
+              <td class="mono">VNPTAI24081126</td>
+              <td class="num mono">1</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH06</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Trạm biến áp T1</td>
+              <td class="ip mono">10.20.18.40</td>
+              <td class="mono">REG-091840</td>
+              <td class="num mono">8000</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">Camera IP thế hệ 2</span></td>
+              <td class="mono">CIP-8MP-PTZ</td>
+              <td class="mono">GEN2-09184012</td>
+              <td class="num mono">4</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH07</td>
+              <td><span class="status-pill pill-fail"><span class="dot"></span>Kết nối thất bại</span></td>
+              <td><span class="status-pill pill-muted"><span class="dot"></span>Không ghi</span></td>
+              <td class="name-cell">Camera Nút giao Phạm Văn Đồng – Hoàng Quốc Việt</td>
+              <td class="ip mono">10.20.22.55</td>
+              <td class="mono">REG-092255</td>
+              <td class="num mono">554</td>
+              <td class="mono">noc_vnpt</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">ONVIF chuẩn chung</span></td>
+              <td class="mono">IPC-2MP-B</td>
+              <td class="mono">ONVIF22092255</td>
+              <td class="num mono">2</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH08</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Cầu vượt Mai Dịch</td>
+              <td class="ip mono">10.20.22.61</td>
+              <td class="mono">REG-092261</td>
+              <td class="num mono">554</td>
+              <td class="mono">noc_vnpt</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">ONVIF chuẩn chung</span></td>
+              <td class="mono">IPC-4MP-B</td>
+              <td class="mono">ONVIF22092261</td>
+              <td class="num mono">2</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH09</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Sảnh chính toà nhà điều hành</td>
+              <td class="ip mono">10.20.14.140</td>
+              <td class="mono">--</td>
+              <td class="num mono">37777</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">VNPT AI Cam</span></td>
+              <td class="mono">VAI-4MP-IR30</td>
+              <td class="mono">VNPTAI24081140</td>
+              <td class="num mono">1</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH10</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-off"><span class="dot"></span>Lỗi lưu trữ</span></td>
+              <td class="name-cell">Camera Khu vực xử lý nước thải</td>
+              <td class="ip mono">10.20.18.52</td>
+              <td class="mono">REG-091852</td>
+              <td class="num mono">8000</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">Camera IP thế hệ 2</span></td>
+              <td class="mono">CIP-4MP-BOX</td>
+              <td class="mono">GEN2-09185207</td>
+              <td class="num mono">3</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH11</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Cổng số 5 – Khu công nghệ cao Hoà Lạc</td>
+              <td class="ip mono">10.20.31.10</td>
+              <td class="mono">REG-093110</td>
+              <td class="num mono">37777</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">VNPT AI Cam</span></td>
+              <td class="mono">VAI-4MP-IR30</td>
+              <td class="mono">VNPTAI24093110</td>
+              <td class="num mono">1</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH12</td>
+              <td><span class="status-pill pill-warn"><span class="dot"></span>Đang xuống cấp</span></td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Đang ghi</span></td>
+              <td class="name-cell">Camera Trục đường Võ Chí Công</td>
+              <td class="ip mono">10.20.22.77</td>
+              <td class="mono">REG-092277</td>
+              <td class="num mono">554</td>
+              <td class="mono">noc_vnpt</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">ONVIF chuẩn chung</span></td>
+              <td class="mono">IPC-2MP-B</td>
+              <td class="mono">ONVIF22092277</td>
+              <td class="num mono">2</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH13</td>
+              <td><span class="status-pill pill-ok"><span class="dot"></span>Trực tuyến</span></td>
+              <td><span class="status-pill pill-muted"><span class="dot"></span>Không ghi</span></td>
+              <td class="name-cell">Camera Nhà xe cán bộ</td>
+              <td class="ip mono">10.20.14.155</td>
+              <td class="mono">--</td>
+              <td class="num mono">37777</td>
+              <td class="mono">admin</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">VNPT AI Cam</span></td>
+              <td class="mono">VAI-2MP-DOME</td>
+              <td class="mono">VNPTAI24081155</td>
+              <td class="num mono">1</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+            <tr>
+              <td class="col-check"><input type="checkbox" class="row-check"></td>
+              <td class="col-ch mono">CH14</td>
+              <td><span class="status-pill pill-off"><span class="dot"></span>Mất kết nối</span></td>
+              <td><span class="status-pill pill-muted"><span class="dot"></span>Không ghi</span></td>
+              <td class="name-cell">Camera Vòng xuyến Cầu Giấy</td>
+              <td class="ip mono">10.20.22.90</td>
+              <td class="mono">REG-092290</td>
+              <td class="num mono">554</td>
+              <td class="mono">noc_vnpt</td>
+              <td><span class="pw-cell"><span class="pw-mask">••••••••</span><button class="pw-toggle" title="Hiện mật khẩu"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button></span></td>
+              <td><span class="mfr-tag">ONVIF chuẩn chung</span></td>
+              <td class="mono">IPC-4MP-B</td>
+              <td class="mono">ONVIF22092290</td>
+              <td class="num mono">2</td>
+              <td class="col-op"><span class="op-links"><button class="edit">Sửa</button><button class="del">Xoá</button></span></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <span class="total mono">Tổng 47 kênh</span>
+        <span>·</span>
+        <span class="mono">Hiển thị 1–14</span>
+        <div class="pagination-spacer"></div>
+        <button class="page-btn"><svg class="icon" style="width:12px;height:12px" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button class="page-btn active mono">1</button>
+        <button class="page-btn mono">2</button>
+        <button class="page-btn mono">3</button>
+        <button class="page-btn mono">4</button>
+        <button class="page-btn"><svg class="icon" style="width:12px;height:12px" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+        <select class="page-size mono">
+          <option>14 / trang</option>
+          <option>30 / trang</option>
+          <option>50 / trang</option>
+        </select>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============ Modal: Thêm thiết bị ============ -->
+<div class="modal-overlay" id="addDeviceModal">
+  <div class="modal modal-add">
+    <div class="modal-head">
+      <h3>Thêm thiết bị</h3>
+      <button class="modal-close" data-close="addDeviceModal">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-quick">Quét nhanh</button>
+      <button class="tab-btn" data-tab="tab-manual">Nhập tay</button>
+      <button class="tab-btn" data-tab="tab-rtsp">RTSP</button>
+      <button class="tab-btn" data-tab="tab-batch">Nhập hàng loạt</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Tab: Quét nhanh -->
+      <div class="tab-panel active" id="tab-quick">
+        <div class="quick-toolbar">
+          <button class="btn primary" id="btnStartSearch">
+            <svg class="icon" viewBox="0 0 24 24" stroke="white"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            Bắt đầu quét
+          </button>
+          <div class="pw-input">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input type="password" placeholder="Mật khẩu kết nối" value="••••••••">
+          </div>
+          <button class="btn" disabled>Khởi tạo</button>
+          <button class="btn">Đổi IP</button>
+          <div class="toolbar-spacer"></div>
+          <button class="btn">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16l-6 8v6l-4 2v-8z"/></svg>
+            Bộ lọc
+          </button>
+        </div>
+
+        <div class="scan-table-wrap">
+          <table class="scan-table">
+            <thead>
+              <tr>
+                <th style="width:32px"><input type="checkbox" class="row-check"></th>
+                <th>Trạng thái khởi tạo</th>
+                <th>Địa chỉ IP</th>
+                <th>Model thiết bị</th>
+                <th>Hãng sản xuất</th>
+                <th>Cổng</th>
+                <th>Loại sản phẩm</th>
+                <th>SN</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><span class="init-badge init-ok">Đã khởi tạo</span></td>
+                <td class="mono">10.20.14.201</td>
+                <td class="mono">VAI-4MP-IR30</td>
+                <td>VNPT AI Cam</td>
+                <td class="mono">37777</td>
+                <td>IVSS</td>
+                <td class="mono">VNPTAI24081201</td>
+                <td><span class="scan-op"><button title="Cấu hình"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button><button title="Xem trước"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg></button></span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" checked></td>
+                <td><span class="init-badge init-ok">Đã khởi tạo</span></td>
+                <td class="mono">10.20.14.202</td>
+                <td class="mono">VMS V8</td>
+                <td>VNPT AI Cam</td>
+                <td class="mono">10443</td>
+                <td>IVSS</td>
+                <td class="mono">VNPTAI24081202</td>
+                <td><span class="scan-op"><button title="Cấu hình"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button><button title="Xem trước"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg></button></span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><span class="init-badge init-pending">Chưa khởi tạo</span></td>
+                <td class="mono">10.20.14.203</td>
+                <td class="mono">IPC-2MP-B</td>
+                <td>ONVIF chuẩn chung</td>
+                <td class="mono">80</td>
+                <td>Camera IP</td>
+                <td class="mono">ONVIF22081203</td>
+                <td><span class="scan-op"><button title="Cấu hình"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button><button title="Xem trước"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg></button></span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><span class="init-badge init-fail">Khởi tạo thất bại</span></td>
+                <td class="mono">10.20.14.204</td>
+                <td class="mono">CIP-4MP-BOX</td>
+                <td>Camera IP thế hệ 2</td>
+                <td class="mono">8000</td>
+                <td>Camera IP</td>
+                <td class="mono">GEN2-08120409</td>
+                <td><span class="scan-op"><button title="Cấu hình"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button><button title="Xem trước"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg></button></span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><span class="init-badge init-ok">Đã khởi tạo</span></td>
+                <td class="mono">10.20.14.205</td>
+                <td class="mono">VAI-4MP-IR30</td>
+                <td>VNPT AI Cam</td>
+                <td class="mono">37777</td>
+                <td>IVSS</td>
+                <td class="mono">VNPTAI24081205</td>
+                <td><span class="scan-op"><button title="Cấu hình"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button><button title="Xem trước"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg></button></span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><span class="init-badge init-pending">Chưa khởi tạo</span></td>
+                <td class="mono">10.20.14.206</td>
+                <td class="mono">IPC-2MP-B</td>
+                <td>ONVIF chuẩn chung</td>
+                <td class="mono">80</td>
+                <td>Camera IP</td>
+                <td class="mono">ONVIF22081206</td>
+                <td><span class="scan-op"><button title="Cấu hình"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button><button title="Xem trước"><svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg></button></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:8px;font-size:11.5px;color:var(--text-muted)">Tổng 23 thiết bị được tìm thấy trong dải mạng 10.20.14.0/24, 10.20.22.0/24</div>
+      </div>
+
+      <!-- Tab: Nhập tay -->
+      <div class="tab-panel" id="tab-manual">
+        <div class="field-grid">
+          <div class="field"><label>Tên kênh</label><input type="text" placeholder="VD: Camera Cổng chính KCN Bắc Thăng Long"></div>
+          <div class="field"><label>Địa chỉ IP</label><input type="text" class="mono" placeholder="10.20.14.xxx"></div>
+          <div class="field"><label>Cổng</label><input type="text" class="mono" placeholder="37777"></div>
+          <div class="field">
+            <label>Giao thức</label>
+            <select><option>Riêng tư (Private)</option><option>ONVIF</option><option>ONVIFS</option></select>
+          </div>
+          <div class="field"><label>Tài khoản</label><input type="text" placeholder="admin"></div>
+          <div class="field"><label>Mật khẩu</label><input type="password" placeholder="••••••••"></div>
+          <div class="field span-2"><label>Số kênh remote</label><input type="text" class="mono" style="max-width:120px" value="1"></div>
+        </div>
+        <div class="hint">Kênh sẽ được thêm trực tiếp bằng thông tin nhập tay, không qua quét mạng — dùng cho thiết bị nằm ngoài dải mạng nội bộ NOC.</div>
+      </div>
+
+      <!-- Tab: RTSP -->
+      <div class="tab-panel" id="tab-rtsp">
+        <div class="field-grid">
+          <div class="field span-2"><label>Đường dẫn RTSP</label><input type="text" class="mono" placeholder="rtsp://10.20.14.101:554/cam/realmonitor?channel=1&subtype=0"></div>
+          <div class="field"><label>Tên kênh</label><input type="text" placeholder="VD: Camera Nút giao Phạm Văn Đồng"></div>
+          <div class="field"><label>Số kênh remote</label><input type="text" class="mono" value="1"></div>
+        </div>
+        <div class="hint">Dùng khi thiết bị chỉ lộ luồng RTSP công khai, không hỗ trợ giao thức riêng hoặc ONVIF discovery.</div>
+      </div>
+
+      <!-- Tab: Nhập hàng loạt -->
+      <div class="tab-panel" id="tab-batch">
+        <div class="batch-drop">
+          <svg class="icon" viewBox="0 0 24 24" style="width:26px;height:26px;color:var(--text-muted);margin-bottom:8px"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
+          <div><b>Chọn tệp</b> hoặc kéo thả tệp .xlsx vào đây</div>
+          <div class="fname">Chưa có tệp nào được chọn</div>
+        </div>
+        <div class="batch-template">
+          <a href="#"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Tải mẫu nhập .xlsx</a>
+          <span>· Tối đa 200 dòng / lần nhập</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <div class="bw-footer">
+        <span class="bw-label">Băng thông còn lại / Tổng băng thông</span>
+        <div class="kpi-bar"><span style="width:63%"></span></div>
+        <span class="bw-value mono">187,4/512 Mbps</span>
+      </div>
+      <button class="btn" data-close="addDeviceModal">Huỷ</button>
+      <button class="btn primary" data-close="addDeviceModal">Đồng ý</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Modal: Đổi IP ============ -->
+<div class="modal-overlay" id="modifyIpModal">
+  <div class="modal modal-ip">
+    <div class="modal-head">
+      <h3>Đổi địa chỉ IP</h3>
+      <button class="modal-close" data-close="modifyIpModal">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding-top:16px;padding-bottom:16px;">
+
+      <div class="ip-select-table">
+        <table>
+          <thead><tr><th>SN</th><th>Địa chỉ hiện tại</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">ONVIF22091417</td><td class="mono">10.20.22.14</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ip-form-grid">
+        <div>
+          <div class="field" style="margin-bottom:14px;">
+            <label>Static IP</label>
+            <div class="octet-group">
+              <input class="mono" maxlength="3" value="10"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="20"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="22"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="15">
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:14px;">
+            <label>Subnet Mask</label>
+            <div class="octet-group">
+              <input class="mono" maxlength="3" value="255"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="255"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="255"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="0">
+            </div>
+          </div>
+          <div class="field">
+            <label>Default Gateway</label>
+            <div class="octet-group">
+              <input class="mono" maxlength="3" value="10"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="20"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="22"><span class="octet-dot">.</span>
+              <input class="mono" maxlength="3" value="1">
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="field" style="margin-bottom:14px;">
+            <label>Giá trị tăng dần</label>
+            <input type="text" class="mono" value="1" style="max-width:90px">
+          </div>
+          <div class="field" style="margin-bottom:14px;">
+            <label>Tài khoản</label>
+            <input type="text" value="admin">
+          </div>
+          <div class="field">
+            <label>Mật khẩu</label>
+            <input type="password" value="••••••••">
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-callout">
+        <svg class="icon" viewBox="0 0 24 24" style="color:var(--amber)"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <span>Chức năng này chỉ hỗ trợ thiết bị remote kết nối qua giao thức riêng, ONVIF và ONVIFS. Thiết bị kết nối qua RTSP công khai cần đổi IP trực tiếp trên thiết bị.</span>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <div class="toolbar-spacer"></div>
+      <button class="btn" data-close="modifyIpModal">Huỷ</button>
+      <button class="btn primary" data-close="modifyIpModal">Tiếp theo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Modal open/close ----
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  document.getElementById('openAddDevice').addEventListener('click', () => openModal('addDeviceModal'));
+  document.getElementById('openModifyIp').addEventListener('click', () => openModal('modifyIpModal'));
+  document.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', () => closeModal(el.getAttribute('data-close')));
+  });
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+  });
+
+  // ---- Add Device tabs ----
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---- Row selection -> enable/disable Xoá ----
+  const table = document.getElementById('deviceTable');
+  const selectAll = document.getElementById('selectAll');
+  const deleteBtn = document.getElementById('btnDelete');
+  function rowChecks(){ return Array.from(table.querySelectorAll('tbody .row-check')); }
+  function syncDelete(){
+    const any = rowChecks().some(c => c.checked);
+    deleteBtn.disabled = !any;
+    rowChecks().forEach(c => c.closest('tr').classList.toggle('row-selected', c.checked));
+  }
+  table.querySelectorAll('tbody .row-check').forEach(c => c.addEventListener('change', syncDelete));
+  selectAll.addEventListener('change', () => {
+    rowChecks().forEach(c => c.checked = selectAll.checked);
+    syncDelete();
+  });
+  syncDelete();
+
+  // ---- Password mask toggle ----
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mask = btn.previousElementSibling;
+      if (mask.textContent.includes('•')) { mask.textContent = 'Aic#8271vt'; }
+      else { mask.textContent = '••••••••'; }
+    });
+  });
+
+  // ---- Chip removal ----
+  document.querySelectorAll('.chip button').forEach(btn => {
+    btn.addEventListener('click', () => btn.closest('.chip').remove());
+  });
+</script>
+
+</body>
+</html>

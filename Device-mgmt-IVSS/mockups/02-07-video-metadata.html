@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video metadata · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm tham chiếu: refs/02-van-hanh-ai/07-video-metadata/
+    - fig6-52_rule-config.png     → tab "Cấu hình quy tắc" (bảng quy tắc + vùng phát hiện)
+    - fig6-53_global-config.png   → tab "Cấu hình toàn cục" (đếm theo vạch kẻ)
+    - fig6-54_attribute-display.png → modal "Cấu hình hiển thị thuộc tính" (tab Người làm mặc định,
+      dùng chung pattern modal với 02-05-phat-hien-khuon-mat.html nhưng nội dung thuộc tính khác —
+      Người/Xe cơ giới/Xe thô sơ thay vì Khuôn mặt)
+    - fig6-55_ai-report.png       → tab "Báo cáo AI" (bảng thống kê tổng hợp theo thời gian)
+
+  Giả định thiết kế:
+  - Bảng "Báo cáo AI" dùng table.devices thay vì vẽ lại biểu đồ cột — đúng
+    triết lý Tufte của hệ thống (data-ink ratio), mỗi dòng có thanh mini-bar
+    (tái dùng .mb-track/.mb-fill) để giữ tính so sánh trực quan mà không cần
+    thư viện chart. Dữ liệu minh hoạ: lưu lượng camera Km12+400 cao tốc HN -
+    Hải Phòng tháng 08/2026, có một ngày lưu lượng tăng đột biến (nghỉ lễ
+    Quốc khánh 2/9 kéo dài khiến lượt xe/người tăng cao ngày cuối tuần liền kề).
+  - "Trích xuất đặc trưng nâng cao" (Extract Eigenvalue trong ảnh gốc) dịch
+    thành cấu hình toàn cục ảnh hưởng mọi quy tắc, đặt ở tab Cấu hình quy tắc
+    theo đúng vị trí trong ảnh gốc (góc phải bảng quy tắc).
+  - Vùng phát hiện/đếm dùng khung preview camera màu tối + placeholder vẽ
+    vùng (không dùng ảnh thật, không vẽ người/xe SVG).
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .page-tabs{display:flex;align-items:center;gap:4px;margin-bottom:14px;flex-wrap:wrap;}
+  .page-tabs .ptab{
+    appearance:none;border:1px solid var(--line-strong);background:var(--bg-soft);
+    color:var(--text-muted);font-family:inherit;font-size:12.5px;font-weight:700;
+    padding:8px 16px;cursor:pointer;border-radius:3px 3px 0 0;border-bottom:none;
+  }
+  .page-tabs .ptab.active{color:var(--primary);background:var(--bg);border-bottom:2px solid var(--bg);position:relative;top:1px;}
+  .page-tabs .fill{flex:1;}
+  .page-section{display:none;}
+  .page-section.active{display:block;}
+
+  .rule-table{width:100%;font-size:12.5px;border:1px solid var(--line);}
+  .rule-table thead th{background:var(--bg-soft);text-align:left;padding:9px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--text-muted);border-bottom:2px solid var(--navy);}
+  .rule-table tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  .rule-table tbody tr:last-child td{border-bottom:none;}
+  .toggle-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);}
+  .toggle-pill .dot{width:9px;height:9px;border-radius:50%;background:var(--line-strong);}
+  .toggle-pill.on .dot{background:var(--primary);}
+  .toggle-pill.on{color:var(--primary);font-weight:600;}
+
+  .cam-preview{aspect-ratio:16/10;background:#26313F;position:relative;display:flex;align-items:center;justify-content:center;color:#9FB0C4;font-size:12px;text-align:center;padding:16px;}
+  .cam-preview .draw-box{position:absolute;inset:10% 30%;border:2px dashed var(--accent2);}
+  .cam-preview .tripwire{position:absolute;left:18%;right:18%;top:52%;height:2px;background:var(--warning);}
+  .cam-preview .tripwire::before,.cam-preview .tripwire::after{content:"";position:absolute;top:-9px;width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;}
+  .cam-preview .pt-a{position:absolute;left:18%;top:calc(52% - 9px);width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .cam-preview .pt-b{position:absolute;right:18%;top:calc(52% - 9px);width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .cam-tools{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .cam-tools button{appearance:none;border:none;background:var(--bg);padding:9px;font-size:13px;cursor:pointer;color:var(--text-muted);}
+  .cam-tools button:hover{color:var(--primary);}
+  .cam-wrap{display:grid;grid-template-columns:1fr 36px;gap:0;max-width:520px;}
+
+  .rpt-filter{display:flex;align-items:flex-end;gap:14px;margin-bottom:16px;flex-wrap:wrap;}
+  .rpt-filter .field{max-width:200px;}
+  .granularity{display:flex;border:1px solid var(--line-strong);border-radius:3px;overflow:hidden;}
+  .granularity button{appearance:none;border:none;background:var(--bg);padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--text-muted);}
+  .granularity button.active{background:var(--primary);color:#fff;}
+
+  .rpt-bar{width:100%;}
+  .rpt-bar-track{position:relative;height:8px;background:var(--bg-soft2);}
+  .rpt-bar-fill{position:absolute;left:0;top:0;bottom:0;background:var(--primary);}
+  .rpt-bar-fill.spike{background:var(--warning);}
+
+  .attr-chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .attr-chip{border:1.5px solid var(--line-strong);padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;}
+  .attr-chip.on{border-color:var(--primary);color:var(--primary);}
+  .attr-chip.disabled{color:var(--text-faint);border-color:var(--line);cursor:not-allowed;}
+  .style-chip-row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px;}
+  .style-chip{border:1.5px solid var(--line-strong);padding:10px 12px;border-radius:4px;font-size:11.5px;color:var(--text-muted);cursor:pointer;min-width:180px;line-height:1.6;}
+  .style-chip.on{border-color:var(--primary);color:var(--navy);background:#F3F8FF;}
+  .style-chip b{display:block;color:var(--navy);font-size:12px;margin-bottom:2px;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Video metadata</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Video metadata</h1>
+        <span class="scope">Trích xuất siêu dữ liệu Người / Xe cơ giới / Xe thô sơ từ luồng video theo thời gian thực</span>
+      </div>
+
+      <div class="page-tabs">
+        <button class="ptab active" onclick="switchSection(event,'sec-rule')">Cấu hình quy tắc</button>
+        <button class="ptab" onclick="switchSection(event,'sec-global')">Cấu hình toàn cục</button>
+        <button class="ptab" onclick="switchSection(event,'sec-report')">Báo cáo AI</button>
+        <div class="fill"></div>
+        <button class="btn" onclick="openModal('modal-attr')">Cấu hình hiển thị thuộc tính</button>
+      </div>
+
+      <!-- ═══════════ SECTION: Cấu hình quy tắc ═══════════ -->
+      <div class="page-section active" id="sec-rule">
+        <div class="toolbar">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);"><input type="checkbox" checked> Bật video metadata</label>
+          <button class="btn btn-primary">＋ Thêm quy tắc</button>
+          <div class="fill"></div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-muted);"><input type="checkbox" checked> Trích xuất đặc trưng nâng cao (Eigenvalue)</label>
+        </div>
+
+        <table class="rule-table">
+          <thead>
+            <tr><th style="width:220px;">Tên quy tắc</th><th style="width:160px;">Bật</th><th style="width:200px;">Kèm nhận diện khuôn mặt</th><th>Loại cảnh báo</th><th style="width:60px;">Thao tác</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="chname">Phát hiện người</td>
+              <td><span class="toggle-pill on"><i class="dot"></i>Bật</span></td>
+              <td><span class="toggle-pill on"><i class="dot"></i>Bật</span></td>
+              <td>Tất cả</td>
+              <td><span class="op-link danger" title="Xoá">🗑</span></td>
+            </tr>
+            <tr>
+              <td class="chname">Phát hiện xe cơ giới</td>
+              <td><span class="toggle-pill on"><i class="dot"></i>Bật</span></td>
+              <td><span class="toggle-pill"><i class="dot"></i>Không áp dụng</span></td>
+              <td>Tất cả</td>
+              <td><span class="op-link danger" title="Xoá">🗑</span></td>
+            </tr>
+            <tr>
+              <td class="chname">Phát hiện xe thô sơ</td>
+              <td><span class="toggle-pill on"><i class="dot"></i>Bật</span></td>
+              <td><span class="toggle-pill on"><i class="dot"></i>Bật</span></td>
+              <td>Tất cả</td>
+              <td><span class="op-link danger" title="Xoá">🗑</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="card" style="margin-top:18px;">
+          <h2>Cài đặt vùng phát hiện</h2>
+          <div class="form-grid" style="grid-template-columns:auto 1fr;gap:22px;align-items:start;">
+            <div class="cam-wrap">
+              <div class="cam-preview">
+                <div class="draw-box"></div>
+                Xem trước camera<br>Km12+400 cao tốc HN - Hải Phòng
+              </div>
+              <div class="cam-tools">
+                <button title="Vẽ vùng phát hiện">▭</button>
+                <button title="Vùng lớn nhất">⬚</button>
+                <button title="Xoá vùng">🗑</button>
+              </div>
+            </div>
+            <div>
+              <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:16px;">
+                <input type="checkbox" style="width:auto;">
+                <label style="text-transform:none;font-weight:600;font-size:12.5px;color:var(--text);">Bật thống kê lưu lượng dòng xe</label>
+              </div>
+              <div class="form-grid" style="margin-bottom:14px;">
+                <div class="field">
+                  <label>Khu vực biển số</label>
+                  <select><option>Việt Nam</option><option>Châu Âu</option><option>Khác</option></select>
+                </div>
+                <div class="field">
+                  <label>Lịch áp dụng</label>
+                  <select><option>Lịch mặc định (24/7)</option></select>
+                </div>
+              </div>
+              <div class="notice-box" style="background:#E9F4FF;border:1px solid #BFE0FC;border-left:3px solid var(--accent2);padding:10px 13px;font-size:12px;color:#0A3D66;line-height:1.55;margin:0 0 14px;display:flex;gap:10px;">
+                <span>ⓘ</span><span>Cấu hình này áp dụng trực tiếp cho thiết bị và chỉ có hiệu lực sau khi hệ thống khởi động lại.</span>
+              </div>
+              <a class="op-link">＋ Thêm lịch mới</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-top:16px;">
+          <button class="btn btn-primary">Lưu</button>
+          <button class="btn">Làm mới</button>
+        </div>
+      </div>
+
+      <!-- ═══════════ SECTION: Cấu hình toàn cục ═══════════ -->
+      <div class="page-section" id="sec-global">
+        <div class="card">
+          <h2>Đếm theo vạch kẻ (Tripwire Counting)</h2>
+          <div class="form-grid" style="grid-template-columns:auto 1fr;gap:22px;align-items:start;">
+            <div class="cam-wrap">
+              <div class="cam-preview">
+                <span class="pt-a">A</span>
+                <div class="tripwire"></div>
+                <span class="pt-b">B</span>
+                Xem trước camera<br>Cổng chính KCN Bắc Thăng Long
+              </div>
+              <div class="cam-tools">
+                <button title="Kéo vạch kẻ">↔</button>
+              </div>
+            </div>
+            <div>
+              <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:16px;">
+                <input type="checkbox" checked style="width:auto;">
+                <label style="text-transform:none;font-weight:600;font-size:12.5px;color:var(--text);">Bật đếm theo vạch kẻ</label>
+              </div>
+              <div class="field" style="max-width:260px;">
+                <label>Hướng đếm</label>
+                <select>
+                  <option>A → B</option>
+                  <option>B → A</option>
+                  <option selected>Cả hai chiều</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-top:16px;">
+          <button class="btn btn-primary">Lưu</button>
+          <button class="btn">Làm mới</button>
+        </div>
+      </div>
+
+      <!-- ═══════════ SECTION: Báo cáo AI ═══════════ -->
+      <div class="page-section" id="sec-report">
+        <div class="rpt-filter">
+          <div class="field">
+            <label>Kênh</label>
+            <select><option>1 - Km12+400 cao tốc HN - Hải Phòng</option><option>2 - Cổng chính KCN Bắc Thăng Long</option></select>
+          </div>
+          <div class="field">
+            <label>Đối tượng</label>
+            <select><option>Tất cả</option><option>Người</option><option>Xe cơ giới</option><option>Xe thô sơ</option><option>Khuôn mặt</option></select>
+          </div>
+          <div class="field">
+            <label>Hướng</label>
+            <select><option>Không phân biệt</option><option>A → B</option><option>B → A</option></select>
+          </div>
+          <div class="field">
+            <label>Đơn vị thời gian</label>
+            <div class="granularity">
+              <button>Ngày</button>
+              <button class="active">Tháng</button>
+              <button>Năm</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Kỳ báo cáo</label>
+            <input type="text" value="2026-08">
+          </div>
+          <button class="btn btn-primary" style="height:35px;">Xem báo cáo</button>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <h2>Video metadata tháng 08/2026 — Km12+400 cao tốc HN - Hải Phòng</h2>
+          <div class="hint">Ngày 16/08 (Chủ nhật liền kề nghỉ lễ Quốc khánh 2/9) ghi nhận lưu lượng người/phương tiện tăng đột biến do dòng xe đổ về nút giao IC5.</div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices" style="min-width:920px;">
+            <thead>
+              <tr>
+                <th>Thời gian</th>
+                <th>Người</th>
+                <th>Xe cơ giới</th>
+                <th>Xe thô sơ</th>
+                <th>Tổng</th>
+                <th style="width:220px;">Tỷ trọng so với đỉnh tháng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="mono-cell tabular">10/08/2026</td><td class="tabular">137</td><td class="tabular">388</td><td class="tabular">170</td><td class="tabular"><b>695</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:11%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">11/08/2026</td><td class="tabular">204</td><td class="tabular">412</td><td class="tabular">158</td><td class="tabular"><b>774</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:12%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">12/08/2026</td><td class="tabular">189</td><td class="tabular">395</td><td class="tabular">146</td><td class="tabular"><b>730</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:12%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">13/08/2026</td><td class="tabular">221</td><td class="tabular">430</td><td class="tabular">183</td><td class="tabular"><b>834</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:13%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">14/08/2026</td><td class="tabular">198</td><td class="tabular">401</td><td class="tabular">162</td><td class="tabular"><b>761</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:12%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">15/08/2026</td><td class="tabular">276</td><td class="tabular">512</td><td class="tabular">209</td><td class="tabular"><b>997</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:16%"></span></div></td></tr>
+              <tr class="selected"><td class="mono-cell tabular">16/08/2026</td><td class="tabular">2.140</td><td class="tabular">3.520</td><td class="tabular">546</td><td class="tabular"><b>6.206</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill spike" style="width:100%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">17/08/2026</td><td class="tabular">312</td><td class="tabular">480</td><td class="tabular">190</td><td class="tabular"><b>982</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:16%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">18/08/2026</td><td class="tabular">175</td><td class="tabular">368</td><td class="tabular">151</td><td class="tabular"><b>694</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:11%"></span></div></td></tr>
+              <tr><td class="mono-cell tabular">19/08/2026</td><td class="tabular">160</td><td class="tabular">344</td><td class="tabular">139</td><td class="tabular"><b>643</b></td><td><div class="rpt-bar-track"><span class="rpt-bar-fill" style="width:10%"></span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-foot">
+          <span>Tổng cộng tháng 08/2026: <b class="tabular">14.316</b> lượt phát hiện — trung bình <b class="tabular">1.432</b> lượt/ngày</span>
+          <div class="pager">
+            <button disabled>‹</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>›</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════ MODAL: Cấu hình hiển thị thuộc tính ═══════════ -->
+  <div class="overlay" id="modal-attr">
+    <div class="modal w-wide">
+      <div class="modal-head">
+        <h2>Cấu hình hiển thị thuộc tính AI</h2>
+        <button class="x" onclick="closeModal('modal-attr')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tabs">
+          <button class="tab-btn" onclick="switchTab(event,'atab-face')">Khuôn mặt</button>
+          <button class="tab-btn active" onclick="switchTab(event,'atab-human')">Người</button>
+          <button class="tab-btn" onclick="switchTab(event,'atab-mv')">Xe cơ giới</button>
+          <button class="tab-btn" onclick="switchTab(event,'atab-nmv')">Xe thô sơ</button>
+        </div>
+
+        <div class="tab-panel" id="atab-face">
+          <div class="hint">Cấu hình thuộc tính hiển thị cho Khuôn mặt — xem chi tiết tại màn <b>Phát hiện khuôn mặt</b>.</div>
+        </div>
+
+        <div class="tab-panel active" id="atab-human">
+          <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:16px;">
+            <input type="checkbox" checked style="width:auto;">
+            <label style="text-transform:none;font-weight:600;font-size:13px;color:var(--text);">Bật cấu hình thuộc tính AI hiển thị trên khung nhận diện</label>
+          </div>
+
+          <h2 style="font-size:12.5px;">Kiểu khung hiển thị</h2>
+          <div class="style-chip-row">
+            <div class="style-chip on"><b>Phát hiện người</b>Tên camera + giờ, hiển thị bảng thuộc tính trang phục</div>
+            <div class="style-chip"><b>Phát hiện người — rút gọn</b>Tên + giờ, 2 khung ảnh so sánh</div>
+          </div>
+
+          <h2 style="font-size:12.5px;">Thuộc tính hiển thị (4/4)</h2>
+          <div class="attr-chip-row">
+            <span class="attr-chip disabled">Giới tính</span>
+            <span class="attr-chip disabled">Độ tuổi</span>
+            <span class="attr-chip on">Kiểu tay áo</span>
+            <span class="attr-chip on">Màu áo trên</span>
+            <span class="attr-chip on">Kiểu quần/váy</span>
+            <span class="attr-chip on">Màu quần/váy</span>
+            <span class="attr-chip disabled">Túi xách/balo</span>
+            <span class="attr-chip disabled">Ô dù</span>
+            <span class="attr-chip disabled">Áo mưa</span>
+            <span class="attr-chip disabled">Đội mũ</span>
+            <span class="attr-chip disabled">Kiểu tóc</span>
+            <span class="attr-chip disabled">Hướng di chuyển</span>
+            <span class="attr-chip disabled">Đang cầm vật</span>
+            <span class="attr-chip disabled">Che mặt</span>
+          </div>
+          <div class="hint" style="margin-top:8px;">Tối đa 4 thuộc tính hiển thị đồng thời trên khung nhận diện để đảm bảo hiệu năng xử lý thời gian thực.</div>
+        </div>
+
+        <div class="tab-panel" id="atab-mv">
+          <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:16px;">
+            <input type="checkbox" checked style="width:auto;">
+            <label style="text-transform:none;font-weight:600;font-size:13px;color:var(--text);">Bật cấu hình thuộc tính AI hiển thị trên khung nhận diện</label>
+          </div>
+          <h2 style="font-size:12.5px;">Thuộc tính hiển thị (3/4)</h2>
+          <div class="attr-chip-row">
+            <span class="attr-chip on">Loại phương tiện</span>
+            <span class="attr-chip on">Màu sơn</span>
+            <span class="attr-chip on">Biển số</span>
+            <span class="attr-chip disabled">Hãng xe</span>
+            <span class="attr-chip disabled">Hướng di chuyển</span>
+            <span class="attr-chip disabled">Tốc độ ước tính</span>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="atab-nmv">
+          <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:16px;">
+            <input type="checkbox" checked style="width:auto;">
+            <label style="text-transform:none;font-weight:600;font-size:13px;color:var(--text);">Bật cấu hình thuộc tính AI hiển thị trên khung nhận diện</label>
+          </div>
+          <h2 style="font-size:12.5px;">Thuộc tính hiển thị (2/4)</h2>
+          <div class="attr-chip-row">
+            <span class="attr-chip on">Loại xe thô sơ</span>
+            <span class="attr-chip on">Màu sắc</span>
+            <span class="attr-chip disabled">Có người lái</span>
+            <span class="attr-chip disabled">Hướng di chuyển</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-attr')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-attr')">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  function switchTab(ev, id){
+    const modal = ev.target.closest('.modal');
+    modal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    modal.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    modal.querySelector('#'+id).classList.add('active');
+  }
+
+  function switchSection(ev, id){
+    document.querySelectorAll('.page-tabs .ptab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page-section').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

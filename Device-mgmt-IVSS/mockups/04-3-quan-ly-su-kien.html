@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý sự kiện · Device-mgmt-IVSS</title>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  CẤU TRÚC ĐIỀU HƯỚNG ĐÃ CHỌN (đọc trước khi sửa)
+  ═══════════════════════════════════════════════════════════════════════
+  Nhóm màn "Quản lý sự kiện" (refs/04-cau-hinh/3-quan-ly-su-kien/, 18 ảnh)
+  được dựng thành 2 file, dùng chung 1 hàng TAB LỚN ở đầu trang để giữ
+  nhất quán điều hướng xuyên file:
+
+    Tab lớn 1 · Tổng quan            → sống ở FILE NÀY
+    Tab lớn 2 · Loại sự kiện thiết bị → sống ở FILE NÀY
+    Tab lớn 3 · Liên kết AI           → link sang 04-3b-lien-ket-ai-lich-truc.html#lienket-ai
+    Tab lớn 4 · Lịch trực & VPN       → link sang 04-3b-lien-ket-ai-lich-truc.html#lichtruc
+
+  Lý do tách 2 file: 18 ảnh tham khảo quy về 13 màn hình con, dựng đủ vào
+  1 file sẽ vượt >1500 dòng, khó demo/scroll. Chia theo "chiều dữ liệu":
+  file này = cấu hình NGƯỠNG PHÁT HIỆN cấp camera (không có luồng nhiều
+  bước), file kia = LUỒNG NHIỀU BƯỚC (wizard AI, gửi lệnh) + lịch/VPN cấp
+  hệ thống. Cả 2 tab lớn còn lại vẫn hiển thị trong hàng tab của file này
+  (dạng link), bấm vào sẽ điều hướng sang đúng tab tương ứng ở file kia —
+  người dùng luôn thấy đủ 4 tab lớn, không bị "mất phương hướng".
+
+  Trong mỗi tab lớn, cấp điều hướng thứ 2 là SUB-TAB dạng pill (class
+  .subnav mới, scoped riêng trong file này — không có trong shared.css)
+  để phân biệt rõ với tab lớn (dùng lại .tabs/.tab-btn có sẵn).
+
+  Tab lớn 2 "Loại sự kiện thiết bị" có thêm bộ CHỌN KÊNH thu gọn
+  (.chan-pick, scoped riêng) nằm bên trái mỗi form — phỏng theo đúng cách
+  fig8-39/fig8-40 gốc đặt cây kênh nhỏ NGAY TRONG bước cấu hình, thay vì
+  dùng lại .tree-pane toàn trang của màn neo "Quản lý thiết bị" (màn đó
+  là danh sách thiết bị nên cây theo ĐỊA BÀN; màn này là cấu hình theo
+  TỪNG KÊNH nên cây theo KÊNH — khác mục đích, không tái dùng .tree-pane
+  để tránh nhầm lẫn 2 loại cây).
+
+  GIẢ ĐỊNH:
+  - 8 kênh camera dùng lại NGUYÊN VĂN tên/IP đã có ở màn neo
+    04-cau-hinh-1-quan-ly-thiet-bi.html (Camera Cổng chính Toà nhà VNPT
+    Cầu Giấy, Camera Ngã tư Nguyễn Trãi..., v.v.) để dữ liệu nhất quán
+    xuyên toàn bộ mockup, không bịa thêm camera mới.
+  - fig8-52 và fig8-59 (2 ảnh "offline-alarm" gần giống nhau) gộp thành
+    1 form "Mất kết nối" duy nhất, có bổ sung 1 field "Thời gian xác
+    nhận mất kết nối" — ảnh gốc không có field ngưỡng thời gian tường
+    minh (chỉ vòng qua Event Linkage) nhưng spec yêu cầu "form ngưỡng
+    thời gian", nên thêm field hợp lý theo đúng hành vi NVR/IVSS thật.
+  - fig8-56 và fig8-60 (2 ảnh "alarm-in-port-1" khác nhau) dựng thành 2
+    cổng báo động trong cùng 1 form (Cổng báo động 1, Cổng báo động 2)
+    thay vì 2 màn riêng — đúng bản chất "nhiều cổng" đã nêu trong spec.
+  - "Phân tích chất lượng video" (fig8-55) không được xếp rõ vào tab lớn
+    nào trong đề bài gốc → xếp vào "Loại sự kiện thiết bị" vì cùng bản
+    chất "ngưỡng phát hiện cấp camera" như 5 mục còn lại của tab này.
+  - Không đưa resource-strip (bullet graph kênh/băng thông) vào màn này
+    — component đó đặc thù cho màn danh sách thiết bị, không liên quan
+    ngữ cảnh cấu hình sự kiện.
+  - Ảnh xem trước camera trong Phát hiện chuyển động / Cấu hình AI KHÔNG
+    dùng ảnh thật (refs/*.png cấm đưa vào mockup) và KHÔNG vẽ SVG giả
+    cảnh — dùng khung trừu tượng (gradient tối + lưới kẻ + nhãn) đúng
+    nguyên tắc "placeholder trung thực" của huashu-design.
+  ═══════════════════════════════════════════════════════════════════════
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ═══ Pattern mới, scoped riêng cho nhóm màn Quản lý sự kiện ═══ */
+
+  /* Hàng tab lớn — tái dùng .tabs/.tab-btn nhưng cỡ lớn hơn 1 chút để
+     phân biệt với sub-tab pill bên trong từng tab lớn */
+  .bigtabs{display:flex;gap:2px;border-bottom:2px solid var(--navy);margin-bottom:18px;}
+  .bigtabs a, .bigtabs button{
+    appearance:none;border:none;background:none;font-family:inherit;text-decoration:none;
+    padding:10px 6px;margin-right:26px;font-size:14px;font-weight:700;
+    color:var(--text-faint);cursor:pointer;border-bottom:3px solid transparent;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .bigtabs a.ext::after{content:"↗";font-size:11px;font-weight:600;color:var(--text-faint);}
+  .bigtabs .active{color:var(--primary);border-bottom-color:var(--primary);}
+  .bigtabs a:hover, .bigtabs button:hover{color:var(--primary);}
+  .bigpanel{display:none;}
+  .bigpanel.active{display:block;}
+
+  /* Sub-tab dạng pill trong 1 tab lớn */
+  .subnav{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .subnav button{
+    appearance:none;border:1px solid var(--line-strong);background:var(--bg);
+    color:var(--text-muted);font-family:inherit;font-size:12.5px;font-weight:600;
+    padding:7px 14px;border-radius:999px;cursor:pointer;
+  }
+  .subnav button.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .subnav button:hover:not(.active){border-color:var(--primary);color:var(--primary);}
+  .subpanel{display:none;}
+  .subpanel.active{display:block;}
+
+  /* Bố cục 1 form cấu hình theo kênh: chọn kênh thu gọn bên trái + form bên phải */
+  .cfg-layout{display:grid;grid-template-columns:230px 1fr;gap:0;border:1px solid var(--line);background:var(--bg);}
+  .chan-pick{border-right:1px solid var(--line);padding:12px;max-height:560px;overflow-y:auto;}
+  .chan-pick .cp-search{
+    width:100%;border:1px solid var(--line-strong);border-radius:3px;padding:6px 9px;
+    font-size:12px;font-family:inherit;margin-bottom:10px;
+  }
+  .chan-pick .cp-item{
+    display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:3px;cursor:pointer;
+    font-size:12px;color:var(--text);margin-bottom:2px;
+  }
+  .chan-pick .cp-item:hover{background:var(--bg-soft);}
+  .chan-pick .cp-item.active{background:#E9F0FC;color:var(--primary);font-weight:700;}
+  .chan-pick .cp-item .cp-dot{width:6px;height:6px;border-radius:50%;background:var(--primary);flex:none;}
+  .chan-pick .cp-item .cp-no{color:var(--text-faint);font-weight:600;width:16px;flex:none;}
+  .chan-pick .cp-item .cp-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cfg-form{padding:20px 24px;}
+  .cfg-form .scope-label{font-size:12px;color:var(--text-muted);margin-bottom:16px;}
+  .cfg-form .scope-label b{color:var(--primary);}
+
+  /* Khung xem trước camera — placeholder trừu tượng, KHÔNG phải ảnh thật */
+  .preview-box{
+    position:relative;height:220px;border:1px solid var(--line-strong);overflow:hidden;
+    background:linear-gradient(135deg,#0B1626,#182840);
+  }
+  .preview-box .grid-overlay{
+    position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),
+                      linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);
+    background-size:22px 22px;
+  }
+  .preview-box .region{position:absolute;border:2px solid var(--accent);background:rgba(0,179,255,.14);}
+  .preview-box .tag{
+    position:absolute;top:9px;left:10px;font-size:11px;font-weight:700;letter-spacing:.3px;
+    color:#fff;background:rgba(0,10,30,.55);padding:3px 9px;border-radius:3px;
+  }
+  .preview-box .hint{
+    position:absolute;bottom:9px;left:10px;right:10px;font-size:11px;color:rgba(255,255,255,.62);
+  }
+  .region-colors{display:flex;gap:8px;margin:12px 0;}
+  .region-colors i{width:22px;height:22px;border-radius:50%;display:inline-block;cursor:pointer;border:2px solid transparent;}
+  .region-colors i.rc-1{background:#D64545;}
+  .region-colors i.rc-2{background:#E0A429;}
+  .region-colors i.rc-3{background:#2E63C7;}
+  .region-colors i.rc-4{background:#2E9E5B;border-color:var(--navy);}
+
+  /* Slider hàng ngang: label trái, slider giữa, số phải */
+  .thresh-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;margin-top:10px;}
+  .thresh-row input[type=range]{width:100%;accent-color:var(--primary);}
+  .thresh-row .tr-val{width:46px;text-align:center;}
+
+  /* Cổng báo động — mini card lặp lại */
+  .port-card{border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin-bottom:14px;}
+  .port-card .pc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .port-card .pc-head .pc-title{font-size:13px;font-weight:700;color:var(--navy);}
+  .toggle{position:relative;display:inline-block;width:36px;height:20px;flex:none;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle .slider{position:absolute;inset:0;background:var(--line-strong);border-radius:20px;cursor:pointer;transition:.15s;}
+  .toggle .slider::before{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.3);}
+  .toggle input:checked + .slider{background:var(--primary);}
+  .toggle input:checked + .slider::before{transform:translateX(16px);}
+  .radio-row{display:flex;gap:20px;align-items:center;}
+  .radio-row label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text);cursor:pointer;}
+
+  .local-linkage{border-top:1px solid var(--line);margin-top:18px;padding-top:16px;}
+  .local-linkage h3{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--navy);margin:0 0 12px;}
+  .local-linkage .ll-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;}
+  .local-linkage .ll-row:last-child{border-bottom:none;}
+  .local-linkage .ll-row .ll-label{width:150px;font-weight:600;color:var(--text);}
+  .ll-enabled{color:#1D8A4E;font-weight:700;}
+
+  .actions-row{display:flex;gap:8px;margin-top:20px;}
+
+  /* Video quality analytics grid */
+  .vqa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px;}
+  .vqa-card{border:1px solid var(--line);border-radius:4px;padding:12px 14px;}
+  .vqa-card .vc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .vqa-card .vc-head .vc-name{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;}
+  .vqa-card .vc-icon{width:8px;height:8px;border-radius:50%;background:var(--primary);flex:none;}
+
+  /* Ma trận tổng quan — định nghĩa số cột riêng cho use-case này */
+  .matrix.evt-matrix{grid-template-columns:230px repeat(9,1fr);}
+  .evt-matrix .mx-cell{font-size:11.5px;}
+  .evt-matrix .mx-chan{font-weight:600;color:var(--text);}
+
+  @media (max-width:1180px){
+    .cfg-layout{grid-template-columns:1fr;}
+    .chan-pick{border-right:none;border-bottom:1px solid var(--line);max-height:none;}
+    .vqa-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Cấu hình &nbsp;/&nbsp; <b>Quản lý sự kiện</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane" style="padding:22px 28px 48px;">
+
+      <div class="panel-heading">
+        <h1>Quản lý sự kiện</h1>
+        <span class="scope">Cấu hình liên kết sự kiện, trí tuệ AI và ngưỡng phát hiện cho toàn hệ thống camera</span>
+      </div>
+
+      <!-- ═══════ TAB LỚN ═══════ -->
+      <nav class="bigtabs">
+        <button class="active" onclick="switchBig(event,'tab-overview')">Tổng quan</button>
+        <button onclick="switchBig(event,'tab-device-events')">Loại sự kiện thiết bị</button>
+        <a class="ext" href="04-3b-lien-ket-ai-lich-truc.html#lienket-ai">Liên kết AI</a>
+        <a class="ext" href="04-3b-lien-ket-ai-lich-truc.html#lichtruc">Lịch trực &amp; VPN</a>
+      </nav>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- TAB LỚN 1 · TỔNG QUAN (ma trận kênh × sự kiện) -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="bigpanel active" id="tab-overview">
+
+        <div class="card">
+          <h2>Ma trận liên kết sự kiện theo kênh</h2>
+          <p style="margin:-6px 0 16px;font-size:12px;color:var(--text-muted);">
+            Ô <span style="color:var(--primary);font-weight:700;">✓</span> = tính năng đang bật cho kênh đó.
+            Bấm vào tên kênh để mở nhanh cấu hình chi tiết ở tab "Loại sự kiện thiết bị".
+          </p>
+
+          <div class="matrix evt-matrix">
+            <div class="mx-cell mx-head" style="grid-column:1"></div>
+            <div class="mx-cell mx-head" style="grid-column:2/7;text-align:center;">Sự kiện thiết bị</div>
+            <div class="mx-cell mx-head" style="grid-column:7/11;text-align:center;">Trí tuệ AI</div>
+
+            <div class="mx-cell mx-head">Kênh</div>
+            <div class="mx-cell mx-head">Chuyển động</div>
+            <div class="mx-cell mx-head">Che giả mạo</div>
+            <div class="mx-cell mx-head">Cổng báo động</div>
+            <div class="mx-cell mx-head">Mất kết nối</div>
+            <div class="mx-cell mx-head">Không ổ đĩa</div>
+            <div class="mx-cell mx-head">Khuôn mặt</div>
+            <div class="mx-cell mx-head">Người</div>
+            <div class="mx-cell mx-head">Phương tiện</div>
+            <div class="mx-cell mx-head">Biển số</div>
+
+            <!-- Kênh 1 -->
+            <div class="mx-cell mx-chan">1 · Cổng chính Toà nhà Cầu Giấy</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div>
+
+            <!-- Kênh 2 -->
+            <div class="mx-cell mx-chan">2 · Ngã tư Nguyễn Trãi - Khuất Duy Tiến</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+
+            <!-- Kênh 3 -->
+            <div class="mx-cell mx-chan">3 · Sảnh chờ ga Cầu Giấy (BRT)</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div>
+
+            <!-- Kênh 4 -->
+            <div class="mx-cell mx-chan">4 · Vòng xuyến Cầu Giấy - Xuân Thuỷ</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+
+            <!-- Kênh 5 -->
+            <div class="mx-cell mx-chan">5 · Cổng chính KCN Bắc Thăng Long</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-on">✓</div>
+
+            <!-- Kênh 6 -->
+            <div class="mx-cell mx-chan">6 · Kho vận số 3</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div>
+
+            <!-- Kênh 7 -->
+            <div class="mx-cell mx-chan">7 · Trạm cân xe tải</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+            <div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div>
+
+            <!-- Kênh 8 -->
+            <div class="mx-cell mx-chan">8 · Bãi đỗ xe nhà máy Canon</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div>
+            <div class="mx-cell mx-off">–</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">–</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Ghi chú vận hành</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label>Tổng số kênh đang giám sát</label>
+              <div class="tabular" style="font-size:15px;font-weight:700;color:var(--navy);">8 / 2.418 kênh toàn hệ thống</div>
+              <div class="hint">Trang này minh hoạ 1 nhánh địa bàn (Cầu Giấy &amp; KCN Bắc Thăng Long) — xem toàn bộ ở màn Quản lý thiết bị.</div>
+            </div>
+            <div class="field">
+              <label>Kênh có cảnh báo AI chưa cấu hình</label>
+              <div class="tabular" style="font-size:15px;font-weight:700;color:var(--warning);">3 kênh</div>
+              <div class="hint">Chưa bật Nhận diện khuôn mặt hoặc Phát hiện phương tiện dù đủ điều kiện phần cứng.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════ -->
+      <!-- TAB LỚN 2 · LOẠI SỰ KIỆN THIẾT BỊ (ngưỡng cấp camera) -->
+      <!-- ═══════════════════════════════════════════════════ -->
+      <div class="bigpanel" id="tab-device-events">
+
+        <div class="subnav">
+          <button class="active" onclick="switchSub(event,'de','sub-motion')">Phát hiện chuyển động</button>
+          <button onclick="switchSub(event,'de','sub-tamper')">Giả mạo / che camera</button>
+          <button onclick="switchSub(event,'de','sub-alarmin')">Cổng báo động vào</button>
+          <button onclick="switchSub(event,'de','sub-offline')">Mất kết nối</button>
+          <button onclick="switchSub(event,'de','sub-nodisk')">Không có ổ đĩa</button>
+          <button onclick="switchSub(event,'de','sub-vqa')">Chất lượng video</button>
+        </div>
+
+        <!-- ─────── Phát hiện chuyển động ─────── -->
+        <div class="subpanel active" id="sub-motion">
+          <div class="cfg-layout">
+            <div class="chan-pick" data-group="motion">
+              <input class="cp-search" placeholder="Tìm theo tên kênh/IP">
+              <div class="cp-item active" onclick="pickChannel(this,'motion','1 · Camera Cổng chính Toà nhà VNPT Cầu Giấy')"><span class="cp-no">1</span><span class="cp-dot"></span><span class="cp-name">Cổng chính Toà nhà Cầu Giấy</span></div>
+              <div class="cp-item" onclick="pickChannel(this,'motion','2 · Camera Ngã tư Nguyễn Trãi - Khuất Duy Tiến')"><span class="cp-no">2</span><span class="cp-dot"></span><span class="cp-name">Ngã tư Nguyễn Trãi - KDT</span></div>
+              <div class="cp-item" onclick="pickChannel(this,'motion','3 · Camera Sảnh chờ ga Cầu Giấy (BRT)')"><span class="cp-no">3</span><span class="cp-dot"></span><span class="cp-name">Sảnh chờ ga Cầu Giấy</span></div>
+              <div class="cp-item" onclick="pickChannel(this,'motion','4 · Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ')"><span class="cp-no">4</span><span class="cp-dot"></span><span class="cp-name">Vòng xuyến Cầu Giấy - Xuân Thuỷ</span></div>
+              <div class="cp-item" onclick="pickChannel(this,'motion','5 · Camera Cổng chính KCN Bắc Thăng Long')"><span class="cp-no">5</span><span class="cp-dot"></span><span class="cp-name">Cổng chính KCN Bắc Thăng Long</span></div>
+              <div class="cp-item" onclick="pickChannel(this,'motion','6 · Camera Kho vận số 3')"><span class="cp-no">6</span><span class="cp-dot"></span><span class="cp-name">Kho vận số 3</span></div>
+              <div class="cp-item" onclick="pickChannel(this,'motion','7 · Camera Trạm cân xe tải')"><span class="cp-no">7</span><span class="cp-dot"></span><span class="cp-name">Trạm cân xe tải</span></div>
+              <div class="cp-item" onclick="pickChannel(this,'motion','8 · Camera Bãi đỗ xe nhà máy Canon')"><span class="cp-no">8</span><span class="cp-dot"></span><span class="cp-name">Bãi đỗ xe nhà máy Canon</span></div>
+            </div>
+            <div class="cfg-form">
+              <div class="scope-label">Đang cấu hình kênh: <b id="motion-scope">1 · Camera Cổng chính Toà nhà VNPT Cầu Giấy</b></div>
+
+              <div class="form-grid" style="margin-bottom:16px;">
+                <div class="field" style="flex-direction:row;align-items:center;gap:10px;">
+                  <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                  <label style="text-transform:none;font-size:13px;color:var(--text);">Bật phát hiện chuyển động</label>
+                </div>
+                <div class="field">
+                  <label>Độ trễ chống rung (anti-dither)</label>
+                  <input type="text" value="5"><span class="hint">Đơn vị giây, phạm vi 0–100s</span>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;">
+                <div>
+                  <div class="preview-box">
+                    <div class="grid-overlay"></div>
+                    <div class="region" style="left:8%;top:14%;width:46%;height:58%;"></div>
+                    <div class="tag">Kênh 1 · minh hoạ vùng phát hiện</div>
+                    <div class="hint">Placeholder trừu tượng — không dùng ảnh camera thật theo vùng cấm thương hiệu</div>
+                  </div>
+                  <div class="region-colors">
+                    <i class="rc-1" title="Vùng 1"></i><i class="rc-2" title="Vùng 2"></i>
+                    <i class="rc-3" title="Vùng 3"></i><i class="rc-4" title="Vùng 4 (đang chọn)"></i>
+                  </div>
+                </div>
+                <div>
+                  <div class="field" style="margin-bottom:12px;">
+                    <label>Tên vùng</label>
+                    <input type="text" value="Region1">
+                  </div>
+                  <div class="field">
+                    <label>Độ nhạy</label>
+                    <div class="thresh-row"><input type="range" min="0" max="100" value="60"><input class="tr-val" value="60"></div>
+                  </div>
+                  <div class="field" style="margin-top:12px;">
+                    <label>Ngưỡng thay đổi âm thanh</label>
+                    <div class="thresh-row"><input type="range" min="0" max="100" value="5"><input class="tr-val" value="5"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid" style="margin-top:18px;">
+                <div class="field">
+                  <label>Lịch áp dụng</label>
+                  <select><option>Lịch mặc định (24/7)</option><option>Giờ hành chính</option><option>Ngoài giờ hành chính</option></select>
+                </div>
+                <div class="field">
+                  <label>Liên kết sự kiện</label>
+                  <button class="btn">＋ Chọn</button>
+                </div>
+              </div>
+
+              <div class="local-linkage">
+                <h3>🔗 Liên kết cục bộ</h3>
+                <div class="ll-row">
+                  <span class="ll-label">Ghi hình</span>
+                  <span>Ghi thêm sau sự kiện</span>
+                  <input type="text" value="10" style="width:52px;border:1px solid var(--line-strong);border-radius:3px;padding:6px;text-align:center;">
+                  <span style="color:var(--text-faint);">giây (10–300s)</span>
+                  <span style="margin-left:8px;">Thiết bị:</span>
+                  <span class="badge b-init">1 - Kênh 1</span>
+                  <a class="op-link" style="margin-left:4px;">Bắt đầu ghi</a>
+                </div>
+              </div>
+
+              <div class="actions-row">
+                <button class="btn btn-primary">Lưu</button>
+                <button class="btn">Làm mới</button>
+                <button class="btn">Sao chép sang kênh khác</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── Giả mạo / che camera ─────── -->
+        <div class="subpanel" id="sub-tamper">
+          <div class="cfg-layout">
+            <div class="chan-pick">
+              <input class="cp-search" placeholder="Tìm theo tên kênh/IP">
+              <div class="cp-item active"><span class="cp-no">1</span><span class="cp-dot"></span><span class="cp-name">Cổng chính Toà nhà Cầu Giấy</span></div>
+              <div class="cp-item"><span class="cp-no">3</span><span class="cp-dot"></span><span class="cp-name">Sảnh chờ ga Cầu Giấy</span></div>
+              <div class="cp-item"><span class="cp-no">5</span><span class="cp-dot"></span><span class="cp-name">Cổng chính KCN Bắc Thăng Long</span></div>
+            </div>
+            <div class="cfg-form" style="max-width:560px;">
+              <div class="scope-label">Đang cấu hình kênh: <b>1 · Camera Cổng chính Toà nhà VNPT Cầu Giấy</b></div>
+
+              <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:18px;">
+                <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                <label style="text-transform:none;font-size:13px;color:var(--text);">Bật phát hiện giả mạo / che ống kính</label>
+              </div>
+
+              <div class="field" style="margin-bottom:18px;">
+                <label>Liên kết sự kiện</label>
+                <button class="btn">＋ Chọn</button>
+              </div>
+
+              <div class="local-linkage">
+                <h3>🔗 Liên kết cục bộ</h3>
+                <div class="ll-row"><span class="ll-label">Còi báo động</span><span class="ll-enabled">Đã bật</span></div>
+                <div class="ll-row"><span class="ll-label">Ghi nhật ký</span><span class="ll-enabled">Đã bật</span></div>
+              </div>
+
+              <div class="actions-row">
+                <button class="btn btn-primary">Lưu</button>
+                <button class="btn">Làm mới</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── Cổng báo động vào ─────── -->
+        <div class="subpanel" id="sub-alarmin">
+          <div class="cfg-layout">
+            <div class="chan-pick">
+              <input class="cp-search" placeholder="Tìm theo tên kênh/IP">
+              <div class="cp-item active"><span class="cp-no">5</span><span class="cp-dot"></span><span class="cp-name">Cổng chính KCN Bắc Thăng Long</span></div>
+              <div class="cp-item"><span class="cp-no">7</span><span class="cp-dot"></span><span class="cp-name">Trạm cân xe tải</span></div>
+            </div>
+            <div class="cfg-form">
+              <div class="scope-label">Đang cấu hình cổng báo động vật lý của kênh: <b>5 · Camera Cổng chính KCN Bắc Thăng Long</b> — thiết bị có 2 cổng alarm-in</div>
+
+              <div class="port-card">
+                <div class="pc-head">
+                  <span class="pc-title">Cổng báo động 1 — Barrier kiểm soát ra vào</span>
+                  <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+                <div class="form-grid">
+                  <div class="field"><label>Tên cổng</label><input type="text" value="Alarm In 1"></div>
+                  <div class="field">
+                    <label>Kiểu tiếp điểm</label>
+                    <div class="radio-row"><label><input type="radio" name="type1" checked> Thường mở (NO)</label><label><input type="radio" name="type1"> Thường đóng (NC)</label></div>
+                  </div>
+                  <div class="field"><label>Độ trễ chống rung</label><input type="text" value="5"><span class="hint">giây (0–600s)</span></div>
+                  <div class="field"><label>Lịch áp dụng</label><select><option>Lịch mặc định (24/7)</option></select></div>
+                  <div class="field"><label>Liên kết sự kiện</label><button class="btn">＋ Chọn</button></div>
+                </div>
+              </div>
+
+              <div class="port-card">
+                <div class="pc-head">
+                  <span class="pc-title">Cổng báo động 2 — Cảm biến cổng phụ</span>
+                  <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+                <div class="form-grid">
+                  <div class="field"><label>Tên cổng</label><input type="text" value="Alarm In 2_1"></div>
+                  <div class="field">
+                    <label>Kiểu tiếp điểm</label>
+                    <div class="radio-row"><label><input type="radio" name="type2" checked> Thường mở (NO)</label><label><input type="radio" name="type2"> Thường đóng (NC)</label></div>
+                  </div>
+                  <div class="field"><label>Độ trễ chống rung</label><input type="text" value="5"><span class="hint">giây (0–600s)</span></div>
+                  <div class="field"><label>Lịch áp dụng</label><select><option>Lịch mặc định (24/7)</option></select></div>
+                  <div class="field"><label>Liên kết sự kiện</label><button class="btn">＋ Chọn</button></div>
+                </div>
+              </div>
+
+              <div class="local-linkage">
+                <h3>🔗 Liên kết cục bộ (áp dụng chung)</h3>
+                <div class="ll-row"><span class="ll-label">Ghi nhật ký</span><span class="ll-enabled">Đã bật</span></div>
+              </div>
+
+              <div class="actions-row">
+                <button class="btn btn-primary">Lưu</button>
+                <button class="btn">Làm mới</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── Mất kết nối ─────── -->
+        <div class="subpanel" id="sub-offline">
+          <div class="cfg-layout">
+            <div class="chan-pick">
+              <input class="cp-search" placeholder="Tìm theo tên kênh/IP">
+              <div class="cp-item active"><span class="cp-no">3</span><span class="cp-dot"></span><span class="cp-name">Sảnh chờ ga Cầu Giấy</span></div>
+              <div class="cp-item"><span class="cp-no">6</span><span class="cp-dot"></span><span class="cp-name">Kho vận số 3</span></div>
+              <div class="cp-item"><span class="cp-no">8</span><span class="cp-dot"></span><span class="cp-name">Bãi đỗ xe nhà máy Canon</span></div>
+            </div>
+            <div class="cfg-form" style="max-width:560px;">
+              <div class="scope-label">Đang cấu hình kênh: <b>3 · Camera Sảnh chờ ga Cầu Giấy (BRT)</b> — hiện <span style="color:var(--text-muted);">Mất kết nối</span> theo bảng thiết bị</div>
+
+              <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:16px;">
+                <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                <label style="text-transform:none;font-size:13px;color:var(--text);">Bật cảnh báo mất kết nối</label>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Thời gian xác nhận mất kết nối</label>
+                  <input type="text" value="30"><span class="hint">giây (5–300s) — tránh báo động giả khi rớt mạng thoáng qua</span>
+                </div>
+                <div class="field">
+                  <label>Lịch áp dụng</label>
+                  <select><option>Lịch mặc định (24/7)</option></select>
+                </div>
+                <div class="field full">
+                  <label>Liên kết sự kiện</label>
+                  <button class="btn">＋ Chọn</button>
+                </div>
+              </div>
+
+              <div class="local-linkage">
+                <h3>🔗 Liên kết cục bộ</h3>
+                <div class="ll-row"><span class="ll-label">Ghi nhật ký</span><span class="ll-enabled">Đã bật</span></div>
+              </div>
+
+              <div class="actions-row">
+                <button class="btn btn-primary">Lưu</button>
+                <button class="btn">Làm mới</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── Không có ổ đĩa ─────── -->
+        <div class="subpanel" id="sub-nodisk">
+          <div class="cfg-layout">
+            <div class="chan-pick">
+              <input class="cp-search" placeholder="Tìm theo tên đầu ghi">
+              <div class="cp-item active"><span class="cp-no">•</span><span class="cp-dot"></span><span class="cp-name">Đầu ghi NVR-CG-01 (Cầu Giấy)</span></div>
+              <div class="cp-item"><span class="cp-no">•</span><span class="cp-dot"></span><span class="cp-name">Đầu ghi NVR-KCN-01 (Bắc Thăng Long)</span></div>
+            </div>
+            <div class="cfg-form" style="max-width:560px;">
+              <div class="scope-label">Đang cấu hình đầu ghi: <b>NVR-CG-01 (Cầu Giấy)</b></div>
+
+              <div class="warn-box" style="margin:0 0 16px;">
+                <span class="wi">ℹ</span>
+                <span>Trạng thái hiện tại: <b>đủ ổ đĩa lưu trữ</b> — 4/4 khay đang hoạt động bình thường.</span>
+              </div>
+
+              <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:18px;">
+                <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+                <label style="text-transform:none;font-size:13px;color:var(--text);">Bật cảnh báo khi không có ổ đĩa khả dụng</label>
+              </div>
+
+              <div class="field" style="margin-bottom:18px;">
+                <label>Liên kết sự kiện</label>
+                <button class="btn">＋ Chọn</button>
+              </div>
+
+              <div class="local-linkage">
+                <h3>🔗 Liên kết cục bộ</h3>
+                <div class="ll-row"><span class="ll-label">Còi báo động</span><span class="ll-enabled">Đã bật</span></div>
+                <div class="ll-row"><span class="ll-label">Ghi nhật ký</span><span class="ll-enabled">Đã bật</span></div>
+              </div>
+
+              <div class="actions-row">
+                <button class="btn btn-primary">Lưu</button>
+                <button class="btn">Làm mới</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────── Chất lượng video ─────── -->
+        <div class="subpanel" id="sub-vqa">
+          <div class="card">
+            <div class="field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:14px;">
+              <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+              <label style="text-transform:none;font-size:13px;color:var(--text);">Bật phân tích chất lượng video (AI theo đầu ghi)</label>
+            </div>
+
+            <div class="warn-box" style="margin-top:0;">
+              <span class="wi">⚠</span>
+              <span>Thang ngưỡng dùng chung: <b>Bình thường 0–20</b> · <b>Cảnh báo 20–50</b> · <b>Báo động 50–100</b>.</span>
+            </div>
+
+            <div class="vqa-grid">
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Che ống kính</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Đổi khung cảnh</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Rung hình</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="80"><input class="tr-val" value="80"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Nhiễu tín hiệu</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Nhiễu giao thoa</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Mất tín hiệu</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Đóng băng hình</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Phơi sáng quá mức</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="60"><input class="tr-val" value="60"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Hình mờ</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="80"><input class="tr-val" value="80"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Lệch màu</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Thay đổi đột ngột</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Tương phản thấp</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+              <div class="vqa-card"><div class="vc-head"><span class="vc-name"><i class="vc-icon"></i>Nhiễu tĩnh</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div><div class="thresh-row"><input type="range" min="0" max="100" value="50"><input class="tr-val" value="50"></div></div>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn btn-primary">Lưu</button>
+              <button class="btn">Làm mới</button>
+              <button class="btn">Sao chép sang kênh khác</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Danh sách kênh áp dụng (4)</h2>
+            <div class="table-scroll">
+              <table class="devices" style="min-width:0;">
+                <thead>
+                  <tr><th style="width:34px;"><input type="checkbox"></th><th>Kênh</th><th>Tên kênh</th><th>Địa chỉ IP</th><th>Mục chẩn đoán đang bật</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><input type="checkbox"></td><td class="tabular">1</td><td class="chname">Cổng chính Toà nhà Cầu Giấy</td><td class="mono-cell">10.20.14.11</td><td>Che ống kính, Đổi khung cảnh</td></tr>
+                  <tr><td><input type="checkbox"></td><td class="tabular">3</td><td class="chname">Sảnh chờ ga Cầu Giấy (BRT)</td><td class="mono-cell">10.20.14.33</td><td>Che ống kính, Phơi sáng quá mức</td></tr>
+                  <tr><td><input type="checkbox"></td><td class="tabular">5</td><td class="chname">Cổng chính KCN Bắc Thăng Long</td><td class="mono-cell">10.40.2.10</td><td>Che ống kính, Đổi khung cảnh, Hình mờ</td></tr>
+                  <tr><td><input type="checkbox"></td><td class="tabular">7</td><td class="chname">Trạm cân xe tải</td><td class="mono-cell">10.40.2.25</td><td>Che ống kính</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function switchBig(ev, id){
+    document.querySelectorAll('.bigtabs > button, .bigtabs > a').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.bigpanel').forEach(p=>p.classList.remove('active'));
+    ev.currentTarget.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  function switchSub(ev, group, id){
+    const nav = ev.currentTarget.closest('.subnav');
+    nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    ev.currentTarget.classList.add('active');
+    const container = nav.parentElement;
+    container.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function pickChannel(el, group, label){
+    const list = el.closest('.chan-pick');
+    list.querySelectorAll('.cp-item').forEach(i=>i.classList.remove('active'));
+    el.classList.add('active');
+    const scope = document.getElementById(group + '-scope');
+    if(scope) scope.textContent = label;
+  }
+</script>
+
+</body>
+</html>

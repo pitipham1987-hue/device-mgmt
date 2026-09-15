@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm 01-thiet-lap-ban-dau / 3-dang-nhap.
+  Nguồn tham chiếu cấu trúc (KHÔNG copy pixel-for-pixel):
+    refs/01-thiet-lap-ban-dau/3-dang-nhap/fig5-08_network-configuration.png
+    refs/01-thiet-lap-ban-dau/3-dang-nhap/p65_login-pc-client.png
+    refs/01-thiet-lap-ban-dau/3-dang-nhap/p66_login-web.png
+
+  Giả định: đây là màn TRƯỚC đăng nhập nên KHÔNG dùng topbar/tree-pane của
+  hệ thống thiết kế chính — chỉ dùng bảng màu/token/font chung qua
+  shared.css. Cấu hình mạng (fig5-08, NIC List) là bước kỹ thuật viên NOC
+  thực hiện tại hiện trường trước khi bàn giao thiết bị — dựng dạng modal
+  mở từ liên kết "Cấu hình mạng nâng cao" trên màn đăng nhập, không phải
+  trang riêng, đúng theo yêu cầu. Không dùng ảnh nền chụp thật — nền dựng
+  bằng CSS gradient/hoạ tiết lưới gợi hạ tầng giám sát. Toàn bộ token/
+  component kế thừa từ shared.css; phần khung đăng nhập tối màu và NIC
+  table viết scoped với tiền tố "lg-".
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  html,body{height:100%;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 18% 20%, rgba(0,179,255,.16), transparent 42%),
+      radial-gradient(circle at 82% 78%, rgba(0,71,187,.28), transparent 46%),
+      linear-gradient(160deg, var(--navy2) 0%, #001A47 45%, #061224 100%);
+    display:flex;flex-direction:column;
+  }
+
+  .lg-grid-overlay{
+    position:fixed;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:46px 46px;
+  }
+
+  .lg-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;position:relative;z-index:1;}
+  .lg-panel{width:100%;max-width:380px;}
+
+  .lg-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:26px;}
+  .lg-brand .mark{width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;}
+  .lg-brand .name{color:#fff;font-weight:800;font-size:16px;letter-spacing:.2px;}
+  .lg-brand .name small{display:block;font-weight:500;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:.6px;text-transform:uppercase;margin-top:1px;}
+
+  .lg-card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+    padding:28px 26px 24px;
+    backdrop-filter:blur(6px);
+  }
+  .lg-card h1{color:#fff;font-size:16px;font-weight:700;margin:0 0 3px;}
+  .lg-card .sub{color:rgba(255,255,255,.55);font-size:12px;margin-bottom:20px;}
+
+  .lg-field{margin-bottom:12px;}
+  .lg-field label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;}
+  .lg-input-row{position:relative;}
+  .lg-input-row .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4);font-size:13px;}
+  .lg-input-row input, .lg-input-row select{
+    width:100%;background:rgba(255,255,255,.94);border:1px solid transparent;border-radius:4px;
+    padding:10px 12px 10px 34px;font-size:13px;font-family:inherit;color:var(--text);
+  }
+  .lg-input-row select{padding-left:34px;-webkit-appearance:none;appearance:none;cursor:pointer;}
+  .lg-input-row .eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:13px;cursor:pointer;user-select:none;}
+  .lg-input-row input:focus, .lg-input-row select:focus{outline:2px solid var(--accent);border-color:var(--primary);}
+
+  .lg-row-between{display:flex;justify-content:space-between;align-items:center;margin:4px 0 18px;}
+  .lg-row-between .remember{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.7);}
+  .lg-row-between a{font-size:12px;color:var(--accent);text-decoration:none;}
+  .lg-row-between a:hover{text-decoration:underline;}
+
+  .lg-btn-login{
+    width:100%;background:var(--primary);color:#fff;border:none;border-radius:4px;
+    padding:12px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:.2px;
+  }
+  .lg-btn-login:hover{background:var(--primary-dark);}
+
+  .lg-advlink{text-align:center;margin-top:16px;}
+  .lg-advlink a{font-size:11.5px;color:rgba(255,255,255,.5);text-decoration:none;cursor:pointer;}
+  .lg-advlink a:hover{color:#fff;text-decoration:underline;}
+
+  .lg-foot{position:relative;z-index:1;padding:16px 20px;background:rgba(0,0,0,.28);border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;gap:10px;}
+  .lg-foot .dl-icon{width:16px;height:16px;background:rgba(255,255,255,.7);border-radius:2px;display:inline-block;}
+  .lg-foot span{color:rgba(255,255,255,.72);font-size:12px;}
+  .lg-foot a{color:#fff;font-weight:600;font-size:12px;text-decoration:none;}
+  .lg-foot a:hover{text-decoration:underline;}
+  .lg-ver{position:fixed;bottom:14px;right:18px;color:rgba(255,255,255,.32);font-size:10.5px;font-family:var(--mono);z-index:1;}
+
+  /* ───── NIC list modal (fig5-08) ───── */
+  .lg-nic-table{width:100%;font-size:12px;border:1px solid var(--line);}
+  .lg-nic-table th{background:var(--bg-soft);text-align:left;padding:8px 10px;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--text-muted);border-bottom:1px solid var(--line);white-space:nowrap;}
+  .lg-nic-table td{padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  .lg-nic-table tr.active td{background:#EDF3FC;}
+  .lg-nic-name{display:flex;align-items:center;gap:7px;}
+  .lg-nic-name .dot{width:7px;height:7px;border-radius:50%;background:var(--primary);}
+  .lg-nic-name .dot.off{background:var(--text-faint);}
+</style>
+</head>
+<body>
+
+  <div class="lg-grid-overlay"></div>
+
+  <div class="lg-wrap">
+    <div class="lg-panel">
+      <div class="lg-brand">
+        <span class="mark">AI</span>
+        <span class="name">VNPT AI<small>Device-mgmt-IVSS</small></span>
+      </div>
+
+      <div class="lg-card">
+        <h1>Đăng nhập hệ thống</h1>
+        <div class="sub">Trạm VNPT IVSS-16CH-AI-02 · 10.40.2.2</div>
+
+        <div class="lg-field">
+          <label>Tài khoản</label>
+          <div class="lg-input-row">
+            <span class="ic">◑</span>
+            <input type="text" value="admin">
+          </div>
+        </div>
+
+        <div class="lg-field">
+          <label>Mật khẩu</label>
+          <div class="lg-input-row">
+            <span class="ic">🔒</span>
+            <input type="password" value="••••••••••">
+            <span class="eye" onclick="togglePw(this)">👁</span>
+          </div>
+        </div>
+
+        <div class="lg-field">
+          <label>Giao thức kết nối</label>
+          <div class="lg-input-row">
+            <span class="ic">☰</span>
+            <select><option>TCP</option><option>UDP</option></select>
+          </div>
+        </div>
+
+        <div class="lg-row-between">
+          <label class="remember"><input type="checkbox" checked style="margin:0;"> Ghi nhớ đăng nhập</label>
+          <a href="#">Quên mật khẩu?</a>
+        </div>
+
+        <button class="lg-btn-login">Đăng nhập</button>
+
+        <div class="lg-advlink"><a onclick="openModal('modal-network')">Cấu hình mạng nâng cao trước khi đăng nhập</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lg-foot">
+    <span class="dl-icon"></span>
+    <span>Cần quản trị nhiều trạm cùng lúc? </span>
+    <a href="#">Tải VNPT AI PC Client</a>
+  </div>
+  <div class="lg-ver">Device-mgmt-IVSS · Firmware v7.220.0009 · build 2026-08-30</div>
+
+  <!-- ═══════════ MODAL: Cấu hình mạng ban đầu (fig5-08) ═══════════ -->
+  <div class="overlay" id="modal-network">
+    <div class="modal w-wide">
+      <div class="modal-head">
+        <h2>Cấu hình mạng ban đầu</h2>
+        <button class="x" onclick="closeModal('modal-network')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="panel-heading" style="margin-bottom:10px;">
+          <h1 style="font-size:13px;">Danh sách cổng mạng (NIC)</h1>
+        </div>
+        <div class="toolbar" style="justify-content:flex-end;">
+          <button class="btn">Bộ lọc ▾</button>
+        </div>
+
+        <table class="lg-nic-table">
+          <thead>
+            <tr><th>Tên cổng</th><th>Loại</th><th>DHCP</th><th>Địa chỉ IP</th><th>Subnet Mask</th><th>Địa chỉ MAC</th><th>Tốc độ</th><th>Thao tác</th></tr>
+          </thead>
+          <tbody>
+            <tr class="active">
+              <td><span class="lg-nic-name"><i class="dot"></i>NIC 1</span></td>
+              <td>Cổng Ethernet</td>
+              <td>Không</td>
+              <td class="mono-cell">10.40.2.2</td>
+              <td class="mono-cell">255.255.255.0</td>
+              <td class="mono-cell">3C:E1:A1:0B:22:9F</td>
+              <td>10M/100M/1000M tự thích ứng</td>
+              <td><a class="op-link">Sửa</a></td>
+            </tr>
+            <tr>
+              <td><span class="lg-nic-name"><i class="dot off"></i>NIC 2</span></td>
+              <td>Cổng Ethernet</td>
+              <td>Không</td>
+              <td class="mono-cell">—</td>
+              <td class="mono-cell">—</td>
+              <td class="mono-cell">3C:E1:A1:0B:22:A0</td>
+              <td>10M/100M/1000M tự thích ứng</td>
+              <td><a class="op-link">Sửa</a></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="form-grid" style="margin-top:18px;">
+          <div class="field">
+            <label>Cổng mặc định</label>
+            <select><option>NIC 1</option><option>NIC 2</option></select>
+            <span class="hint">Cổng này sẽ được dùng để kết nối mạng theo mặc định.</span>
+          </div>
+        </div>
+
+        <div class="qc-detail-head" style="margin:20px 0 4px;border-top:1px solid var(--line);padding-top:16px;">
+          <span style="font-size:13px;font-weight:700;color:var(--navy);">Cấu hình DNS</span>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Loại</label>
+            <select><option>IPv4</option><option>IPv6</option></select>
+          </div>
+          <div class="field">
+            <label>Địa chỉ máy chủ</label>
+            <div style="display:flex;gap:16px;padding-top:6px;font-size:12.5px;">
+              <label style="display:flex;align-items:center;gap:5px;"><input type="radio" name="dnstype"> DHCP</label>
+              <label style="display:flex;align-items:center;gap:5px;"><input type="radio" name="dnstype" checked> Tĩnh (Static)</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>DNS ưu tiên</label>
+            <div class="octet-group">
+              <input value="8"><span>.</span><input value="8"><span>.</span><input value="8"><span>.</span><input value="8">
+            </div>
+          </div>
+          <div class="field">
+            <label>DNS dự phòng</label>
+            <div class="octet-group">
+              <input value="1"><span>.</span><input value="1"><span>.</span><input value="1"><span>.</span><input value="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="warn-box">
+          <span class="wi">⚠</span>
+          <span>Thay đổi địa chỉ IP của NIC mặc định sẽ làm gián đoạn phiên quản trị hiện tại. Ghi lại địa chỉ mới trước khi áp dụng để tránh mất quyền truy cập.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-network')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-network')">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  function togglePw(el){
+    const input = el.previousElementSibling;
+    if(input.type === 'password'){ input.type='text'; el.style.opacity=1; }
+    else { input.type='password'; el.style.opacity=.7; }
+  }
+</script>
+
+</body>
+</html>

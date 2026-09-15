@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcuPick · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 03-acupick (tìm kiếm truy xuất theo đặc điểm).
+  Ảnh tham khảo: refs/02-van-hanh-ai/03-acupick/
+    fig6-08_tasks.png                — bảng cấu hình AI theo kênh (AI Config,
+      Event/Scheduled Snapshot) — dùng làm cơ sở cho khối "Bật AI theo đầu ghi".
+    fig6-09_enable-ai-by-recorder.png — bảng "AcuPick: AI by Camera / AI by
+      Recorder" theo từng kênh + banner ghi chú Metadata video tự bật kèm.
+    fig6-10..17 (auto-select.png / manually-select.png, 4 cặp) — khung hình
+      camera với khung nhận diện quanh người/xe máy/ô tô/khuôn mặt; "Auto
+      Select" tô khung tất cả đối tượng nổi bật, "Manually Select" cho vẽ/chọn
+      khung thủ công kèm thanh công cụ phóng to/theo dõi/cắt/xoay.
+
+  Kế thừa shared.css — 4 cặp chế độ dùng .tabs (Tự động chọn / Chọn thủ công)
+  đúng theo yêu cầu. Suy luận 4 loại đối tượng AcuPick từ nội dung khung hình
+  trong ảnh gốc (người đi bộ, xe máy, ô tô/biển số, khuôn mặt cận cảnh) ánh xạ
+  thành 4 danh mục: Người, Phương tiện, Khuôn mặt, Biển số xe — khớp các chức
+  năng AI đã liệt kê ở màn Tổng quan AI (02-01) và Tuần tra theo lịch (02-02).
+  Không vẽ ảnh khuôn mặt/biển số giả — khung hình dùng khối xám placeholder,
+  vùng phát hiện là khung viền có nhãn text thuần tuý.
+
+  Trang dài, có thanh điều hướng phụ (anchor link) để nhảy nhanh giữa các khối,
+  theo đúng lựa chọn "chia section trong 1 trang dài" được đề xuất trong spec.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* ── Pattern mới scoped riêng cho trang này ── */
+
+  .info-box{
+    display:flex;gap:10px;background:#E9F0FC;border:1px solid #C7D9F5;
+    border-left:3px solid var(--primary);padding:10px 13px;font-size:12px;
+    color:var(--navy2);line-height:1.55;margin-bottom:16px;
+  }
+  .info-box .wi{font-size:15px;flex:none;color:var(--primary);}
+
+  /* Sub-nav trong trang */
+  .subnav{
+    position:sticky;top:0;z-index:20;
+    display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);
+    border-radius:5px;padding:6px;margin-bottom:20px;flex-wrap:wrap;
+  }
+  .subnav a{
+    font-size:12px;font-weight:600;color:var(--text-muted);text-decoration:none;
+    padding:7px 12px;border-radius:3px;
+  }
+  .subnav a:hover{background:var(--bg-soft2);color:var(--primary);}
+  .subnav a.sn-primary{color:var(--primary);}
+
+  section.blk{margin-bottom:34px;scroll-margin-top:64px;}
+  section.blk .blk-h{
+    display:flex;align-items:baseline;gap:10px;margin-bottom:12px;
+  }
+  section.blk .blk-h h2{font-size:15px;font-weight:700;color:var(--navy);margin:0;}
+  section.blk .blk-h .blk-sub{font-size:12px;color:var(--text-muted);}
+
+  .acu-status-icon{font-weight:700;}
+  .acu-status-icon.ok{color:var(--primary);}
+  .acu-status-icon.off{color:var(--text-faint);}
+
+  /* Cặp thẻ Auto/Manual select cho từng loại đối tượng */
+  .acu-card{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:20px 22px;}
+  .acu-frame-shell{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-top:4px;}
+  @media (max-width:1180px){ .acu-frame-shell{grid-template-columns:1fr;} }
+
+  .acu-frame{
+    background:var(--navy);aspect-ratio:16/9;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.38);
+    font-size:11.5px;
+  }
+  .acu-frame .box{position:absolute;border:2px solid var(--accent);}
+  .acu-frame .box.auto{border-color:#3FD08C;}
+  .acu-frame .box .tag{
+    position:absolute;top:-19px;left:-2px;background:var(--accent);color:var(--navy);
+    font-size:9.5px;font-weight:700;padding:1px 5px;white-space:nowrap;
+  }
+  .acu-frame .box.auto .tag{background:#3FD08C;}
+  .acu-frame .box.picked{border-color:#FFC145;border-style:solid;}
+  .acu-frame .box.picked .tag{background:#FFC145;}
+
+  .acu-tools{
+    position:absolute;left:10px;bottom:10px;display:flex;gap:6px;
+  }
+  .acu-tools span{
+    width:24px;height:24px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);
+    border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;
+  }
+
+  .acu-target-list{font-size:12px;}
+  .acu-target-list .tgt-row{
+    display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);
+  }
+  .acu-target-list .tgt-row:last-child{border-bottom:none;}
+  .acu-target-list .tgt-thumb{
+    width:38px;height:38px;background:var(--bg-soft2);color:var(--text-faint);flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:9.5px;text-align:center;line-height:1.15;
+  }
+  .acu-target-list .tgt-meta{flex:1;min-width:0;}
+  .acu-target-list .tgt-meta .tm-main{font-weight:600;color:var(--text);display:block;}
+  .acu-target-list .tgt-meta .tm-sub{color:var(--text-faint);font-size:11px;}
+  .acu-target-list .tgt-conf{font-size:11px;color:var(--primary);font-weight:700;white-space:nowrap;}
+
+  .acu-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>AcuPick</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <!-- ═══════════ RESOURCE STRIP ═══════════ -->
+  <div class="resource-strip cols-3">
+    <div class="bullet">
+      <span class="b-label">Camera đã bật AcuPick</span>
+      <span class="b-track"><span class="b-fill" style="width:37.5%"></span></span>
+      <span class="b-figure tabular">6 <small>/ 16 kênh (NVR-BTL-03)</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Đối tượng thu thập hôm nay</span>
+      <span class="b-track"><span class="b-fill" style="width:64%"></span></span>
+      <span class="b-figure tabular">18.204 <small>lượt trích xuất</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Độ trễ xử lý trung bình</span>
+      <span class="b-track"><span class="b-fill" style="width:22%"></span></span>
+      <span class="b-figure tabular">180 ms <small>/ khung hình</small></span>
+    </div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>AcuPick — Trích xuất &amp; tìm kiếm theo đặc điểm</h1>
+        <span class="scope">Đầu ghi: <b>NVR-BTL-03 · KCN Bắc Thăng Long</b> — 16 kênh</span>
+      </div>
+
+      <nav class="subnav">
+        <a href="#blk-enable" class="sn-primary">① Bật AI theo đầu ghi</a>
+        <a href="#blk-person">② Người</a>
+        <a href="#blk-vehicle">③ Phương tiện</a>
+        <a href="#blk-face">④ Khuôn mặt</a>
+        <a href="#blk-plate">⑤ Biển số xe</a>
+      </nav>
+
+      <!-- ═══════════ 1. BẬT AI THEO ĐẦU GHI ═══════════ -->
+      <section class="blk" id="blk-enable">
+        <div class="blk-h"><h2>① Bật AI theo đầu ghi</h2><span class="blk-sub">Tham chiếu fig6-09 — bảng AcuPick theo Camera / theo Đầu ghi</span></div>
+
+        <div class="info-box">
+          <span class="wi">ⓘ</span>
+          <span>Sau khi bật <b>AcuPick theo đầu ghi</b>, chức năng <b>Metadata video</b> sẽ tự động được bật kèm theo cho cùng đầu ghi.</span>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices" style="min-width:900px;">
+            <thead>
+              <tr>
+                <th style="width:110px;">AcuPick<br><span style="font-weight:400;text-transform:none;">theo Camera</span></th>
+                <th style="width:110px;">AcuPick<br><span style="font-weight:400;text-transform:none;">theo Đầu ghi</span></th>
+                <th>Kênh</th>
+                <th>Trạng thái</th>
+                <th>Tên kênh</th>
+                <th>Địa chỉ IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align:center;"><input type="checkbox"></td>
+                <td style="text-align:center;"><input type="checkbox" checked></td>
+                <td class="tabular">1</td>
+                <td><span class="acu-status-icon ok">✓</span></td>
+                <td class="chname">Cổng chính KCN Bắc Thăng Long</td>
+                <td class="mono-cell">10.40.2.10</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><input type="checkbox"></td>
+                <td style="text-align:center;"><input type="checkbox" checked></td>
+                <td class="tabular">2</td>
+                <td><span class="acu-status-icon ok">✓</span></td>
+                <td class="chname">Kho vận số 3</td>
+                <td class="mono-cell">10.40.2.18</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><input type="checkbox"></td>
+                <td style="text-align:center;"><input type="checkbox"></td>
+                <td class="tabular">3</td>
+                <td><span class="acu-status-icon off">✕</span></td>
+                <td class="chname">Trạm cân xe tải</td>
+                <td class="mono-cell">10.40.2.25</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><input type="checkbox"></td>
+                <td style="text-align:center;"><input type="checkbox"></td>
+                <td class="tabular">4</td>
+                <td><span class="acu-status-icon ok">✓</span></td>
+                <td class="chname">Bãi đỗ xe nhà máy Canon</td>
+                <td class="mono-cell">10.40.2.31</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;"><input type="checkbox"></td>
+                <td style="text-align:center;"><input type="checkbox" checked></td>
+                <td class="tabular">5</td>
+                <td><span class="acu-status-icon ok">✓</span></td>
+                <td class="chname">Cổng phụ số 2</td>
+                <td class="mono-cell">10.40.2.36</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="toolbar" style="margin-top:14px;">
+          <button class="btn btn-primary">Áp dụng</button>
+          <button class="btn">Làm mới</button>
+        </div>
+      </section>
+
+      <!-- ═══════════ 2. NGƯỜI ═══════════ -->
+      <section class="blk" id="blk-person">
+        <div class="blk-h"><h2>② AcuPick — Người</h2><span class="blk-sub">Chọn đối tượng người trong khung hình để trích xuất đặc điểm phục vụ tìm kiếm</span></div>
+
+        <div class="acu-card">
+          <div class="tabs" style="margin-bottom:16px;">
+            <button class="tab-btn active" onclick="switchTab(event,'p-auto')">Tự động chọn</button>
+            <button class="tab-btn" onclick="switchTab(event,'p-manual')">Chọn thủ công</button>
+          </div>
+
+          <div class="tab-panel active" id="p-auto">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH1 — xem trước trực tiếp (placeholder)
+                <div class="box auto" style="left:8%;top:30%;width:16%;height:55%;"><span class="tag">Người · 96%</span></div>
+                <div class="box auto" style="left:30%;top:22%;width:15%;height:60%;"><span class="tag">Người · 91%</span></div>
+                <div class="box auto" style="left:52%;top:18%;width:14%;height:64%;"><span class="tag">Người · 88%</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Hệ thống tự động chọn <b style="color:var(--text);">3 đối tượng</b> có độ tin cậy cao nhất</div>
+                <div class="tgt-row"><span class="tgt-thumb">Ảnh<br>người</span><span class="tgt-meta"><span class="tm-main">Người #1</span><span class="tm-sub">Áo xanh công nhân, đội mũ bảo hộ</span></span><span class="tgt-conf">96%</span></div>
+                <div class="tgt-row"><span class="tgt-thumb">Ảnh<br>người</span><span class="tgt-meta"><span class="tm-main">Người #2</span><span class="tm-sub">Áo phản quang, không mũ bảo hộ</span></span><span class="tgt-conf">91%</span></div>
+                <div class="tgt-row"><span class="tgt-thumb">Ảnh<br>người</span><span class="tgt-meta"><span class="tm-main">Người #3</span><span class="tm-sub">Đồng phục bảo vệ, đeo khẩu trang</span></span><span class="tgt-conf">88%</span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Bỏ qua</button>
+              <button class="btn btn-primary">Áp dụng lựa chọn tự động</button>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="p-manual">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH1 — kéo để vẽ khung chọn (placeholder)
+                <div class="box" style="left:8%;top:30%;width:16%;height:55%;opacity:.4;"></div>
+                <div class="box picked" style="left:30%;top:22%;width:15%;height:60%;"><span class="tag">Đã chọn</span></div>
+                <div class="box" style="left:52%;top:18%;width:14%;height:64%;opacity:.4;"></div>
+                <div class="acu-tools"><span>🔍</span><span>⛶</span><span>✂</span><span>⟳</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Chọn <b style="color:var(--text);">1 đối tượng</b> để trích xuất đặc điểm thủ công</div>
+                <div class="tgt-row"><input type="checkbox"><span class="tgt-thumb">Ảnh<br>người</span><span class="tgt-meta"><span class="tm-main">Người #1</span><span class="tm-sub">Áo xanh công nhân, đội mũ bảo hộ</span></span></div>
+                <div class="tgt-row"><input type="checkbox" checked><span class="tgt-thumb">Ảnh<br>người</span><span class="tgt-meta"><span class="tm-main">Người #2</span><span class="tm-sub">Áo phản quang, không mũ bảo hộ</span></span></div>
+                <div class="tgt-row"><input type="checkbox"><span class="tgt-thumb">Ảnh<br>người</span><span class="tgt-meta"><span class="tm-main">Người #3</span><span class="tm-sub">Đồng phục bảo vệ, đeo khẩu trang</span></span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Huỷ</button>
+              <button class="btn btn-primary">Xác nhận lựa chọn thủ công</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ 3. PHƯƠNG TIỆN ═══════════ -->
+      <section class="blk" id="blk-vehicle">
+        <div class="blk-h"><h2>③ AcuPick — Phương tiện</h2><span class="blk-sub">Trích xuất đặc điểm xe máy, ô tô trong khung hình</span></div>
+
+        <div class="acu-card">
+          <div class="tabs" style="margin-bottom:16px;">
+            <button class="tab-btn active" onclick="switchTab(event,'v-auto')">Tự động chọn</button>
+            <button class="tab-btn" onclick="switchTab(event,'v-manual')">Chọn thủ công</button>
+          </div>
+
+          <div class="tab-panel active" id="v-auto">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH5 — xem trước trực tiếp (placeholder)
+                <div class="box auto" style="left:10%;top:35%;width:22%;height:45%;"><span class="tag">Xe máy · 94%</span></div>
+                <div class="box auto" style="left:55%;top:15%;width:34%;height:65%;"><span class="tag">Ô tô con · 97%</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Hệ thống tự động chọn <b style="color:var(--text);">2 phương tiện</b> nổi bật nhất</div>
+                <div class="tgt-row"><span class="tgt-thumb">Ảnh<br>xe</span><span class="tgt-meta"><span class="tm-main">Xe máy #1</span><span class="tm-sub">Màu đỏ, có 2 người ngồi</span></span><span class="tgt-conf">94%</span></div>
+                <div class="tgt-row"><span class="tgt-thumb">Ảnh<br>xe</span><span class="tgt-meta"><span class="tm-main">Ô tô con #1</span><span class="tm-sub">Màu bạc, sedan 4 cửa</span></span><span class="tgt-conf">97%</span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Bỏ qua</button>
+              <button class="btn btn-primary">Áp dụng lựa chọn tự động</button>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="v-manual">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH5 — kéo để vẽ khung chọn (placeholder)
+                <div class="box" style="left:10%;top:35%;width:22%;height:45%;opacity:.4;"></div>
+                <div class="box picked" style="left:55%;top:15%;width:34%;height:65%;"><span class="tag">Đã chọn</span></div>
+                <div class="acu-tools"><span>🔍</span><span>⛶</span><span>✂</span><span>⟳</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Chọn <b style="color:var(--text);">1 phương tiện</b> để trích xuất đặc điểm thủ công</div>
+                <div class="tgt-row"><input type="checkbox"><span class="tgt-thumb">Ảnh<br>xe</span><span class="tgt-meta"><span class="tm-main">Xe máy #1</span><span class="tm-sub">Màu đỏ, có 2 người ngồi</span></span></div>
+                <div class="tgt-row"><input type="checkbox" checked><span class="tgt-thumb">Ảnh<br>xe</span><span class="tgt-meta"><span class="tm-main">Ô tô con #1</span><span class="tm-sub">Màu bạc, sedan 4 cửa</span></span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Huỷ</button>
+              <button class="btn btn-primary">Xác nhận lựa chọn thủ công</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ 4. KHUÔN MẶT ═══════════ -->
+      <section class="blk" id="blk-face">
+        <div class="blk-h"><h2>④ AcuPick — Khuôn mặt</h2><span class="blk-sub">Trích xuất khuôn mặt cận cảnh phục vụ tìm kiếm, đối sánh danh sách đen</span></div>
+
+        <div class="acu-card">
+          <div class="tabs" style="margin-bottom:16px;">
+            <button class="tab-btn active" onclick="switchTab(event,'f-auto')">Tự động chọn</button>
+            <button class="tab-btn" onclick="switchTab(event,'f-manual')">Chọn thủ công</button>
+          </div>
+
+          <div class="tab-panel active" id="f-auto">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH1 — xem trước trực tiếp (placeholder)
+                <div class="box auto" style="left:38%;top:60%;width:8%;height:16%;"><span class="tag">Mặt · 92%</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Hệ thống tự động chọn <b style="color:var(--text);">1 khuôn mặt</b> rõ nét nhất trong khung</div>
+                <div class="tgt-row"><span class="tgt-thumb">Ảnh<br>mặt</span><span class="tgt-meta"><span class="tm-main">Khuôn mặt #1</span><span class="tm-sub">Nam, ước lượng ~30 tuổi, không khẩu trang</span></span><span class="tgt-conf">92%</span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Bỏ qua</button>
+              <button class="btn btn-primary">Áp dụng lựa chọn tự động</button>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="f-manual">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH1 — kéo để vẽ khung chọn (placeholder)
+                <div class="box picked" style="left:38%;top:60%;width:8%;height:16%;"><span class="tag">Đã chọn</span></div>
+                <div class="acu-tools"><span>🔍</span><span>⛶</span><span>✂</span><span>⟳</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Điều chỉnh khung, sau đó xác nhận trích xuất</div>
+                <div class="tgt-row"><input type="checkbox" checked><span class="tgt-thumb">Ảnh<br>mặt</span><span class="tgt-meta"><span class="tm-main">Khuôn mặt #1</span><span class="tm-sub">Nam, ước lượng ~30 tuổi, không khẩu trang</span></span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Huỷ</button>
+              <button class="btn btn-primary">Xác nhận lựa chọn thủ công</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ 5. BIỂN SỐ XE ═══════════ -->
+      <section class="blk" id="blk-plate">
+        <div class="blk-h"><h2>⑤ AcuPick — Biển số xe</h2><span class="blk-sub">Trích xuất biển số phục vụ tìm kiếm phương tiện, đối chiếu danh sách quan tâm</span></div>
+
+        <div class="acu-card">
+          <div class="tabs" style="margin-bottom:16px;">
+            <button class="tab-btn active" onclick="switchTab(event,'l-auto')">Tự động chọn</button>
+            <button class="tab-btn" onclick="switchTab(event,'l-manual')">Chọn thủ công</button>
+          </div>
+
+          <div class="tab-panel active" id="l-auto">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH5 — xem trước trực tiếp (placeholder)
+                <div class="box auto" style="left:60%;top:52%;width:16%;height:10%;"><span class="tag">Biển số · 95%</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Hệ thống tự động đọc <b style="color:var(--text);">1 biển số</b> rõ nét nhất trong khung</div>
+                <div class="tgt-row"><span class="tgt-thumb">Ảnh<br>biển số</span><span class="tgt-meta"><span class="tm-main">30A-123.45</span><span class="tm-sub">Ô tô con màu bạc</span></span><span class="tgt-conf">95%</span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Bỏ qua</button>
+              <button class="btn btn-primary">Áp dụng lựa chọn tự động</button>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="l-manual">
+            <div class="acu-frame-shell">
+              <div class="acu-frame">
+                Camera CH5 — kéo để vẽ khung chọn (placeholder)
+                <div class="box picked" style="left:60%;top:52%;width:16%;height:10%;"><span class="tag">Đã chọn</span></div>
+                <div class="acu-tools"><span>🔍</span><span>⛶</span><span>✂</span><span>⟳</span></div>
+              </div>
+              <div class="acu-target-list">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Điều chỉnh khung sát viền biển số, sau đó xác nhận</div>
+                <div class="tgt-row"><input type="checkbox" checked><span class="tgt-thumb">Ảnh<br>biển số</span><span class="tgt-meta"><span class="tm-main">30A-123.45</span><span class="tm-sub">Ô tô con màu bạc</span></span></div>
+              </div>
+            </div>
+            <div class="acu-actions">
+              <button class="btn">Huỷ</button>
+              <button class="btn btn-primary">Xác nhận lựa chọn thủ công</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  function switchTab(ev, id){
+    const card = ev.target.closest('.acu-card');
+    card.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    card.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    card.querySelector('#'+id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

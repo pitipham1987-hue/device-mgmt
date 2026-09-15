@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tuần tra theo lịch · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 02-tuan-tra-theo-lich.
+  Ảnh tham khảo: refs/02-van-hanh-ai/02-tuan-tra-theo-lich/
+    fig6-02_real-time-mode.png  — "AI by Recorder: Real-time Mode" — lưới thẻ
+      theo từng chức năng AI, mỗi thẻ liệt kê camera đã gán.
+    fig6-03_task-mode.png       — "Task Mode" — thanh Time Plan + chú giải
+      trạng thái Enabled/Overloaded/Disabled.
+    fig6-04, fig6-07_configure-the-task.png — wizard 2 bước "Select Channel →
+      AI Config" (cây chọn kênh + Tour Settings).
+    fig6-05_rule-configuration.png — form quy tắc: bảng "Add Rule", preview
+      camera có khung vẽ vùng, nhóm toggle phát hiện (Hat/Workwear/Face Mask
+      Detection) + First/Repeat Alarm Time + Sensitivity slider.
+    fig6-06_tasks.png — Time Plan dạng Gantt 24h theo từng chức năng AI.
+
+  Kế thừa shared.css — dùng .tabs cho 2 chế độ (thời gian thực / theo tác vụ),
+  .card + .form-grid cho form cấu hình quy tắc, table.devices cho danh sách
+  tác vụ. Không dựng canvas vẽ vùng phát hiện lên ảnh thật (không có ảnh thật) —
+  thay preview camera bằng khối placeholder xám có nhãn theo đúng nguyên tắc dự
+  án. Pattern mới (lưới thẻ AI theo chế độ thời gian thực, thanh mini-timeline
+  24h trong bảng tác vụ) định kiểu scoped trong file này.
+
+  Giả định: bối cảnh 1 đầu ghi NVR tại KCN Bắc Thăng Long, 16 kênh; danh mục
+  chức năng AI tham chiếu theo đúng 8 thẻ trong fig6-02 + bổ sung "Phát hiện an
+  toàn lao động (PPE)" làm ví dụ chính cho form cấu hình quy tắc, khớp fig6-05.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* ── Pattern mới scoped riêng cho trang này ── */
+
+  .info-box{
+    display:flex;gap:10px;background:#E9F0FC;border:1px solid #C7D9F5;
+    border-left:3px solid var(--primary);padding:10px 13px;font-size:12px;
+    color:var(--navy2);line-height:1.55;margin-bottom:16px;
+  }
+  .info-box .wi{font-size:15px;flex:none;color:var(--primary);}
+
+  .recorder-row{
+    display:flex;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap;
+  }
+  .recorder-row .field{max-width:340px;flex:1;min-width:220px;}
+  .recorder-row .rstat{font-size:12px;color:var(--text-muted);}
+  .recorder-row .rstat b{color:var(--text);}
+
+  /* Lưới thẻ chức năng AI — chế độ thời gian thực */
+  .ai-fn-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  }
+  @media (max-width:1180px){ .ai-fn-grid{grid-template-columns:repeat(2,1fr);} }
+  .ai-fn-card{background:var(--bg);border:1px solid var(--line);border-radius:5px;}
+  .ai-fn-card .fh{
+    display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);
+  }
+  .ai-fn-card .fh .ic{
+    width:26px;height:26px;border-radius:4px;background:#E9F0FC;color:var(--primary);
+    display:flex;align-items:center;justify-content:center;font-size:13px;flex:none;
+  }
+  .ai-fn-card .fh .ft{font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.3;}
+  .ai-fn-card .fb{padding:10px 14px 14px;min-height:76px;}
+  .ai-fn-card .cam-chip{
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:11.5px;padding:5px 0;border-bottom:1px dashed var(--line);color:var(--text);
+  }
+  .ai-fn-card .cam-chip:last-child{border-bottom:none;}
+  .ai-fn-card .cam-chip .cn{color:var(--text-faint);font-size:10.5px;}
+  .ai-fn-card .empty{color:var(--text-faint);font-size:11.5px;font-style:normal;}
+  .ai-fn-card .fmore{
+    display:block;margin-top:8px;font-size:11.5px;color:var(--primary);font-weight:600;cursor:pointer;
+  }
+
+  /* Bảng tác vụ — mini timeline 24h */
+  .task-legend{display:flex;gap:8px;align-items:center;}
+  .mini-timeline{position:relative;width:220px;height:16px;background:var(--bg-soft2);}
+  .mini-timeline .seg{position:absolute;top:0;bottom:0;background:var(--primary);}
+  .mini-timeline .seg.overload{background:#E8A4C5;}
+  .mini-timeline .seg.disabled{background:var(--text-faint);}
+  .mini-timeline .gridline{position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,.06);}
+  .tl-caption{font-size:10px;color:var(--text-faint);margin-top:3px;}
+
+  /* Modal wizard: chọn camera + form quy tắc */
+  .channel-picker{
+    border:1px solid var(--line);max-height:220px;overflow-y:auto;font-size:12px;
+  }
+  .channel-picker .cp-group{
+    background:var(--bg-soft);padding:6px 10px;font-weight:700;color:var(--navy);font-size:11px;
+    border-bottom:1px solid var(--line);
+  }
+  .channel-picker .cp-row{
+    display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);
+  }
+  .channel-picker .cp-row:last-child{border-bottom:none;}
+  .channel-picker .cp-row .cp-name{flex:1;}
+  .channel-picker .cp-row .cp-ip{color:var(--text-faint);font-family:var(--mono);font-size:11px;}
+
+  .toggle-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-top:4px;}
+  .toggle-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:9px 12px;border:1px solid var(--line);border-radius:3px;background:var(--bg-soft);
+  }
+  .toggle-item.on{border-color:#C7D9F5;background:#F3F7FE;}
+  .toggle-item .ti-label{font-size:12.5px;font-weight:600;color:var(--text);}
+  .switch{
+    position:relative;width:34px;height:19px;background:var(--line-strong);border-radius:10px;flex:none;
+  }
+  .switch.on{background:var(--primary);}
+  .switch i{
+    position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;
+    transition:left .15s;
+  }
+  .switch.on i{left:17px;}
+
+  .sens-row{display:flex;align-items:center;gap:12px;margin-top:14px;}
+  .sens-row input[type=range]{flex:1;accent-color:var(--primary);}
+  .sens-row .sens-val{
+    width:36px;text-align:center;font-weight:700;color:var(--navy);font-size:13px;
+  }
+
+  .preview-shell{display:grid;grid-template-columns:280px 1fr;gap:16px;margin-top:14px;}
+  .cam-preview{
+    background:var(--navy);aspect-ratio:16/10;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);
+    font-size:11.5px;
+  }
+  .cam-preview .zone{
+    position:absolute;border:2px dashed var(--accent);left:18%;top:22%;width:58%;height:52%;
+  }
+  .cam-preview .zone .zlabel{
+    position:absolute;top:-20px;left:0;background:var(--accent);color:var(--navy);
+    font-size:10px;font-weight:700;padding:2px 6px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Tuần tra theo lịch</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <!-- ═══════════ RESOURCE STRIP ═══════════ -->
+  <div class="resource-strip cols-3">
+    <div class="bullet">
+      <span class="b-label">Tác vụ đang bật</span>
+      <span class="b-track"><span class="b-fill" style="width:81%"></span></span>
+      <span class="b-figure tabular">13 <small>/ 16 tác vụ</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Camera đã gán tuần tra</span>
+      <span class="b-track"><span class="b-fill" style="width:56%"></span></span>
+      <span class="b-figure tabular">9 <small>/ 16 kênh (NVR-BTL-03)</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Tác vụ quá tải (Overloaded)</span>
+      <span class="b-track"><span class="b-fill" style="width:12.5%;background:#E8A4C5;"></span></span>
+      <span class="b-figure tabular">2 <small>cần giãn khung giờ</small></span>
+    </div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Tuần tra theo lịch</h1>
+        <span class="scope">AI theo đầu ghi — <b>NVR-BTL-03 · KCN Bắc Thăng Long</b></span>
+      </div>
+
+      <div class="recorder-row">
+        <div class="field">
+          <label>Chọn đầu ghi</label>
+          <select>
+            <option>NVR-BTL-03 · KCN Bắc Thăng Long (16 kênh)</option>
+            <option>NVR-CG-01 · Quận Cầu Giấy (32 kênh)</option>
+            <option>NVR-HP5B-02 · Cao tốc HN - Hải Phòng (24 kênh)</option>
+          </select>
+        </div>
+        <span class="rstat">Firmware <b>V7.100.0000027.0</b> · Dung lượng AI còn lại <b>6/16 kênh</b></span>
+      </div>
+
+      <!-- ═══════════ TABS: Thời gian thực / Theo tác vụ ═══════════ -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event,'tab-realtime')">Chế độ thời gian thực</button>
+        <button class="tab-btn" onclick="switchTab(event,'tab-taskmode')">Chế độ theo tác vụ</button>
+      </div>
+
+      <!-- ─────── TAB 1: THỜI GIAN THỰC ─────── -->
+      <div class="tab-panel active" id="tab-realtime">
+        <div class="info-box">
+          <span class="wi">ⓘ</span>
+          <span>Ở chế độ thời gian thực, chức năng AI chạy liên tục 24/7 trên các camera đã gán — không theo khung giờ. Dùng <b>Chế độ theo tác vụ</b> nếu cần lịch tuần tra riêng theo khung giờ.</span>
+        </div>
+
+        <div class="ai-fn-grid">
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">◎</span><span class="ft">Phát hiện khuôn mặt</span></div>
+            <div class="fb"><span class="empty">Chưa gán camera</span><span class="fmore">+ Gán camera</span></div>
+          </div>
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">✦</span><span class="ft">Nhận diện khuôn mặt</span></div>
+            <div class="fb">
+              <div class="cam-chip"><span>86 — Camera Cổng chính VNPT Cầu Giấy</span><span class="cn">Online</span></div>
+              <span class="fmore">+ Gán thêm camera</span>
+            </div>
+          </div>
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">◈</span><span class="ft">Người &amp; vật thể</span></div>
+            <div class="fb"><span class="empty">Chưa gán camera</span><span class="fmore">+ Gán camera</span></div>
+          </div>
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">👤</span><span class="ft">Metadata — Phát hiện người</span></div>
+            <div class="fb"><span class="empty">Chưa gán camera</span><span class="fmore">+ Gán camera</span></div>
+          </div>
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">🚗</span><span class="ft">Metadata — Phương tiện cơ giới</span></div>
+            <div class="fb">
+              <div class="cam-chip"><span>1 — Camera Cổng chính KCN Bắc Thăng Long</span><span class="cn">Online</span></div>
+              <div class="cam-chip"><span>2 — Camera Kho vận số 3</span><span class="cn">Online</span></div>
+              <div class="cam-chip"><span>3 — Camera Trạm cân xe tải</span><span class="cn">Lỗi</span></div>
+              <div class="cam-chip"><span>4 — Camera Bãi đỗ xe nhà máy Canon</span><span class="cn">Online</span></div>
+              <span class="fmore">+ Gán thêm camera</span>
+            </div>
+          </div>
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">🏍</span><span class="ft">Metadata — Phương tiện thô sơ</span></div>
+            <div class="fb"><span class="empty">Chưa gán camera</span><span class="fmore">+ Gán camera</span></div>
+          </div>
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">▤</span><span class="ft">Cảnh báo theo mô tả văn bản</span></div>
+            <div class="fb">
+              <div class="cam-chip"><span>1 — Camera Cổng chính KCN Bắc Thăng Long</span><span class="cn">Online</span></div>
+              <div class="cam-chip"><span>5 — Camera Km12+400 cao tốc HN-HP</span><span class="cn">Online</span></div>
+              <span class="fmore">+ Gán thêm camera</span>
+            </div>
+          </div>
+
+          <div class="ai-fn-card">
+            <div class="fh"><span class="ic">◉</span><span class="ft">Hiểu cảnh đa phương thức</span></div>
+            <div class="fb">
+              <div class="cam-chip"><span>70 — Camera Nút giao Km22 HN-HP</span><span class="cn">Online</span></div>
+              <div class="cam-chip"><span>71 — Camera Trạm thu phí QL5B Km9</span><span class="cn">Online</span></div>
+              <span class="fmore">+ Gán thêm camera</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─────── TAB 2: THEO TÁC VỤ ─────── -->
+      <div class="tab-panel" id="tab-taskmode">
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="openModal('modal-task')"><span class="btn-icon">＋</span> Thêm tác vụ</button>
+          <button class="btn" id="btn-delete-task" disabled>Xoá</button>
+          <button class="btn">Lịch tuần tra (Tour)</button>
+          <div class="fill"></div>
+          <div class="task-legend">
+            <span class="badge b-init">Đang bật</span>
+            <span class="badge" style="background:#FBE7F1;color:#A23E75;">Quá tải</span>
+            <span class="badge b-pending">Đã tắt</span>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices" style="min-width:1240px;">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Tên tác vụ</th>
+                <th>Chức năng AI</th>
+                <th>Camera / kênh áp dụng</th>
+                <th>Khung giờ hoạt động (0h–24h)</th>
+                <th>Trạng thái</th>
+                <th>Lặp lại</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Tuần tra PPE nhà máy Canon<span class="sub">Tạo 02/09/2026</span></td>
+                <td>Phát hiện an toàn lao động (PPE)</td>
+                <td class="mono-cell">CH1 · Bãi đỗ xe nhà máy Canon</td>
+                <td>
+                  <div class="mini-timeline">
+                    <span class="seg" style="left:8.3%;width:22.9%;"></span>
+                    <span class="seg" style="left:66.7%;width:16.6%;"></span>
+                  </div>
+                  <div class="tl-caption">02:35–08:01 · 16:00–20:00</div>
+                </td>
+                <td><span class="badge b-init">Đang bật</span></td>
+                <td>Hằng ngày</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Giám sát vượt rào cổng KCN<span class="sub">Tạo 28/08/2026</span></td>
+                <td>Vượt rào / xâm nhập</td>
+                <td class="mono-cell">CH1 · Cổng chính KCN Bắc Thăng Long</td>
+                <td>
+                  <div class="mini-timeline">
+                    <span class="seg" style="left:75%;width:20.8%;"></span>
+                    <span class="seg" style="left:0%;width:25%;"></span>
+                  </div>
+                  <div class="tl-caption">18:00–23:59 · 00:00–06:00</div>
+                </td>
+                <td><span class="badge b-init">Đang bật</span></td>
+                <td>Hằng ngày</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Tụ tập đông người ga BRT<span class="sub">Tạo 19/08/2026</span></td>
+                <td>Tụ tập đông người</td>
+                <td class="mono-cell">CH33 · Sảnh chờ ga Cầu Giấy (BRT)</td>
+                <td>
+                  <div class="mini-timeline">
+                    <span class="seg overload" style="left:29.2%;width:8.3%;"></span>
+                    <span class="seg overload" style="left:70.8%;width:8.3%;"></span>
+                  </div>
+                  <div class="tl-caption">07:00–09:00 · 17:00–19:00</div>
+                </td>
+                <td><span class="badge" style="background:#FBE7F1;color:#A23E75;">Quá tải</span></td>
+                <td>T2–T6</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Đếm phương tiện Km12 cao tốc HN-HP<span class="sub">Tạo 10/08/2026</span></td>
+                <td>Metadata — Phương tiện cơ giới</td>
+                <td class="mono-cell">CH1 · Km12+400 hướng Hải Phòng</td>
+                <td>
+                  <div class="mini-timeline">
+                    <span class="seg" style="left:0%;width:100%;"></span>
+                  </div>
+                  <div class="tl-caption">00:00–23:59 (cả ngày)</div>
+                </td>
+                <td><span class="badge b-init">Đang bật</span></td>
+                <td>Hằng ngày</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Bỏ lại vật thể trạm thu phí 5B<span class="sub">Tạo 03/08/2026</span></td>
+                <td>Bỏ lại vật thể</td>
+                <td class="mono-cell">CH3–CH4 · Làn thu phí không dừng 3-4</td>
+                <td>
+                  <div class="mini-timeline">
+                    <span class="seg disabled" style="left:0%;width:100%;"></span>
+                  </div>
+                  <div class="tl-caption">Đã tắt toàn bộ khung giờ</div>
+                </td>
+                <td><span class="badge b-pending">Đã tắt</span></td>
+                <td>Hằng ngày</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="chname">Tuần tra Tour trạm cân xe tải<span class="sub">Tạo 27/07/2026 · PTZ Tour</span></td>
+                <td>Người &amp; vật thể</td>
+                <td class="mono-cell">CH1 (PTZ) · Trạm cân số 2 — 4 điểm dừng</td>
+                <td>
+                  <div class="mini-timeline">
+                    <span class="seg" style="left:41.7%;width:12.5%;"></span>
+                  </div>
+                  <div class="tl-caption">10:00–13:00 · Tour Interval 60s</div>
+                </td>
+                <td><span class="badge b-init">Đang bật</span></td>
+                <td>Hằng ngày</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-foot">
+          <span>Tổng <b class="tabular">16</b> tác vụ đã cấu hình trên đầu ghi này</span>
+          <div class="pager">
+            <button disabled>‹</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>›</button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════ MODAL: Thêm tác vụ (wizard 2 bước) ═══════════ -->
+  <div class="overlay" id="modal-task">
+    <div class="modal w-full">
+      <div class="modal-head">
+        <h2>Thêm tác vụ tuần tra</h2>
+        <button class="x" onclick="closeModal('modal-task')">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="wizard-rail">
+          <div class="step done"><span class="num">✓</span> Chọn camera</div>
+          <div class="rail-line"></div>
+          <div class="step active"><span class="num">2</span> Cấu hình quy tắc AI</div>
+        </div>
+
+        <div class="info-box">
+          <span class="wi">ⓘ</span>
+          <span>Ở chế độ theo tác vụ, một kênh PTZ chỉ được gán vào <b>một tác vụ</b> tại một thời điểm. Với Tour Task, mỗi kênh PTZ chỉ liên kết được <b>một chức năng AI</b>.</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:18px;">
+
+          <!-- Cây chọn kênh (thu gọn, đã chọn ở bước 1) -->
+          <div>
+            <label style="font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:6px;">Kênh đã chọn</label>
+            <div class="channel-picker">
+              <div class="cp-group">NVR-BTL-03 · KCN Bắc Thăng Long</div>
+              <div class="cp-row"><input type="checkbox" checked><span class="cp-name">CH1 · Cổng chính KCN Bắc Thăng Long</span></div>
+              <div class="cp-row"><input type="checkbox"><span class="cp-name">CH2 · Kho vận số 3</span></div>
+              <div class="cp-row"><input type="checkbox"><span class="cp-name">CH3 · Trạm cân xe tải</span></div>
+              <div class="cp-row"><input type="checkbox"><span class="cp-name">CH4 · Bãi đỗ xe nhà máy Canon</span></div>
+            </div>
+          </div>
+
+          <!-- Form cấu hình quy tắc: card + form-grid -->
+          <div>
+            <div class="card">
+              <h2>Cấu hình quy tắc — Phát hiện an toàn lao động (PPE)</h2>
+
+              <div class="toolbar" style="margin-bottom:10px;">
+                <button class="btn btn-primary">+ Thêm quy tắc</button>
+              </div>
+
+              <div class="table-scroll" style="margin-bottom:16px;">
+                <table class="devices" style="min-width:0;">
+                  <thead>
+                    <tr><th style="width:40px;">STT</th><th>Tên quy tắc</th><th>Loại quy tắc</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="tabular">1</td>
+                      <td class="chname">Phát hiện PPE khu vực 1</td>
+                      <td>PPE Detection</td>
+                      <td><span class="badge b-init">Đang bật</span></td>
+                      <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h2 style="font-size:13px;">Vùng phát hiện &amp; ngưỡng cảnh báo</h2>
+              <div class="preview-shell">
+                <div class="cam-preview">
+                  Camera CH1 — xem trước (placeholder)
+                  <div class="zone"><span class="zlabel">Vùng phát hiện</span></div>
+                </div>
+
+                <div>
+                  <div class="warn-box" style="margin:0 0 12px;">
+                    <span class="wi">⚠</span>
+                    <span>Bật <b>Liên kết nhận diện khuôn mặt</b> yêu cầu kênh này đã bật chức năng Nhận diện khuôn mặt.</span>
+                  </div>
+
+                  <div class="toggle-grid">
+                    <div class="toggle-item"><span class="ti-label">Liên kết nhận diện khuôn mặt</span><span class="switch"><i></i></span></div>
+                    <div class="toggle-item"><span class="ti-label">Danh sách cảnh báo giả</span><span class="switch"><i></i></span></div>
+                    <div class="toggle-item"><span class="ti-label">Phát hiện mũ bảo hộ</span><span class="switch"><i></i></span></div>
+                    <div class="toggle-item on"><span class="ti-label">Phát hiện áo phản quang</span><span class="switch on"><i></i></span></div>
+                    <div class="toggle-item"><span class="ti-label">Phát hiện khẩu trang</span><span class="switch"><i></i></span></div>
+                    <div class="toggle-item"><span class="ti-label">Phát hiện kính bảo hộ</span><span class="switch"><i></i></span></div>
+                  </div>
+
+                  <div class="form-grid" style="margin-top:16px;">
+                    <div class="field">
+                      <label>Thời gian cảnh báo đầu (giây)</label>
+                      <input type="text" value="2">
+                      <span class="hint">1–3600 giây</span>
+                    </div>
+                    <div class="field">
+                      <label>Thời gian lặp cảnh báo (giây)</label>
+                      <input type="text" value="0">
+                      <span class="hint">0–3600 giây</span>
+                    </div>
+                  </div>
+
+                  <label style="font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;display:block;margin-top:14px;">Độ nhạy phát hiện</label>
+                  <div class="sens-row">
+                    <input type="range" min="1" max="10" value="5">
+                    <span class="sens-val tabular">5</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-task')">Quay lại</button>
+        <button class="btn" onclick="closeModal('modal-task')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-task')">Lưu tác vụ</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  function switchTab(ev, id){
+    const scope = ev.target.closest('.main-pane') || document;
+    scope.querySelectorAll(':scope > .tabs .tab-btn, .tabs .tab-btn').forEach(b=>b.classList.remove('active'));
+    scope.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

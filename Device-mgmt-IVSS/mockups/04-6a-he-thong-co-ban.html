@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cấu hình hệ thống · Device-mgmt-IVSS</title>
+
+<!--
+  04-6a · Quản lý hệ thống — PHẦN 1: Thiết lập hệ thống cơ bản.
+  Kế thừa hệ thống thiết kế đã chốt (hướng 🧠 Thiết kế sư hàng đầu / Tufte),
+  KHÔNG chạy lại quy trình 3-hướng — xem ../direction-approved.md dòng cuối:
+  "19 nhóm còn lại ... kế thừa shared.css, không lặp lại quy trình 3-hướng."
+  Màn neo tham chiếu: 04-cau-hinh-1-quan-ly-thiet-bi.html.
+
+  Nguồn cấu trúc: ../refs/04-cau-hinh/6-quan-ly-he-thong/ — CHỈ 7 ảnh:
+  fig8-82 (cài đặt cơ bản), fig8-83 (thời gian), fig8-84 (hiển thị),
+  fig8-85 (tải bản đồ), fig8-86 (gắn kênh lên bản đồ), fig8-87 (lịch trực),
+  fig8-88 (thêm ngày nghỉ). KHÔNG động tới user/permission/security/certificate
+  (fig8-89 → fig8-107) — phạm vi đó thuộc PHẦN 2 do agent khác dựng song song.
+
+  Cấu trúc: 1 trang "Cấu hình hệ thống" — sidebar trái điều hướng 5 mục
+  (Cơ bản / Thời gian / Hiển thị / Bản đồ & Gắn kênh / Lịch trực & Ngày nghỉ),
+  chuyển mục bằng JS ẩn/hiện (.tab-panel có sẵn trong shared.css, không định
+  nghĩa lại). Sidebar dùng class mới .settings-menu (scoped riêng file này —
+  shared.css có sẵn .tree-pane cho cây địa bàn nhiều cấp, không phù hợp cho
+  menu 5 mục phẳng nên không ép dùng lại, chỉ mượn khung .tree-pane làm vỏ).
+
+  Pattern MỚI (scoped trong <style> dưới, KHÔNG thêm vào shared.css):
+  .settings-menu/.sm-item — menu điều hướng dọc
+  .switch — toggle on/off (shared.css chưa có component này)
+  .clock-box — hiển thị giờ hệ thống dạng số (thay đồng hồ kim analog trong
+    ảnh gốc, đúng triết lý Tufte: bỏ chrome trang trí, giữ data-ink)
+  .display-grid/.display-card — small-multiples chọn màn hình xuất (giữ đúng
+    tinh thần "small multiples" đã chốt cho toàn hệ thống)
+  .map-widget/.map-pin — khối placeholder bản đồ (nền kẻ ô mô phỏng lưới bản
+    đồ, KHÔNG dùng ảnh thật) + chấm định vị camera bằng CSS thuần
+  .chan-list — danh sách kênh compact để kéo lên bản đồ
+  .week-row/.wr-track — lưới lịch tuần 0-24h dạng thanh ngang
+  .radio-row, .holiday-table — hàng radio + bảng ngày nghỉ đơn giản
+
+  Giả định dữ liệu (không có trong ảnh gốc, suy luận hợp lý cho bối cảnh VN):
+  - Tên hệ thống, múi giờ (UTC+07:00), NTP server, ngày lễ VN 2026 thực tế
+    (1/1, 30/4, 1/5, 2/9, Giỗ Tổ Hùng Vương, Tết Nguyên đán) — ngày Tết/Giỗ Tổ
+    là ước lượng minh hoạ, không phải văn bản nghỉ lễ chính thức của Chính phủ.
+  - Danh sách kênh gắn bản đồ tái dùng đúng tên kênh khu vực Cầu Giấy đã có ở
+    màn "Quản lý thiết bị" để nhất quán dữ liệu xuyên các màn hình.
+  - Đồng hồ hệ thống hiển thị đúng ngày hôm nay (15/09/2026) theo bối cảnh
+    phiên làm việc.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ───────── Scoped: sidebar điều hướng mục cấu hình (không có trong shared.css) ───────── */
+  .settings-menu{padding:6px 0 16px;}
+  .sm-item{
+    width:100%;display:block;text-align:left;cursor:pointer;
+    border:none;border-left:3px solid transparent;background:none;
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--text-muted);
+    padding:10px 16px 10px 17px;
+  }
+  .sm-item .sm-desc{display:block;font-weight:400;font-size:11px;color:var(--text-faint);margin-top:2px;line-height:1.4;}
+  .sm-item:hover{background:var(--bg-soft);color:var(--text);}
+  .sm-item.active{background:#E9F0FC;color:var(--primary);border-left-color:var(--primary);}
+  .sm-item.active .sm-desc{color:var(--primary);opacity:.7;}
+
+  /* ───────── Scoped: toggle switch ───────── */
+  .switch{position:relative;display:inline-block;width:38px;height:22px;flex:none;}
+  .switch input{opacity:0;width:0;height:0;position:absolute;}
+  .switch .slider{position:absolute;inset:0;background:var(--line-strong);border-radius:22px;cursor:pointer;transition:background .15s;}
+  .switch .slider::before{content:"";position:absolute;height:16px;width:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,20,50,.25);}
+  .switch input:checked + .slider{background:var(--primary);}
+  .switch input:checked + .slider::before{transform:translateX(16px);}
+  .switch input:disabled + .slider{opacity:.45;cursor:not-allowed;}
+  .toggle-row{display:flex;align-items:center;gap:10px;min-height:30px;}
+  .toggle-row .tr-hint{font-size:11.5px;color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;}
+
+  /* ───────── Scoped: hàng radio đơn giản ───────── */
+  .radio-row{display:flex;align-items:center;gap:22px;min-height:30px;}
+  .radio-row label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;color:var(--text);cursor:pointer;}
+  .radio-row input{accent-color:var(--primary);}
+
+  /* ───────── Scoped: đồng hồ hệ thống (số, không dùng kim analog) ───────── */
+  .clock-box{display:flex;align-items:baseline;gap:18px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line);}
+  .clock-box .cb-time{font-size:34px;font-weight:800;color:var(--navy);font-family:var(--mono);}
+  .clock-box .cb-date{font-size:13px;color:var(--text-muted);}
+  .clock-box .cb-date b{display:block;color:var(--text);font-size:13.5px;font-weight:700;}
+
+  /* ───────── Scoped: small multiples chọn màn hình xuất ───────── */
+  .display-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .display-card{border:1px solid var(--line-strong);border-radius:3px;padding:14px 10px 10px;text-align:center;cursor:pointer;}
+  .display-card.active{border-color:var(--primary);background:#E9F0FC;}
+  .display-card .dc-screen{height:64px;border:1.5px dashed var(--line-strong);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;color:var(--text-faint);margin-bottom:8px;border-radius:2px;}
+  .display-card.active .dc-screen{border-color:var(--primary);color:var(--primary);}
+  .display-card .dc-label{font-size:11px;font-weight:700;color:var(--text-muted);}
+  .display-card.active .dc-label{color:var(--primary);}
+
+  /* ───────── Scoped: khối bản đồ + gắn kênh ───────── */
+  .map-layout{display:grid;grid-template-columns:236px 1fr;border:1px solid var(--line);}
+  .chan-list{border-right:1px solid var(--line);padding:10px;max-height:456px;overflow-y:auto;background:var(--bg);}
+  .chan-list .cl-search{width:100%;border:1px solid var(--line-strong);border-radius:3px;padding:7px 9px;font-size:12px;font-family:inherit;margin-bottom:10px;}
+  .chan-list .cl-group{font-size:10.5px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.35px;padding:8px 4px 5px;border-top:1px solid var(--line);margin-top:2px;}
+  .chan-list .cl-group:first-of-type{border-top:none;margin-top:0;}
+  .cl-item{display:flex;align-items:center;gap:8px;padding:6px 6px;font-size:12px;border-radius:3px;cursor:grab;}
+  .cl-item:hover{background:var(--bg-soft);}
+  .cl-item .dot{width:7px;height:7px;border-radius:50%;flex:none;}
+  .cl-item .cl-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);}
+
+  .map-widget{
+    position:relative;min-height:456px;overflow:hidden;
+    background-color:var(--bg-soft2);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(199,205,213,.5) 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(90deg, rgba(199,205,213,.5) 0 1px, transparent 1px 32px);
+  }
+  .map-caption{position:absolute;top:14px;left:16px;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;background:rgba(255,255,255,.88);padding:4px 10px;border-radius:2px;}
+  .map-pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;}
+  .map-pin .pin-dot{width:16px;height:16px;border-radius:50% 50% 2px 50%;transform:rotate(45deg);background:var(--primary);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,20,50,.35);}
+  .map-pin.offline .pin-dot{background:var(--error);}
+  .map-pin .pin-tag{margin-top:5px;background:var(--navy);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;white-space:nowrap;}
+  .map-pin.offline .pin-tag{background:var(--error);}
+  .map-legend{position:absolute;bottom:12px;left:16px;display:flex;gap:16px;font-size:11.5px;color:var(--text-muted);background:rgba(255,255,255,.88);padding:6px 12px;border-radius:2px;}
+  .map-legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle;}
+
+  /* ───────── Scoped: lịch trực tuần ───────── */
+  .schedule-layout{display:grid;grid-template-columns:196px 1fr;gap:22px;}
+  .sched-list{border-right:1px solid var(--line);padding-right:18px;}
+  .sched-item{display:block;width:100%;text-align:left;border:none;background:none;font-family:inherit;cursor:pointer;padding:9px 10px;border-radius:3px;font-size:12.5px;font-weight:600;color:var(--text-muted);margin-bottom:2px;}
+  .sched-item .si-sub{display:block;font-weight:400;font-size:11px;color:var(--text-faint);margin-top:1px;}
+  .sched-item.active{background:#E9F0FC;color:var(--primary);}
+  .sched-item.active .si-sub{color:var(--primary);opacity:.75;}
+  .sched-add{margin-top:6px;color:var(--primary);font-weight:700;font-size:12.5px;cursor:pointer;padding:9px 10px;}
+
+  .week-ruler-row{display:grid;grid-template-columns:46px 1fr 76px;gap:10px;margin-bottom:6px;}
+  .week-ruler{display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);padding:0 1px;}
+  .week-row{display:grid;grid-template-columns:46px 1fr 76px;align-items:center;gap:10px;padding:6px 0;}
+  .week-row .wr-day{font-size:12px;font-weight:700;color:var(--navy);}
+  .week-row .wr-track{position:relative;height:16px;background:var(--bg-soft2);}
+  .week-row .wr-fill{position:absolute;top:0;bottom:0;background:var(--primary);}
+  .week-row .wr-copy{font-size:11px;color:var(--text-muted);border:1px solid var(--line-strong);background:var(--bg);padding:5px 8px;border-radius:3px;cursor:pointer;text-align:center;}
+  .week-row .wr-copy:hover{border-color:var(--primary);color:var(--primary);}
+
+  /* ───────── Scoped: bảng ngày nghỉ ───────── */
+  .holiday-table{width:100%;font-size:12.5px;border-collapse:collapse;margin-top:18px;}
+  .holiday-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--navy);font-weight:700;padding:9px 12px;border-bottom:2px solid var(--navy);background:var(--bg-soft);border-top:1px solid var(--line);}
+  .holiday-table td{padding:8px 12px;border-bottom:1px solid var(--line);color:var(--text);}
+  .holiday-table tr:hover td{background:#FAFBFC;}
+  .section-sub{font-size:11.5px;color:var(--text-faint);margin:-8px 0 16px;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Cấu hình &nbsp;/&nbsp; <b>Quản lý hệ thống</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <!-- ═══════════ SHELL: settings-menu + main ═══════════ -->
+  <div class="shell">
+
+    <!-- ─────── LEFT: điều hướng mục cấu hình ─────── -->
+    <nav class="tree-pane">
+      <div class="tp-heading">Mục cấu hình</div>
+      <div class="settings-menu">
+        <button class="sm-item active" onclick="switchSection(this,'tab-basic')">
+          Cơ bản
+          <span class="sm-desc">Tên hệ thống, ngôn ngữ, chuẩn video</span>
+        </button>
+        <button class="sm-item" onclick="switchSection(this,'tab-time')">
+          Thời gian
+          <span class="sm-desc">Múi giờ, đồng bộ NTP</span>
+        </button>
+        <button class="sm-item" onclick="switchSection(this,'tab-display')">
+          Hiển thị
+          <span class="sm-desc">Màn hình xuất, độ phân giải</span>
+        </button>
+        <button class="sm-item" onclick="switchSection(this,'tab-map')">
+          Bản đồ &amp; Gắn kênh
+          <span class="sm-desc">Tải bản đồ khu vực, định vị camera</span>
+        </button>
+        <button class="sm-item" onclick="switchSection(this,'tab-schedule')">
+          Lịch trực &amp; Ngày nghỉ
+          <span class="sm-desc">Lịch ghi hình theo tuần, ngày lễ</span>
+        </button>
+      </div>
+      <div class="tree-legend">
+        Thay đổi ở từng mục cần bấm <b>Áp dụng</b> riêng để lưu — chuyển mục
+        khác khi chưa lưu sẽ mất thay đổi chưa xác nhận.
+      </div>
+    </nav>
+
+    <!-- ─────── RIGHT: nội dung theo mục ─────── -->
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Cấu hình hệ thống</h1>
+        <span class="scope">Thiết lập hệ thống cơ bản — áp dụng cho toàn trung tâm điều hành</span>
+      </div>
+
+      <!-- ═══ 1. CƠ BẢN ═══ -->
+      <div class="tab-panel active" id="tab-basic">
+        <div class="card">
+          <h2>Cài đặt cơ bản</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label>Tên hệ thống</label>
+              <input type="text" value="IVSS-NOC-CauGiay-01">
+              <span class="hint">Hiển thị trên topbar, log hệ thống và thông báo cảnh báo</span>
+            </div>
+            <div class="field">
+              <label>Ngôn ngữ hiển thị</label>
+              <select><option>Tiếng Việt</option><option>English</option></select>
+            </div>
+            <div class="field full">
+              <label>Chuẩn video</label>
+              <div class="radio-row">
+                <label><input type="radio" name="video-std" checked> PAL — chuẩn phát sóng tại Việt Nam</label>
+                <label><input type="radio" name="video-std"> NTSC</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Thời gian tự động đăng xuất</label>
+              <select><option>15 phút</option><option selected>30 phút</option><option>60 phút</option><option>Không tự đăng xuất</option></select>
+            </div>
+            <div class="field">
+              <label>Trình chiếu tự động (Tour)</label>
+              <div class="toggle-row">
+                <span class="switch"><input type="checkbox"><span class="slider"></span></span>
+                <input type="text" value="30" style="width:64px;" disabled>
+                <span class="tr-hint">giây (5–120)</span>
+              </div>
+            </div>
+            <div class="field full">
+              <label>Đồng bộ cấu hình sang thiết bị điều khiển từ xa</label>
+              <div class="toggle-row">
+                <span class="switch"><input type="checkbox" checked><span class="slider"></span></span>
+                <span class="tr-hint">Bao gồm ngôn ngữ, định dạng ngày giờ và múi giờ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="display:flex;justify-content:flex-end;gap:8px;">
+          <button class="btn">Khôi phục mặc định</button>
+          <button class="btn btn-primary">Áp dụng</button>
+        </div>
+      </div>
+
+      <!-- ═══ 2. THỜI GIAN ═══ -->
+      <div class="tab-panel" id="tab-time">
+        <div class="card">
+          <h2>Thời gian &amp; múi giờ</h2>
+          <div class="clock-box">
+            <span class="cb-time tabular">14:32:07</span>
+            <span class="cb-date"><b>Thứ Ba, 15/09/2026</b>(UTC+07:00) Bangkok, Hà Nội, Jakarta</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="field full">
+              <label>Nguồn đồng bộ thời gian</label>
+              <div class="radio-row">
+                <label><input type="radio" name="time-src" checked> Máy chủ NTP</label>
+                <label><input type="radio" name="time-src"> Đặt thủ công</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Máy chủ NTP</label>
+              <input type="text" value="1.vn.pool.ntp.org">
+            </div>
+            <div class="field">
+              <label>Cổng</label>
+              <input type="text" value="123" class="tabular">
+            </div>
+            <div class="field">
+              <label>Chu kỳ đồng bộ</label>
+              <select><option>30 phút</option><option selected>1 giờ</option><option>6 giờ</option><option>24 giờ</option></select>
+            </div>
+
+            <div class="field">
+              <label>Thời gian (thủ công)</label>
+              <input type="text" value="15/09/2026 14:32:07" disabled>
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button class="btn" disabled style="align-self:flex-start;">Đồng bộ theo máy tính</button>
+            </div>
+            <div class="field"></div>
+
+            <div class="field">
+              <label>Định dạng ngày</label>
+              <select><option selected>DD/MM/YYYY</option><option>YYYY-MM-DD</option><option>MM/DD/YYYY</option></select>
+            </div>
+            <div class="field">
+              <label>Định dạng giờ</label>
+              <select><option selected>24 giờ</option><option>12 giờ (AM/PM)</option></select>
+            </div>
+            <div class="field">
+              <label>Múi giờ</label>
+              <select><option selected>(UTC+07:00) Bangkok, Hà Nội, Jakarta</option><option>(UTC+08:00) Bắc Kinh, Singapore</option><option>(UTC+09:00) Tokyo, Seoul</option></select>
+            </div>
+
+            <div class="field">
+              <label>Đồng bộ giờ xuống camera (CAM Time Sync)</label>
+              <div class="toggle-row">
+                <span class="switch"><input type="checkbox" checked><span class="slider"></span></span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Chu kỳ đồng bộ xuống camera</label>
+              <select><option selected>1 giờ</option><option>6 giờ</option><option>24 giờ</option></select>
+            </div>
+            <div class="field"></div>
+
+            <div class="field full">
+              <label>Giờ mùa hè (DST)</label>
+              <div class="toggle-row">
+                <span class="switch"><input type="checkbox" disabled><span class="slider"></span></span>
+                <span class="tr-hint">Việt Nam không áp dụng giờ mùa hè — giữ tắt</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="display:flex;justify-content:flex-end;gap:8px;">
+          <button class="btn">Làm mới</button>
+          <button class="btn btn-primary">Áp dụng</button>
+        </div>
+      </div>
+
+      <!-- ═══ 3. HIỂN THỊ ═══ -->
+      <div class="tab-panel" id="tab-display">
+        <div class="card">
+          <h2>Hiển thị (Display)</h2>
+          <div class="display-grid">
+            <div class="display-card active">
+              <div class="dc-screen">1</div>
+              <div class="dc-label">HDMI / VGA</div>
+            </div>
+            <div class="display-card">
+              <div class="dc-screen">2</div>
+              <div class="dc-label">HDMI</div>
+            </div>
+            <div class="display-card">
+              <div class="dc-screen">3</div>
+              <div class="dc-label">HDMI</div>
+            </div>
+            <div class="display-card">
+              <div class="dc-screen">4</div>
+              <div class="dc-label">HDMI</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Bật màn hình 1</label>
+              <div class="toggle-row">
+                <span class="switch"><input type="checkbox" checked><span class="slider"></span></span>
+              </div>
+            </div>
+            <div class="field"></div>
+            <div class="field">
+              <label>Độ phân giải</label>
+              <select><option selected>1920 × 1080 · 60Hz</option><option>2560 × 1440 · 60Hz</option><option>3840 × 2160 · 30Hz</option></select>
+            </div>
+            <div class="field">
+              <label>Tần số quét</label>
+              <select><option selected>60 Hz</option><option>50 Hz</option></select>
+            </div>
+            <div class="field full">
+              <label>Cảnh báo hiển thị dạng cửa sổ nổi</label>
+              <div class="toggle-row">
+                <span class="switch"><input type="checkbox"><span class="slider"></span></span>
+                <span class="tr-hint">Bật để cảnh báo AI/mất kết nối hiện dạng popup nổi trên màn hình xem trực tiếp</span>
+              </div>
+            </div>
+            <div class="field full">
+              <label>Hỗ trợ 8K</label>
+              <div class="toggle-row">
+                <span class="switch"><input type="checkbox"><span class="slider"></span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="warn-box">
+            <span class="wi">⚠</span>
+            <span>Bật 8K sẽ giảm khả năng giải mã đồng thời của thiết bị — <b>màn hình 3 và 4 sẽ ngừng hoạt động.</b></span>
+          </div>
+        </div>
+        <div class="card" style="display:flex;justify-content:flex-end;gap:8px;">
+          <button class="btn">Làm mới</button>
+          <button class="btn btn-primary">Áp dụng</button>
+        </div>
+      </div>
+
+      <!-- ═══ 4. BẢN ĐỒ & GẮN KÊNH ═══ -->
+      <div class="tab-panel" id="tab-map">
+
+        <div class="card">
+          <h2>Tải lên bản đồ khu vực</h2>
+          <div class="form-grid" style="margin-bottom:16px;">
+            <div class="field">
+              <label>Khu vực áp dụng</label>
+              <select>
+                <option selected>Quận Cầu Giấy, TP. Hà Nội</option>
+                <option>Khu công nghiệp Bắc Thăng Long</option>
+                <option>Tuyến cao tốc Hà Nội – Hải Phòng</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tên bản đồ</label>
+              <input type="text" placeholder="VD: Bản đồ Quận Cầu Giấy - Trục chính">
+            </div>
+          </div>
+          <div class="dropzone">
+            Kéo thả ảnh bản đồ khu vực (.jpg, .png, .bmp) vào đây, hoặc <b>chọn file từ máy tính</b>.<br>
+            <span class="hint">Dung lượng file từ 10 KB đến 10 MB.</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Gắn kênh camera lên bản đồ</h2>
+          <div class="section-sub">Kéo kênh từ danh sách bên trái thả vào đúng vị trí trên bản đồ — vị trí điểm chỉ mang tính mô phỏng.</div>
+
+          <div class="toolbar" style="margin-bottom:12px;">
+            <button class="btn">Sửa bản đồ</button>
+            <button class="btn">Xoá điểm đã gắn</button>
+            <div class="fill"></div>
+            <button class="btn" style="color:var(--error);border-color:var(--error);">Xoá bản đồ</button>
+          </div>
+
+          <div class="map-layout">
+            <div class="chan-list">
+              <input class="cl-search" type="text" placeholder="Tên kênh / IP...">
+              <div class="cl-group">NVR Khu vực Cầu Giấy</div>
+              <div class="cl-item"><span class="dot ok" style="background:var(--primary);"></span><span class="cl-name">Camera Cổng chính Toà nhà VNPT Cầu Giấy</span></div>
+              <div class="cl-item"><span class="dot ok" style="background:var(--primary);"></span><span class="cl-name">Camera Ngã tư Nguyễn Trãi - Khuất Duy Tiến</span></div>
+              <div class="cl-item"><span class="dot neutral"></span><span class="cl-name">Camera Sảnh chờ ga Cầu Giấy (BRT)</span></div>
+              <div class="cl-item"><span class="dot ok" style="background:var(--primary);"></span><span class="cl-name">Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ</span></div>
+              <div class="cl-group">Chưa gắn bản đồ</div>
+              <div class="cl-item"><span class="dot ok" style="background:var(--primary);"></span><span class="cl-name">Camera Sân sau Toà nhà VNPT Cầu Giấy</span></div>
+            </div>
+            <div class="map-widget">
+              <span class="map-caption">Bản đồ khu vực Quận Cầu Giấy</span>
+
+              <div class="map-pin" style="left:28%;top:34%;">
+                <span class="pin-dot"></span>
+                <span class="pin-tag">Cổng chính VNPT</span>
+              </div>
+              <div class="map-pin" style="left:52%;top:24%;">
+                <span class="pin-dot"></span>
+                <span class="pin-tag">Nguyễn Trãi - KDT</span>
+              </div>
+              <div class="map-pin offline" style="left:41%;top:58%;">
+                <span class="pin-dot"></span>
+                <span class="pin-tag">Sảnh chờ BRT</span>
+              </div>
+              <div class="map-pin" style="left:68%;top:66%;">
+                <span class="pin-dot"></span>
+                <span class="pin-tag">Vòng xuyến Xuân Thuỷ</span>
+              </div>
+
+              <div class="map-legend">
+                <span><i class="dot" style="background:var(--primary);"></i>Trực tuyến</span>
+                <span><i class="dot" style="background:var(--error);"></i>Mất kết nối</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="display:flex;justify-content:flex-end;gap:8px;">
+          <button class="btn">Huỷ thay đổi</button>
+          <button class="btn btn-primary">Lưu vị trí gắn kênh</button>
+        </div>
+      </div>
+
+      <!-- ═══ 5. LỊCH TRỰC & NGÀY NGHỈ ═══ -->
+      <div class="tab-panel" id="tab-schedule">
+
+        <div class="card">
+          <h2>Lịch trực (Time Plan)</h2>
+          <div class="section-sub">Lịch áp dụng cho ghi hình liên tục và kích hoạt cảnh báo AI theo khung giờ.</div>
+
+          <div class="schedule-layout">
+            <div class="sched-list">
+              <button class="sched-item active">
+                Lịch mặc định
+                <span class="si-sub">Ghi hình 24/7 · đang áp dụng</span>
+              </button>
+              <button class="sched-item">
+                Giờ hành chính mở rộng
+                <span class="si-sub">T2–T6, 06:00–22:00</span>
+              </button>
+              <div class="sched-add">＋ Tạo lịch mới</div>
+            </div>
+
+            <div>
+              <div class="week-ruler-row">
+                <span></span>
+                <div class="week-ruler">
+                  <span>0</span><span>4</span><span>8</span><span>12</span><span>16</span><span>20</span><span>24</span>
+                </div>
+                <span></span>
+              </div>
+
+              <div class="week-row">
+                <span class="wr-day">T2</span>
+                <span class="wr-track"><span class="wr-fill" style="left:0;width:100%;"></span></span>
+                <button class="wr-copy">Copy to</button>
+              </div>
+              <div class="week-row">
+                <span class="wr-day">T3</span>
+                <span class="wr-track"><span class="wr-fill" style="left:0;width:100%;"></span></span>
+                <button class="wr-copy">Copy to</button>
+              </div>
+              <div class="week-row">
+                <span class="wr-day">T4</span>
+                <span class="wr-track"><span class="wr-fill" style="left:0;width:100%;"></span></span>
+                <button class="wr-copy">Copy to</button>
+              </div>
+              <div class="week-row">
+                <span class="wr-day">T5</span>
+                <span class="wr-track"><span class="wr-fill" style="left:0;width:100%;"></span></span>
+                <button class="wr-copy">Copy to</button>
+              </div>
+              <div class="week-row">
+                <span class="wr-day">T6</span>
+                <span class="wr-track"><span class="wr-fill" style="left:0;width:100%;"></span></span>
+                <button class="wr-copy">Copy to</button>
+              </div>
+              <div class="week-row">
+                <span class="wr-day">T7</span>
+                <span class="wr-track"><span class="wr-fill" style="left:25%;width:75%;"></span></span>
+                <button class="wr-copy">Copy to</button>
+              </div>
+              <div class="week-row">
+                <span class="wr-day">CN</span>
+                <span class="wr-track"><span class="wr-fill" style="left:33.3%;width:58.3%;"></span></span>
+                <button class="wr-copy">Copy to</button>
+              </div>
+
+              <div class="form-grid" style="margin-top:18px;">
+                <div class="field full">
+                  <label>Phạm vi hiệu lực</label>
+                  <div class="radio-row">
+                    <label><input type="radio" name="sched-range" checked> Luôn áp dụng</label>
+                    <label><input type="radio" name="sched-range"> Trong khoảng ngày</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="display:flex;justify-content:flex-end;gap:8px;">
+          <button class="btn">Làm mới</button>
+          <button class="btn btn-primary">Lưu lịch trực</button>
+        </div>
+
+        <div class="card">
+          <h2>Thêm ngày nghỉ lễ</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label>Tên ngày nghỉ</label>
+              <input type="text" placeholder="VD: Quốc khánh 2/9">
+            </div>
+            <div class="field">
+              <label>Trạng thái</label>
+              <select><option selected>Bật</option><option>Tắt</option></select>
+            </div>
+            <div class="field full">
+              <label>Chế độ hiệu lực</label>
+              <div class="radio-row">
+                <label><input type="radio" name="hol-mode" checked> Hàng năm (lặp lại)</label>
+                <label><input type="radio" name="hol-mode"> Một lần</label>
+              </div>
+            </div>
+            <div class="field full">
+              <label>Áp dụng theo</label>
+              <div class="radio-row">
+                <label><input type="radio" name="hol-period" checked> Ngày cụ thể</label>
+                <label><input type="radio" name="hol-period"> Theo tuần</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Ngày bắt đầu</label>
+              <input type="text" placeholder="dd/mm/yyyy" value="02/09/2026">
+            </div>
+            <div class="field">
+              <label>Ngày kết thúc</label>
+              <input type="text" placeholder="dd/mm/yyyy" value="02/09/2026">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+            <button class="btn">Làm mới</button>
+            <button class="btn btn-primary">Thêm ngày nghỉ</button>
+          </div>
+
+          <table class="holiday-table">
+            <thead>
+              <tr>
+                <th>Tên ngày nghỉ</th>
+                <th>Ngày bắt đầu</th>
+                <th>Ngày kết thúc</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tết Dương lịch</td>
+                <td class="mono-cell">01/01/2026</td>
+                <td class="mono-cell">01/01/2026</td>
+                <td><span class="badge b-pending">Đã qua</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td>Tết Nguyên đán Bính Ngọ</td>
+                <td class="mono-cell">15/02/2026</td>
+                <td class="mono-cell">21/02/2026</td>
+                <td><span class="badge b-pending">Đã qua</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td>Giỗ Tổ Hùng Vương (10/3 âm lịch)</td>
+                <td class="mono-cell">26/04/2026</td>
+                <td class="mono-cell">26/04/2026</td>
+                <td><span class="badge b-pending">Đã qua</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td>Ngày Giải phóng miền Nam</td>
+                <td class="mono-cell">30/04/2026</td>
+                <td class="mono-cell">30/04/2026</td>
+                <td><span class="badge b-pending">Đã qua</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td>Ngày Quốc tế Lao động</td>
+                <td class="mono-cell">01/05/2026</td>
+                <td class="mono-cell">01/05/2026</td>
+                <td><span class="badge b-pending">Đã qua</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td>Quốc khánh 2/9</td>
+                <td class="mono-cell">02/09/2026</td>
+                <td class="mono-cell">02/09/2026</td>
+                <td><span class="badge b-init">Sắp diễn ra</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function switchSection(btn, id){
+    document.querySelectorAll('.sm-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.main-pane > .tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

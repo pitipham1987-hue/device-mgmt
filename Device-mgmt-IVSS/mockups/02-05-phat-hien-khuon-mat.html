@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phát hiện khuôn mặt · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm tham chiếu: refs/02-van-hanh-ai/05-phat-hien-khuon-mat/
+    - fig6-23_attribute-display.png  → modal "Cấu hình hiển thị thuộc tính"
+    - fig6-27_view-tracks.png        → trang "Tìm kiếm track" (bộ lọc trái + lưới track + chi tiết)
+    - fig6-28_track-management.png   → trang "Quản lý track" (bảng table.devices)
+
+  Kế thừa nguyên vẹn shared.css (hướng 🧠 Tufte đã chốt 15/09/2026) — không sửa
+  shared.css, chỉ thêm CSS scoped mới cho các pattern chưa có (search-layout,
+  track-grid, notice-box, style-chip, mini-box placeholder).
+
+  Giả định thiết kế:
+  - Camera/kênh dùng lại đúng tên thiết bị đã xuất hiện ở màn neo
+    04-cau-hinh-1-quan-ly-thiet-bi.html để giữ tính nhất quán bối cảnh
+    (Cầu Giấy, KCN Bắc Thăng Long, cao tốc HN-Hải Phòng).
+  - "Track" = một chuỗi lần xuất hiện của cùng một khuôn mặt được AI liên kết
+    qua nhiều camera/thời điểm. Không có ảnh khuôn mặt thật → dùng khối màu
+    xám + nhãn text "Ảnh khuôn mặt #NNN" (không vẽ SVG mặt người giả).
+  - Thuộc tính nhân trắc học (giới tính/tuổi...) trong dữ liệu demo đều để
+    "Không xác định" trừ khi cần minh hoạ UI, kèm ghi chú tuân thủ Nghị định
+    13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân — dữ liệu khuôn mặt thật cần được
+    thu thập có sự đồng ý và mã hoá lưu trữ.
+  - "Kiểu khung hiển thị" trong modal cấu hình thuộc tính được thể hiện bằng
+    các chip mô tả bố cục (không phải ảnh xem trước có mặt người), để tránh
+    vẽ SVG khuôn mặt giả theo đúng nguyên tắc phản AI-slop.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* ── Scoped patterns riêng cho màn Phát hiện khuôn mặt ── */
+
+  .notice-box{
+    display:flex;gap:10px;
+    background:#E9F4FF;
+    border:1px solid #BFE0FC;
+    border-left:3px solid var(--accent2);
+    padding:10px 13px;
+    font-size:12px;
+    color:#0A3D66;
+    line-height:1.55;
+    margin:0 0 16px;
+  }
+  .notice-box .ni{font-size:14px;flex:none;}
+
+  .page-tabs{display:flex;align-items:center;gap:4px;margin-bottom:14px;flex-wrap:wrap;}
+  .page-tabs .ptab{
+    appearance:none;border:1px solid var(--line-strong);background:var(--bg);
+    color:var(--text-muted);font-family:inherit;font-size:12.5px;font-weight:700;
+    padding:8px 16px;cursor:pointer;border-radius:3px 3px 0 0;border-bottom:none;
+  }
+  .page-tabs .ptab.active{color:var(--primary);background:var(--bg);border-bottom:2px solid var(--bg);position:relative;top:1px;}
+  .page-tabs .ptab:not(.active){background:var(--bg-soft);}
+  .page-tabs .fill{flex:1;}
+  .page-section{display:none;}
+  .page-section.active{display:block;}
+
+  .search-layout{display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start;}
+
+  .cam-check-list{border:1px solid var(--line);max-height:220px;overflow-y:auto;}
+  .cam-check-list .cc-group{padding:6px 10px;background:var(--bg-soft);font-size:11px;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line);}
+  .cam-check-list label{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:12px;color:var(--text);border-bottom:1px solid var(--line);cursor:pointer;}
+  .cam-check-list label:last-child{border-bottom:none;}
+  .cam-check-list label:hover{background:var(--bg-soft);}
+
+  .sim-row{display:flex;align-items:center;gap:10px;}
+  .sim-row input[type=range]{flex:1;accent-color:var(--primary);}
+  .sim-row .sim-val{font-weight:700;color:var(--navy);font-size:13px;min-width:38px;text-align:right;}
+
+  .result-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px;color:var(--text-muted);}
+  .result-toolbar b{color:var(--navy);}
+  .result-toolbar .fill{flex:1;}
+  .view-toggle{display:flex;border:1px solid var(--line-strong);border-radius:3px;overflow:hidden;}
+  .view-toggle button{appearance:none;border:none;background:var(--bg);padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);}
+  .view-toggle button.active{background:var(--primary);color:#fff;}
+
+  .track-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+    gap:12px;margin-bottom:20px;
+  }
+  .track-card{
+    background:var(--bg);border:1px solid var(--line);cursor:pointer;
+    transition:border-color .12s;
+  }
+  .track-card:hover{border-color:var(--line-strong);}
+  .track-card.selected{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary) inset;}
+  .track-thumb{
+    aspect-ratio:1/1;background:#D8DEE6;
+    display:flex;align-items:center;justify-content:center;
+    color:#6B7480;font-size:11px;font-weight:600;text-align:center;padding:8px;
+    position:relative;
+  }
+  .track-thumb .cnt{
+    position:absolute;top:5px;right:5px;background:rgba(0,23,61,.78);color:#fff;
+    font-size:10px;font-weight:700;padding:2px 6px;border-radius:2px;
+  }
+  .track-meta{padding:7px 9px;}
+  .track-meta .t-cam{font-size:11.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .track-meta .t-time{font-size:11px;color:var(--text-faint);}
+
+  .detail-card{display:grid;grid-template-columns:280px 1fr;gap:20px;}
+  .big-thumb{
+    aspect-ratio:4/3;background:#D8DEE6;
+    display:flex;align-items:center;justify-content:center;
+    color:#5B6675;font-size:12.5px;font-weight:600;text-align:center;padding:16px;
+  }
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:16px;}
+  .detail-grid .dg-item{font-size:12.5px;}
+  .detail-grid .dg-item span{display:block;color:var(--text-faint);font-size:11px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px;}
+  .detail-grid .dg-item b{color:var(--text);font-weight:600;}
+
+  .style-chip-row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px;}
+  .style-chip{
+    border:1.5px solid var(--line-strong);padding:10px 12px;border-radius:4px;
+    font-size:11.5px;color:var(--text-muted);cursor:pointer;min-width:150px;line-height:1.6;
+  }
+  .style-chip.on{border-color:var(--primary);color:var(--navy);background:#F3F8FF;}
+  .style-chip b{display:block;color:var(--navy);font-size:12px;margin-bottom:2px;}
+
+  .attr-chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .attr-chip{
+    border:1.5px solid var(--line-strong);padding:6px 13px;border-radius:20px;
+    font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;
+  }
+  .attr-chip.on{border-color:var(--primary);color:var(--primary);}
+  .attr-chip.disabled{color:var(--text-faint);border-color:var(--line);cursor:not-allowed;}
+
+  .thumb-mini{width:40px;height:40px;background:#D8DEE6;color:#6B7480;font-size:8.5px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;}
+
+  .badge.b-fav{background:#E9F0FC;color:var(--primary);}
+  .badge.b-unfav{background:var(--bg-soft2);color:var(--text-muted);}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Phát hiện khuôn mặt</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Phát hiện khuôn mặt</h1>
+        <span class="scope">Tìm kiếm &amp; quản lý các track khuôn mặt được AI camera phát hiện trên toàn hệ thống</span>
+      </div>
+
+      <div class="notice-box">
+        <span class="ni">ⓘ</span>
+        <span>Dữ liệu khuôn mặt là dữ liệu cá nhân nhạy cảm. Thu thập, lưu trữ, khai thác phải tuân thủ <b>Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân</b> — chỉ dùng cho mục đích an ninh đã đăng ký, hạn chế truy cập theo phân quyền NOC, và mã hoá khi lưu trữ. Ảnh minh hoạ trong màn hình này là khối placeholder, không phải dữ liệu khuôn mặt thật.</span>
+      </div>
+
+      <div class="page-tabs">
+        <button class="ptab active" onclick="switchSection(event,'sec-search')">Tìm kiếm track</button>
+        <button class="ptab" onclick="switchSection(event,'sec-manage')">Quản lý track</button>
+        <div class="fill"></div>
+        <button class="btn" onclick="openModal('modal-attr')">Cấu hình hiển thị thuộc tính</button>
+      </div>
+
+      <!-- ═══════════ SECTION: Tìm kiếm track ═══════════ -->
+      <div class="page-section active" id="sec-search">
+        <div class="search-layout">
+
+          <!-- Left: filter -->
+          <div class="card">
+            <h2>Bộ lọc tìm kiếm</h2>
+
+            <div class="field" style="margin-bottom:12px;">
+              <label>Từ thời điểm</label>
+              <input type="text" value="21/05/2026 00:00:00">
+            </div>
+            <div class="field" style="margin-bottom:14px;">
+              <label>Đến thời điểm</label>
+              <input type="text" value="21/05/2026 23:59:59">
+            </div>
+            <div class="hint" style="margin-bottom:14px;">Khoảng thời gian tìm kiếm không vượt quá 7 ngày.</div>
+
+            <div class="field" style="margin-bottom:14px;">
+              <label>Camera / kênh</label>
+              <div class="cam-check-list">
+                <div class="cc-group">Quận Cầu Giấy, TP. Hà Nội</div>
+                <label><input type="checkbox" checked> Camera Cổng chính Toà nhà VNPT Cầu Giấy</label>
+                <label><input type="checkbox" checked> Camera Ngã tư Nguyễn Trãi - Khuất Duy Tiến</label>
+                <label><input type="checkbox"> Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ</label>
+                <div class="cc-group">KCN Bắc Thăng Long</div>
+                <label><input type="checkbox" checked> Camera Cổng chính KCN Bắc Thăng Long</label>
+                <label><input type="checkbox"> Camera Kho vận số 3</label>
+                <label><input type="checkbox"> Camera Bãi đỗ xe nhà máy Canon</label>
+                <div class="cc-group">Cao tốc HN - Hải Phòng</div>
+                <label><input type="checkbox"> Camera Km12+400 cao tốc HN - Hải Phòng</label>
+                <label><input type="checkbox"> Camera Trạm thu phí Quốc lộ 5B Km9</label>
+              </div>
+            </div>
+
+            <div class="field" style="margin-bottom:6px;">
+              <label>Độ tương đồng tối thiểu</label>
+              <div class="sim-row">
+                <input type="range" min="50" max="100" value="85">
+                <span class="sim-val tabular">85%</span>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;margin-top:14px;justify-content:center;">Tìm kiếm</button>
+          </div>
+
+          <!-- Right: results -->
+          <div>
+            <div class="result-toolbar">
+              <span>Tổng số bản ghi: <b class="tabular">6</b> track</span>
+              <span>· Độ tương đồng ≥ <b>85%</b></span>
+              <div class="fill"></div>
+              <div class="view-toggle">
+                <button class="active" title="Dạng lưới">▦</button>
+                <button title="Dạng bản đồ">🗺</button>
+              </div>
+            </div>
+
+            <div class="track-grid">
+              <div class="track-card selected" onclick="selectTrack(this)">
+                <div class="track-thumb"><span class="cnt">×4</span>Ảnh khuôn mặt #042</div>
+                <div class="track-meta"><div class="t-cam">Cổng chính KCN Bắc Thăng Long</div><div class="t-time tabular">21/05 14:27:45</div></div>
+              </div>
+              <div class="track-card" onclick="selectTrack(this)">
+                <div class="track-thumb"><span class="cnt">×2</span>Ảnh khuôn mặt #087</div>
+                <div class="track-meta"><div class="t-cam">Ngã tư Nguyễn Trãi - Khuất Duy Tiến</div><div class="t-time tabular">21/05 09:12:03</div></div>
+              </div>
+              <div class="track-card" onclick="selectTrack(this)">
+                <div class="track-thumb"><span class="cnt">×1</span>Ảnh khuôn mặt #103</div>
+                <div class="track-meta"><div class="t-cam">Cổng chính Toà nhà VNPT Cầu Giấy</div><div class="t-time tabular">21/05 08:41:19</div></div>
+              </div>
+              <div class="track-card" onclick="selectTrack(this)">
+                <div class="track-thumb"><span class="cnt">×5</span>Ảnh khuôn mặt #118</div>
+                <div class="track-meta"><div class="t-cam">Kho vận số 3</div><div class="t-time tabular">21/05 15:03:52</div></div>
+              </div>
+              <div class="track-card" onclick="selectTrack(this)">
+                <div class="track-thumb"><span class="cnt">×3</span>Ảnh khuôn mặt #126</div>
+                <div class="track-meta"><div class="t-cam">Bãi đỗ xe nhà máy Canon</div><div class="t-time tabular">21/05 11:57:08</div></div>
+              </div>
+              <div class="track-card" onclick="selectTrack(this)">
+                <div class="track-thumb"><span class="cnt">×2</span>Ảnh khuôn mặt #131</div>
+                <div class="track-meta"><div class="t-cam">Km12+400 cao tốc HN - Hải Phòng</div><div class="t-time tabular">21/05 06:24:37</div></div>
+              </div>
+            </div>
+
+            <!-- Detail panel -->
+            <div class="card">
+              <h2>Chi tiết track #042</h2>
+              <div class="detail-card">
+                <div>
+                  <div class="big-thumb">Khung hình trích xuất<br>Camera Cổng chính KCN Bắc Thăng Long<br>21/05/2026 14:27:45</div>
+                  <div class="mini-bullet" style="margin-top:12px;">
+                    <span class="mb-label">Chất lượng ảnh</span>
+                    <span class="mb-track"><span class="mb-fill" style="width:88%"></span></span>
+                    <span class="mb-label tabular">88/100</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="detail-grid">
+                    <div class="dg-item"><span>Nguồn dữ liệu</span><b>Phát hiện khuôn mặt</b></div>
+                    <div class="dg-item"><span>Độ tương đồng</span><b>93%</b></div>
+                    <div class="dg-item"><span>Thời gian gần nhất</span><b class="tabular">21/05/2026 15:41:02</b></div>
+                    <div class="dg-item"><span>Vị trí</span><b>Cổng chính KCN Bắc Thăng Long</b></div>
+                    <div class="dg-item"><span>Giới tính</span><b>Không xác định</b></div>
+                    <div class="dg-item"><span>Độ tuổi ước tính</span><b>Không xác định</b></div>
+                    <div class="dg-item"><span>Đeo kính</span><b>Không</b></div>
+                    <div class="dg-item"><span>Đeo khẩu trang</span><b>Có</b></div>
+                  </div>
+
+                  <table class="scan-table">
+                    <thead>
+                      <tr><th>Ảnh</th><th>Thời gian</th><th>Camera</th><th>Độ tương đồng</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><div class="thumb-mini">#042-1</div></td>
+                        <td class="mono-cell tabular">14:27:45</td>
+                        <td>Cổng chính KCN Bắc Thăng Long</td>
+                        <td class="tabular">93%</td>
+                        <td><a class="op-link">▶ Phát lại</a></td>
+                      </tr>
+                      <tr>
+                        <td><div class="thumb-mini">#042-2</div></td>
+                        <td class="mono-cell tabular">14:41:12</td>
+                        <td>Kho vận số 3</td>
+                        <td class="tabular">90%</td>
+                        <td><a class="op-link">▶ Phát lại</a></td>
+                      </tr>
+                      <tr>
+                        <td><div class="thumb-mini">#042-3</div></td>
+                        <td class="mono-cell tabular">15:02:38</td>
+                        <td>Cổng chính KCN Bắc Thăng Long</td>
+                        <td class="tabular">91%</td>
+                        <td><a class="op-link">▶ Phát lại</a></td>
+                      </tr>
+                      <tr>
+                        <td><div class="thumb-mini">#042-4</div></td>
+                        <td class="mono-cell tabular">15:41:02</td>
+                        <td>Bãi đỗ xe nhà máy Canon</td>
+                        <td class="tabular">87%</td>
+                        <td><a class="op-link">▶ Phát lại</a></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ SECTION: Quản lý track ═══════════ -->
+      <div class="page-section" id="sec-manage">
+        <div class="toolbar">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;"><input type="checkbox" onclick="toggleAllTrack(this)"> Chọn tất cả</label>
+          <button class="btn btn-primary">Thêm vào mục yêu thích</button>
+          <button class="btn" disabled>Gỡ track</button>
+          <button class="btn">Gỡ track trùng lặp</button>
+          <div class="fill"></div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-muted);"><input type="checkbox"> Chỉ hiện track chưa gắn yêu thích</label>
+        </div>
+
+        <div class="table-scroll">
+          <table class="devices" style="min-width:1080px;">
+            <thead>
+              <tr>
+                <th><input type="checkbox"></th>
+                <th>Ảnh đại diện</th>
+                <th>Mã track</th>
+                <th class="sortable sorted">Camera xuất hiện gần nhất <span class="arrow">▾</span></th>
+                <th>Thời gian gần nhất</th>
+                <th>Số lần xuất hiện</th>
+                <th>Yêu thích</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><div class="thumb-mini">#042</div></td>
+                <td class="mono-cell">TRK-260521-042</td>
+                <td>Cổng chính KCN Bắc Thăng Long</td>
+                <td class="mono-cell tabular">21/05/2026 15:41:02</td>
+                <td class="tabular">4</td>
+                <td><span class="badge b-fav">Đã lưu</span></td>
+                <td><a class="op-link">Xem chi tiết</a><a class="op-link danger">Gỡ</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><div class="thumb-mini">#087</div></td>
+                <td class="mono-cell">TRK-260521-087</td>
+                <td>Ngã tư Nguyễn Trãi - Khuất Duy Tiến</td>
+                <td class="mono-cell tabular">21/05/2026 09:14:51</td>
+                <td class="tabular">2</td>
+                <td><span class="badge b-unfav">Chưa lưu</span></td>
+                <td><a class="op-link">Xem chi tiết</a><a class="op-link danger">Gỡ</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><div class="thumb-mini">#103</div></td>
+                <td class="mono-cell">TRK-260521-103</td>
+                <td>Cổng chính Toà nhà VNPT Cầu Giấy</td>
+                <td class="mono-cell tabular">21/05/2026 08:41:19</td>
+                <td class="tabular">1</td>
+                <td><span class="badge b-unfav">Chưa lưu</span></td>
+                <td><a class="op-link">Xem chi tiết</a><a class="op-link danger">Gỡ</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><div class="thumb-mini">#118</div></td>
+                <td class="mono-cell">TRK-260521-118</td>
+                <td>Kho vận số 3</td>
+                <td class="mono-cell tabular">21/05/2026 15:09:44</td>
+                <td class="tabular">5</td>
+                <td><span class="badge b-fav">Đã lưu</span></td>
+                <td><a class="op-link">Xem chi tiết</a><a class="op-link danger">Gỡ</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><div class="thumb-mini">#126</div></td>
+                <td class="mono-cell">TRK-260521-126</td>
+                <td>Bãi đỗ xe nhà máy Canon</td>
+                <td class="mono-cell tabular">21/05/2026 12:03:15</td>
+                <td class="tabular">3</td>
+                <td><span class="badge b-unfav">Chưa lưu</span></td>
+                <td><a class="op-link">Xem chi tiết</a><a class="op-link danger">Gỡ</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check" onclick="onRowCheck(this)"></td>
+                <td><div class="thumb-mini">#131</div></td>
+                <td class="mono-cell">TRK-260521-131</td>
+                <td>Km12+400 cao tốc HN - Hải Phòng</td>
+                <td class="mono-cell tabular">21/05/2026 06:31:02</td>
+                <td class="tabular">2</td>
+                <td><span class="badge b-unfav">Chưa lưu</span></td>
+                <td><a class="op-link">Xem chi tiết</a><a class="op-link danger">Gỡ</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-foot">
+          <span>Tổng <b class="tabular">6</b> track được ghi nhận trong 7 ngày gần nhất</span>
+          <div class="pager">
+            <button disabled>‹</button>
+            <button class="active">1</button>
+            <button>›</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════ MODAL: Cấu hình hiển thị thuộc tính ═══════════ -->
+  <div class="overlay" id="modal-attr">
+    <div class="modal w-wide">
+      <div class="modal-head">
+        <h2>Cấu hình hiển thị thuộc tính AI</h2>
+        <button class="x" onclick="closeModal('modal-attr')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(event,'atab-face')">Khuôn mặt</button>
+          <button class="tab-btn" onclick="switchTab(event,'atab-human')">Người</button>
+          <button class="tab-btn" onclick="switchTab(event,'atab-mv')">Xe cơ giới</button>
+          <button class="tab-btn" onclick="switchTab(event,'atab-nmv')">Xe thô sơ</button>
+        </div>
+
+        <div class="tab-panel active" id="atab-face">
+          <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:16px;">
+            <input type="checkbox" checked style="width:auto;"> <label style="text-transform:none;font-weight:600;font-size:13px;color:var(--text);">Bật cấu hình thuộc tính AI hiển thị trên khung nhận diện</label>
+          </div>
+
+          <h2 style="font-size:12.5px;">Kiểu khung hiển thị</h2>
+          <div class="style-chip-row">
+            <div class="style-chip on"><b>Phát hiện khuôn mặt</b>Tên camera + giờ, 1 ảnh</div>
+            <div class="style-chip"><b>CSDL khuôn mặt</b>Tên đối tượng + giờ, 2 ảnh so khớp</div>
+            <div class="style-chip"><b>Nhận diện khuôn mặt</b>Tên camera + giờ, gắn nhãn "Người lạ"</div>
+            <div class="style-chip"><b>CSDL khuôn mặt — vượt ngưỡng</b>Tên + giờ, gắn nhãn "Vượt số lần"</div>
+          </div>
+
+          <h2 style="font-size:12.5px;">Thuộc tính hiển thị (4/6)</h2>
+          <div class="attr-chip-row">
+            <span class="attr-chip on">Giới tính</span>
+            <span class="attr-chip on">Độ tuổi</span>
+            <span class="attr-chip on">Đeo kính</span>
+            <span class="attr-chip on">Đeo khẩu trang</span>
+            <span class="attr-chip disabled">Biểu cảm</span>
+            <span class="attr-chip disabled">Râu</span>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="atab-human">
+          <div class="hint">Cấu hình thuộc tính hiển thị cho đối tượng Người — xem chi tiết tại màn <b>Video metadata</b>.</div>
+        </div>
+        <div class="tab-panel" id="atab-mv">
+          <div class="hint">Cấu hình thuộc tính hiển thị cho Xe cơ giới — xem chi tiết tại màn <b>Video metadata</b>.</div>
+        </div>
+        <div class="tab-panel" id="atab-nmv">
+          <div class="hint">Cấu hình thuộc tính hiển thị cho Xe thô sơ — xem chi tiết tại màn <b>Video metadata</b>.</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-attr')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-attr')">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  function switchTab(ev, id){
+    const modal = ev.target.closest('.modal');
+    modal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    modal.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    modal.querySelector('#'+id).classList.add('active');
+  }
+
+  function switchSection(ev, id){
+    document.querySelectorAll('.page-tabs .ptab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page-section').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  function selectTrack(el){
+    document.querySelectorAll('.track-card').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function toggleAllTrack(src){
+    document.querySelectorAll('#sec-manage .row-check').forEach(cb=>{
+      cb.checked = src.checked;
+      cb.closest('tr').classList.toggle('selected', src.checked);
+    });
+  }
+  function onRowCheck(cb){
+    cb.closest('tr').classList.toggle('selected', cb.checked);
+  }
+</script>
+
+</body>
+</html>

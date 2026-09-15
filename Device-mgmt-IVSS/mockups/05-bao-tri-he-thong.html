@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bảo trì hệ thống · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn "Bảo trì hệ thống" (05-bao-tri) — KẾ THỪA hệ thống thiết kế đã
+  chốt ở direction-approved.md (hướng 🧠 Thiết kế sư hàng đầu / triết lý
+  Edward Tufte). Không đi lại quy trình 3-hướng — đây là màn hình thứ 2
+  trong 19 nhóm còn lại, dùng chung shared.css với màn neo 04-cau-hinh-1.
+
+  Nguồn tham chiếu cấu trúc: ../refs/05-bao-tri/ (13 ảnh, fig9-01..fig9-13).
+  Khuôn gốc theo INDEX.md: "H — Bảng theo dõi tình trạng" (chương 9, trang
+  358-369 sách hướng dẫn Dahua IVSS V7.1.0) — đây là màn vận hành/giám sát
+  sức khoẻ hệ thống, không phải form cấu hình đơn thuần.
+
+  ── CẤU TRÚC ĐÃ DỰNG ──────────────────────────────────────────────────
+  1 trang, không có tree-pane địa bàn (shell.no-tree) — bảo trì là phạm vi
+  toàn hệ thống, không theo nhánh địa bàn như màn neo. Resource-strip trên
+  cùng giữ 3 chỉ số "mạch sống" hệ thống (CPU/RAM/Lưu trữ) hiển thị xuyên
+  suốt mọi tab, đúng triết lý Tufte "tổng quan trước, chi tiết sau".
+
+  4 tab lớn (tái dùng class .tabs/.tab-btn/.tab-panel đã có sẵn trong
+  shared.css, vốn được dùng cho tab trong modal — ở đây dùng ở cấp trang):
+    • Tổng quan sức khoẻ  → fig9-01, fig9-02, fig9-03, fig9-04, fig9-05
+      (tài nguyên theo thời gian dạng small-multiple thanh mini, phiên bản
+      thuật toán AI, thông tin lưu trữ theo bullet-graph từng ổ/RAID,
+      người dùng đang trực tuyến)
+    • Chẩn đoán           → fig9-06, fig9-07, fig9-08
+      (kiểm tra mạng ping/traceroute, S.M.A.R.T từng ổ đĩa, sức khoẻ ổ đĩa
+      hệ thống — dùng lại chip trạng thái ok/warn/err có sẵn)
+    • Nhật ký & Cập nhật  → fig9-09, fig9-10
+      (bảng log có bộ lọc, bảng firmware từng thành phần)
+    • Bảo trì & Khôi phục → fig9-11, fig9-12, fig9-13
+      (thao tác thủ công kỹ thuật viên, tự động bảo trì theo lịch, khôi
+      phục mặc định — cô lập trong "vùng nguy hiểm" riêng ở cuối trang)
+
+  ── PATTERN MỚI (scoped CSS riêng trong file này, KHÔNG đụng shared.css) ─
+  .kpi-row/.kpi-tile   — thẻ chỉ số nhanh (uptime, nhiệt độ, phiên AI...)
+  .hbars                — small-multiple thanh mini theo thời gian (CSS
+                          thuần, không SVG vẽ tay) cho CPU/RAM/băng thông
+  .net-result           — khối kết quả ping/traceroute dạng terminal
+  .action-row            — hàng "mô tả + nút" cho thao tác bảo trì thủ công
+  .danger-zone           — biến thể .card viền đỏ, cô lập nút khôi phục
+                          mặc định khỏi các nút thao tác thường (yêu cầu spec)
+  .btn-danger             — nút nguy hiểm dùng --error, disabled tới khi
+                          tick xác nhận (JS toggleRestoreBtn)
+
+  ── GIẢ ĐỊNH DỮ LIỆU ──────────────────────────────────────────────────
+  Số liệu CPU/RAM/nhiệt độ/dung lượng/log/SMART là dữ liệu mẫu hợp lý cho
+  1 NVR/máy chủ IVSS tầm trung (RAID 5 8×8TB), không tra cứu từ thiết bị
+  thật — phù hợp vai trò mockup hi-fi. Không có ảnh refs/*.png nào được
+  nhúng vào file, không copy pixel-for-pixel.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* ───────── KPI quick-stat tiles ───────── */
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
+  .kpi-tile{background:var(--bg);border:1px solid var(--line);padding:13px 16px;}
+  .kpi-tile .kt-label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.35px;margin-bottom:6px;}
+  .kpi-tile .kt-value{font-size:21px;font-weight:800;color:var(--navy);line-height:1.1;}
+  .kpi-tile .kt-value small{font-size:12px;font-weight:600;color:var(--text-faint);}
+  .kpi-tile .kt-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
+  .kpi-tile.warn .kt-value{color:var(--warning);}
+
+  /* ───────── Small-multiple mini bar history (Tufte-style) ───────── */
+  .hbars-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 32px;}
+  .hbars-unit .hu-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
+  .hbars-unit .hu-label{font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.35px;}
+  .hbars-unit .hu-now{font-size:15px;font-weight:800;color:var(--navy);}
+  .hbars-unit .hu-now small{font-size:11px;font-weight:500;color:var(--text-faint);}
+  .hbars{display:flex;align-items:flex-end;gap:3px;height:44px;border-bottom:1px solid var(--line);padding-bottom:1px;}
+  .hbars i{flex:1;height:100%;background:var(--bg-soft2);position:relative;display:block;}
+  .hbars i b{position:absolute;left:0;right:0;bottom:0;display:block;background:var(--primary);}
+  .hbars i:last-child b{background:var(--navy);}
+  .hbars-unit .hu-foot{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-faint);margin-top:4px;}
+
+  /* ───────── Network test result (terminal-style, tiết chế) ───────── */
+  .net-result{
+    background:var(--navy);color:#CFE0FA;
+    font-family:var(--mono);font-size:12px;line-height:1.65;
+    padding:14px 16px;white-space:pre-wrap;margin-top:14px;
+  }
+  .net-result .ok{color:#7FE0A8;}
+  .net-result .hd{color:#8FB8E8;}
+
+  /* ───────── Manual maintenance action rows ───────── */
+  .action-row{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:13px 0;border-bottom:1px solid var(--line);
+  }
+  .action-row:last-child{border-bottom:none;}
+  .action-row .ar-title{font-size:13px;font-weight:700;color:var(--text);}
+  .action-row .ar-desc{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+  .action-row .btn{flex:none;white-space:nowrap;}
+
+  /* ───────── Danger zone (khôi phục mặc định — cô lập khỏi nút thường) ──── */
+  .danger-zone{
+    background:var(--bg);
+    border:1px solid var(--error);
+    padding:20px 22px;
+    margin-top:22px;
+  }
+  .danger-zone h2{font-size:14px;font-weight:700;color:var(--error);margin:0 0 4px;display:flex;align-items:center;gap:8px;}
+  .danger-zone .dz-sub{font-size:12px;color:var(--text-muted);margin-bottom:14px;}
+  .confirm-line{display:flex;align-items:flex-start;gap:9px;margin:14px 0 16px;font-size:12.5px;color:var(--text);line-height:1.5;}
+  .confirm-line input{margin-top:3px;flex:none;}
+  .btn-danger{background:var(--error);border-color:var(--error);color:#fff;}
+  .btn-danger:hover{background:#8f1e17;border-color:#8f1e17;color:#fff;}
+  .btn-danger[disabled]{color:var(--text-faint);border-color:var(--line);background:var(--bg-soft);cursor:not-allowed;}
+
+  /* ───────── Schedule form helpers ───────── */
+  .chk-group{display:flex;flex-direction:column;gap:8px;}
+  .chk-line{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);}
+  .day-pick{display:flex;gap:6px;flex-wrap:wrap;}
+  .day-pick span{
+    width:34px;height:28px;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line-strong);font-size:11.5px;color:var(--text-muted);cursor:pointer;
+  }
+  .day-pick span.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700;}
+  .run-meta{display:flex;gap:28px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--text-muted);}
+  .run-meta b{color:var(--text);font-weight:600;}
+
+  .card .card-sub{font-size:12px;color:var(--text-muted);margin:-10px 0 14px;}
+  .card h2 .cnt{font-weight:500;color:var(--text-faint);font-size:12px;margin-left:6px;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Bảo trì &nbsp;/&nbsp; <b>Bảo trì hệ thống</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <!-- ═══════════ RESOURCE STRIP — mạch sống hệ thống, hiển thị xuyên suốt mọi tab ═══════════ -->
+  <div class="resource-strip cols-3">
+    <div class="bullet">
+      <span class="b-label">CPU hệ thống</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:34.6%"></span>
+        <span class="b-tick" style="left:85%"></span>
+      </span>
+      <span class="b-figure tabular">34,6% <small>ngưỡng cảnh báo 85%</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">RAM đang dùng</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:47.8%"></span>
+        <span class="b-tick" style="left:90%"></span>
+      </span>
+      <span class="b-figure tabular">61,2 GB <small>/ 128 GB · 47,8%</small></span>
+    </div>
+    <div class="bullet">
+      <span class="b-label">Lưu trữ tổng</span>
+      <span class="b-track">
+        <span class="b-fill" style="width:66.9%"></span>
+        <span class="b-tick" style="left:92%"></span>
+      </span>
+      <span class="b-figure tabular">42,8 TB <small>/ 64 TB · 66,9%</small></span>
+    </div>
+  </div>
+
+  <!-- ═══════════ SHELL: không tree-pane, bảo trì là phạm vi toàn hệ thống ═══════════ -->
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Bảo trì hệ thống</h1>
+        <span class="scope">Máy chủ IVSS-NOC-01 — <b>đang hoạt động bình thường</b> · uptime 47 ngày 6 giờ</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchMainTab(event,'tab-overview')">Tổng quan sức khoẻ</button>
+        <button class="tab-btn" onclick="switchMainTab(event,'tab-diag')">Chẩn đoán</button>
+        <button class="tab-btn" onclick="switchMainTab(event,'tab-logs')">Nhật ký &amp; Cập nhật</button>
+        <button class="tab-btn" onclick="switchMainTab(event,'tab-maint')">Bảo trì &amp; Khôi phục</button>
+      </div>
+
+      <!-- ═══════ TAB 1: TỔNG QUAN SỨC KHOẺ ═══════ -->
+      <div class="tab-panel active" id="tab-overview">
+
+        <div class="kpi-row">
+          <div class="kpi-tile">
+            <div class="kt-label">Thời gian hoạt động</div>
+            <div class="kt-value">47 <small>ngày</small> 06 <small>giờ</small></div>
+            <div class="kt-sub">Khởi động lần gần nhất: 29/07/2026 08:14</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kt-label">Nhiệt độ CPU</div>
+            <div class="kt-value">52 <small>°C</small></div>
+            <div class="kt-sub">Ngưỡng cảnh báo 75°C</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kt-label">Phiên AI đang xử lý</div>
+            <div class="kt-value">18 <small>luồng</small></div>
+            <div class="kt-sub">Trên tổng 24 kênh bật AI</div>
+          </div>
+          <div class="kpi-tile warn">
+            <div class="kt-label">Cảnh báo 24 giờ qua</div>
+            <div class="kt-value">3</div>
+            <div class="kt-sub">1 lưu trữ · 1 mô hình AI · 1 mạng</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Tài nguyên hệ thống theo thời gian <span class="cnt">1 giờ gần nhất, mỗi mốc 5 phút</span></h2>
+          <div class="hbars-grid">
+            <div class="hbars-unit">
+              <div class="hu-head"><span class="hu-label">CPU</span><span class="hu-now">34,6%</span></div>
+              <div class="hbars">
+                <i><b style="height:38%"></b></i><i><b style="height:44%"></b></i><i><b style="height:41%"></b></i>
+                <i><b style="height:52%"></b></i><i><b style="height:58%"></b></i><i><b style="height:49%"></b></i>
+                <i><b style="height:45%"></b></i><i><b style="height:40%"></b></i><i><b style="height:37%"></b></i>
+                <i><b style="height:33%"></b></i><i><b style="height:36%"></b></i><i><b style="height:35%"></b></i>
+              </div>
+              <div class="hu-foot"><span>-60 phút</span><span>hiện tại</span></div>
+            </div>
+            <div class="hbars-unit">
+              <div class="hu-head"><span class="hu-label">RAM</span><span class="hu-now">47,8% <small>· 61,2GB</small></span></div>
+              <div class="hbars">
+                <i><b style="height:44%"></b></i><i><b style="height:45%"></b></i><i><b style="height:46%"></b></i>
+                <i><b style="height:47%"></b></i><i><b style="height:49%"></b></i><i><b style="height:50%"></b></i>
+                <i><b style="height:48%"></b></i><i><b style="height:47%"></b></i><i><b style="height:46%"></b></i>
+                <i><b style="height:47%"></b></i><i><b style="height:48%"></b></i><i><b style="height:48%"></b></i>
+              </div>
+              <div class="hu-foot"><span>-60 phút</span><span>hiện tại</span></div>
+            </div>
+            <div class="hbars-unit">
+              <div class="hu-head"><span class="hu-label">Băng thông mạng</span><span class="hu-now">312,5 <small>Mbps</small></span></div>
+              <div class="hbars">
+                <i><b style="height:52%"></b></i><i><b style="height:55%"></b></i><i><b style="height:60%"></b></i>
+                <i><b style="height:58%"></b></i><i><b style="height:63%"></b></i><i><b style="height:70%"></b></i>
+                <i><b style="height:66%"></b></i><i><b style="height:61%"></b></i><i><b style="height:57%"></b></i>
+                <i><b style="height:54%"></b></i><i><b style="height:59%"></b></i><i><b style="height:61%"></b></i>
+              </div>
+              <div class="hu-foot"><span>-60 phút</span><span>hiện tại</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Phiên bản thuật toán AI đang chạy <span class="cnt">6 mô hình</span></h2>
+          <div class="table-scroll">
+            <table class="devices" style="min-width:0;">
+              <thead>
+                <tr>
+                  <th>Thuật toán</th><th>Phiên bản đang chạy</th><th>Phiên bản mới nhất</th>
+                  <th>Ngày cập nhật gần nhất</th><th>Trạng thái</th><th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="chname">Nhận diện khuôn mặt</td>
+                  <td class="mono-cell">v3.4.2</td><td class="mono-cell">v3.4.2</td>
+                  <td class="tabular">02/09/2026</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Đã cập nhật</span></td>
+                  <td><a class="op-link">Chi tiết</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">Phát hiện phương tiện</td>
+                  <td class="mono-cell">v2.8.0</td><td class="mono-cell">v2.9.1</td>
+                  <td class="tabular">15/08/2026</td>
+                  <td><span class="chip c-warn"><i class="dot warn"></i>Có bản cập nhật</span></td>
+                  <td><a class="op-link">Cập nhật</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">Nhận diện biển số (ANPR)</td>
+                  <td class="mono-cell">v4.1.5</td><td class="mono-cell">v4.1.5</td>
+                  <td class="tabular">02/09/2026</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Đã cập nhật</span></td>
+                  <td><a class="op-link">Chi tiết</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">Phân tích hành vi</td>
+                  <td class="mono-cell">v1.6.3</td><td class="mono-cell">v1.6.3</td>
+                  <td class="tabular">20/07/2026</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Đã cập nhật</span></td>
+                  <td><a class="op-link">Chi tiết</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">Phát hiện xâm nhập</td>
+                  <td class="mono-cell">v2.2.0</td><td class="mono-cell">v2.3.0</td>
+                  <td class="tabular">15/08/2026</td>
+                  <td><span class="chip c-warn"><i class="dot warn"></i>Có bản cập nhật</span></td>
+                  <td><a class="op-link">Cập nhật</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">Đếm người &amp; phương tiện<span class="sub">Lần tải model gần nhất thất bại — đang dùng bản cache v1.9.4</span></td>
+                  <td class="mono-cell">v1.9.4</td><td class="mono-cell">v1.9.4</td>
+                  <td class="tabular">10/09/2026</td>
+                  <td><span class="chip c-err"><i class="dot err"></i>Lỗi tải model</span></td>
+                  <td><a class="op-link">Thử lại</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Thông tin lưu trữ <span class="cnt">4 volume</span></h2>
+          <div class="resource-strip cols-1" style="border:none;padding:0;">
+            <div class="bullet">
+              <span class="b-label">RAID 5 · Dữ liệu ghi hình</span>
+              <span class="b-track"><span class="b-fill" style="width:71.3%"></span><span class="b-tick" style="left:90%"></span></span>
+              <span class="b-figure tabular">34,2 TB <small>/ 48 TB · 8×8TB · 71,3%</small></span>
+            </div>
+            <div class="bullet">
+              <span class="b-label">Ổ hệ thống (SSD NVMe)</span>
+              <span class="b-track"><span class="b-fill" style="width:43.8%"></span><span class="b-tick" style="left:90%"></span></span>
+              <span class="b-figure tabular">210 GB <small>/ 480 GB · 43,8%</small></span>
+            </div>
+            <div class="bullet">
+              <span class="b-label">Ổ nhật ký &amp; cấu hình</span>
+              <span class="b-track"><span class="b-fill" style="width:51.7%"></span><span class="b-tick" style="left:90%"></span></span>
+              <span class="b-figure tabular">62 GB <small>/ 120 GB · 51,7%</small></span>
+            </div>
+            <div class="bullet">
+              <span class="b-label">Dự phòng nóng</span>
+              <span class="b-track"><span class="b-fill" style="width:0%;background:var(--text-faint);"></span></span>
+              <span class="b-figure tabular"><small>0 / 8 TB · đang chờ, chưa đưa vào mảng RAID</small></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Người dùng đang trực tuyến <span class="cnt">4 phiên</span></h2>
+          <div class="table-scroll">
+            <table class="devices" style="min-width:0;">
+              <thead>
+                <tr>
+                  <th>Tài khoản</th><th>Vai trò</th><th>Địa chỉ IP</th><th>Kênh đăng nhập</th>
+                  <th>Thời gian đăng nhập</th><th>Thời lượng phiên</th><th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="chname">nvdat.noc</td><td>Quản trị viên</td><td class="mono-cell">10.20.1.15</td>
+                  <td>Web</td><td class="tabular">15/09/2026 08:12</td><td class="tabular">3g 42p</td>
+                  <td><a class="op-link danger">Ngắt kết nối</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">lethiha.van</td><td>Kỹ thuật viên</td><td class="mono-cell">10.20.1.22</td>
+                  <td>PC Client</td><td class="tabular">15/09/2026 09:05</td><td class="tabular">2g 49p</td>
+                  <td><a class="op-link danger">Ngắt kết nối</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">tranminh.duc</td><td>Vận hành ca</td><td class="mono-cell">10.20.5.101</td>
+                  <td>Web</td><td class="tabular">15/09/2026 10:30</td><td class="tabular">1g 24p</td>
+                  <td><a class="op-link danger">Ngắt kết nối</a></td>
+                </tr>
+                <tr>
+                  <td class="chname">api-integration<span class="sub">Tài khoản dịch vụ, chỉ đọc</span></td><td>Tài khoản API</td><td class="mono-cell">10.20.1.5</td>
+                  <td class="mono-cell">RESTful API</td><td class="tabular">15/09/2026 00:00</td><td class="tabular">11g 54p</td>
+                  <td><span class="chip c-neutral"><i class="dot neutral"></i>Hệ thống</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════ TAB 2: CHẨN ĐOÁN ═══════ -->
+      <div class="tab-panel" id="tab-diag">
+
+        <div class="card">
+          <h2>Kiểm tra mạng</h2>
+          <div class="scan-row">
+            <div class="field">
+              <label>Địa chỉ đích</label>
+              <input type="text" value="8.8.8.8" placeholder="IP hoặc hostname">
+            </div>
+            <div class="field" style="max-width:160px;">
+              <label>Loại kiểm tra</label>
+              <select><option>Ping</option><option>Traceroute</option></select>
+            </div>
+            <div class="field" style="max-width:120px;">
+              <label>Số gói tin</label>
+              <input type="text" value="4">
+            </div>
+            <button class="btn btn-primary" style="height:35px;">Bắt đầu kiểm tra</button>
+          </div>
+
+          <div class="net-result"><span class="hd">PING 8.8.8.8 (8.8.8.8): 56 byte gói tin</span>
+64 byte từ 8.8.8.8: icmp_seq=1 ttl=115 time=8.42 ms
+64 byte từ 8.8.8.8: icmp_seq=2 ttl=115 time=7.98 ms
+64 byte từ 8.8.8.8: icmp_seq=3 ttl=115 time=9.15 ms
+64 byte từ 8.8.8.8: icmp_seq=4 ttl=115 time=8.03 ms
+
+<span class="hd">--- Thống kê 8.8.8.8 ---</span>
+<span class="ok">4 gói đã gửi, 4 gói nhận, 0% mất gói</span>, thời gian 3021ms
+rtt min/avg/max/mdev = 7.98/8.40/9.15/0.44 ms</div>
+        </div>
+
+        <div class="card">
+          <h2>Phát hiện S.M.A.R.T <span class="cnt">6 ổ đĩa vật lý</span></h2>
+          <div class="table-scroll">
+            <table class="devices" style="min-width:0;">
+              <thead>
+                <tr>
+                  <th>Khay</th><th>Model</th><th>Dung lượng</th><th>Nhiệt độ</th>
+                  <th>Giờ hoạt động</th><th>Sector lỗi</th><th>Trạng thái</th><th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tabular">Khay 1</td><td class="mono-cell">ST8000NM0055</td><td class="tabular">8 TB</td>
+                  <td class="tabular">38°C</td><td class="tabular">14.208 giờ</td><td class="tabular">0</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Tốt</span></td><td><a class="op-link">Kiểm tra lại</a></td>
+                </tr>
+                <tr>
+                  <td class="tabular">Khay 2</td><td class="mono-cell">ST8000NM0055</td><td class="tabular">8 TB</td>
+                  <td class="tabular">39°C</td><td class="tabular">14.208 giờ</td><td class="tabular">0</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Tốt</span></td><td><a class="op-link">Kiểm tra lại</a></td>
+                </tr>
+                <tr>
+                  <td class="tabular">Khay 3</td><td class="mono-cell">ST8000NM0055</td><td class="tabular">8 TB</td>
+                  <td class="tabular">41°C</td><td class="tabular">14.206 giờ</td><td class="tabular">2 (đã remap)</td>
+                  <td><span class="chip c-warn"><i class="dot warn"></i>Cảnh báo</span></td><td><a class="op-link">Kiểm tra lại</a></td>
+                </tr>
+                <tr>
+                  <td class="tabular">Khay 4</td><td class="mono-cell">ST8000NM0055</td><td class="tabular">8 TB</td>
+                  <td class="tabular">37°C</td><td class="tabular">14.208 giờ</td><td class="tabular">0</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Tốt</span></td><td><a class="op-link">Kiểm tra lại</a></td>
+                </tr>
+                <tr>
+                  <td class="tabular">Khay 5<span class="sub">Đã thay 15/06/2026</span></td><td class="mono-cell">ST8000NM0055</td><td class="tabular">8 TB</td>
+                  <td class="tabular">44°C</td><td class="tabular">9.120 giờ</td><td class="tabular">0</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Tốt</span></td><td><a class="op-link">Kiểm tra lại</a></td>
+                </tr>
+                <tr>
+                  <td class="tabular">Khay 6</td><td class="mono-cell">ST8000NM0055</td><td class="tabular">8 TB</td>
+                  <td class="tabular">32°C</td><td class="tabular">120 giờ</td><td class="tabular">0</td>
+                  <td><span class="chip c-neutral"><i class="dot neutral"></i>Dự phòng, chưa dùng</span></td><td><a class="op-link">Kiểm tra lại</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Kiểm tra sức khoẻ ổ đĩa hệ thống <span class="cnt">SSD NVMe 480 GB</span></h2>
+          <div class="bullet" style="margin-bottom:14px;">
+            <span class="b-label">Chỉ số sức khoẻ</span>
+            <span class="b-track"><span class="b-fill" style="width:96%"></span><span class="b-tick" style="left:80%"></span></span>
+            <span class="b-figure tabular">96% <small>tốt — dưới 80% khuyến nghị thay thế</small></span>
+          </div>
+          <div class="hbars-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+            <div>
+              <div class="kt-label" style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Kiểm tra đọc</div>
+              <span class="chip c-ok"><i class="dot ok"></i>Đạt</span>
+            </div>
+            <div>
+              <div class="kt-label" style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Kiểm tra ghi</div>
+              <span class="chip c-ok"><i class="dot ok"></i>Đạt</span>
+            </div>
+            <div>
+              <div class="kt-label" style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Bad sector</div>
+              <span class="tabular" style="font-weight:700;">0</span>
+            </div>
+            <div>
+              <div class="kt-label" style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Nhiệt độ</div>
+              <span class="tabular" style="font-weight:700;">41°C</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary">Chạy kiểm tra toàn diện</button>
+            <span class="hint" style="color:var(--text-faint);font-size:12px;margin-left:10px;">Lần kiểm tra gần nhất: 14/09/2026 02:00 · mất khoảng 8 phút</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════ TAB 3: NHẬT KÝ & CẬP NHẬT ═══════ -->
+      <div class="tab-panel" id="tab-logs">
+
+        <div class="card">
+          <h2>Nhật ký hệ thống</h2>
+          <div class="toolbar" style="margin-bottom:12px;">
+            <div class="field" style="max-width:160px;">
+              <select><option>Tất cả loại</option><option>Hệ thống</option><option>Bảo mật</option><option>Vận hành AI</option><option>Thiết bị</option></select>
+            </div>
+            <div class="field" style="max-width:140px;">
+              <select><option>Tất cả mức độ</option><option>Thông tin</option><option>Cảnh báo</option><option>Lỗi</option></select>
+            </div>
+            <div class="field" style="max-width:190px;">
+              <input type="text" placeholder="15/09/2026 – 15/09/2026">
+            </div>
+            <div class="field" style="max-width:220px;">
+              <input type="text" placeholder="Tìm theo nội dung, tài khoản, IP...">
+            </div>
+            <button class="btn">Lọc</button>
+            <div class="fill"></div>
+            <button class="btn">Xuất CSV</button>
+          </div>
+
+          <div class="table-scroll">
+            <table class="devices" style="min-width:0;">
+              <thead>
+                <tr><th>Thời gian</th><th>Mức độ</th><th>Module</th><th>Nội dung</th><th>Nguồn</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tabular">15/09/2026 14:02:11</td>
+                  <td><span class="chip c-err"><i class="dot err"></i>Lỗi</span></td>
+                  <td>AI Engine</td>
+                  <td>Model "Đếm người &amp; phương tiện" tải thất bại — đang dùng bản cache v1.9.4</td>
+                  <td class="mono-cell">hệ thống</td>
+                </tr>
+                <tr>
+                  <td class="tabular">15/09/2026 13:58:47</td>
+                  <td><span class="chip c-warn"><i class="dot warn"></i>Cảnh báo</span></td>
+                  <td>Lưu trữ</td>
+                  <td>Ổ đĩa khay 3 phát hiện 2 sector lỗi (đã remap)</td>
+                  <td class="mono-cell">hệ thống</td>
+                </tr>
+                <tr>
+                  <td class="tabular">15/09/2026 12:30:05</td>
+                  <td><span class="chip c-neutral"><i class="dot neutral"></i>Thông tin</span></td>
+                  <td>Xác thực</td>
+                  <td>Đăng nhập thành công</td>
+                  <td class="mono-cell">nvdat.noc · 10.20.1.15</td>
+                </tr>
+                <tr>
+                  <td class="tabular">15/09/2026 10:30:02</td>
+                  <td><span class="chip c-neutral"><i class="dot neutral"></i>Thông tin</span></td>
+                  <td>Xác thực</td>
+                  <td>Đăng nhập thành công</td>
+                  <td class="mono-cell">tranminh.duc · 10.20.5.101</td>
+                </tr>
+                <tr>
+                  <td class="tabular">15/09/2026 09:12:40</td>
+                  <td><span class="chip c-neutral"><i class="dot neutral"></i>Thông tin</span></td>
+                  <td>Thiết bị</td>
+                  <td>Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ khôi phục kết nối sau 4 phút mất tín hiệu</td>
+                  <td class="mono-cell">hệ thống</td>
+                </tr>
+                <tr>
+                  <td class="tabular">15/09/2026 08:14:00</td>
+                  <td><span class="chip c-neutral"><i class="dot neutral"></i>Thông tin</span></td>
+                  <td>Hệ thống</td>
+                  <td>Hoàn tất khởi động dịch vụ, toàn bộ module đã sẵn sàng</td>
+                  <td class="mono-cell">hệ thống</td>
+                </tr>
+                <tr>
+                  <td class="tabular">14/09/2026 22:47:19</td>
+                  <td><span class="chip c-warn"><i class="dot warn"></i>Cảnh báo</span></td>
+                  <td>Mạng</td>
+                  <td>Độ trễ tới máy chủ NTP nội bộ vượt 200ms trong 3 phút</td>
+                  <td class="mono-cell">hệ thống</td>
+                </tr>
+                <tr>
+                  <td class="tabular">14/09/2026 02:00:03</td>
+                  <td><span class="chip c-neutral"><i class="dot neutral"></i>Thông tin</span></td>
+                  <td>Tự động bảo trì</td>
+                  <td>Đã xoá 1.204 dòng nhật ký cũ hơn 90 ngày, giải phóng 1,4 GB</td>
+                  <td class="mono-cell">lịch tự động</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-foot">
+            <span>Tổng <b class="tabular">4.812</b> dòng nhật ký 30 ngày qua — đang hiển thị 8 dòng</span>
+            <div class="pager">
+              <button disabled>‹</button><button class="active">1</button><button>2</button><button>3</button><button>…</button><button>602</button><button>›</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Cập nhật firmware <span class="cnt">5 thành phần</span></h2>
+          <div class="table-scroll">
+            <table class="devices" style="min-width:0;">
+              <thead>
+                <tr><th>Thành phần</th><th>Phiên bản hiện tại</th><th>Phiên bản mới nhất</th><th>Ngày phát hành</th><th>Trạng thái</th><th>Thao tác</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="chname">Hệ điều hành lõi NVR</td>
+                  <td class="mono-cell">7.1.0.3</td><td class="mono-cell">7.1.0.3</td>
+                  <td class="tabular">20/08/2026</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Đã là mới nhất</span></td>
+                  <td><button class="btn" disabled>Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td class="chname">AI Engine Runtime</td>
+                  <td class="mono-cell">4.2.1</td><td class="mono-cell">4.3.0</td>
+                  <td class="tabular">05/09/2026</td>
+                  <td><span class="chip c-warn"><i class="dot warn"></i>Có bản mới</span></td>
+                  <td><button class="btn btn-primary">Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td class="chname">Driver GPU (NVIDIA)</td>
+                  <td class="mono-cell">535.104</td><td class="mono-cell">535.104</td>
+                  <td class="tabular">02/07/2026</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Đã là mới nhất</span></td>
+                  <td><button class="btn" disabled>Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td class="chname">Firmware RAID Controller</td>
+                  <td class="mono-cell">4.680.00</td><td class="mono-cell">4.690.00</td>
+                  <td class="tabular">28/08/2026</td>
+                  <td><span class="chip c-warn"><i class="dot warn"></i>Có bản mới</span></td>
+                  <td><button class="btn btn-primary">Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td class="chname">Bootloader</td>
+                  <td class="mono-cell">2.3.1</td><td class="mono-cell">2.3.1</td>
+                  <td class="tabular">11/03/2026</td>
+                  <td><span class="chip c-ok"><i class="dot ok"></i>Đã là mới nhất</span></td>
+                  <td><button class="btn" disabled>Cập nhật</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="warn-box">
+            <span class="wi">⚠</span>
+            <span>Cập nhật <b>AI Engine Runtime</b> hoặc <b>Firmware RAID Controller</b> yêu cầu khởi động lại hệ thống, gián đoạn ghi hình khoảng 3-5 phút. Nên thực hiện ngoài giờ cao điểm.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════ TAB 4: BẢO TRÌ & KHÔI PHỤC ═══════ -->
+      <div class="tab-panel" id="tab-maint">
+
+        <div class="card">
+          <h2>Bảo trì bởi kỹ thuật viên</h2>
+          <div class="card-sub">Thao tác thủ công, áp dụng ngay lập tức — dùng khi cần can thiệp nhanh ngoài lịch tự động.</div>
+
+          <div class="action-row">
+            <div>
+              <div class="ar-title">Khởi động lại dịch vụ ghi hình</div>
+              <div class="ar-desc">Áp dụng khi phát hiện luồng ghi bị treo, không ảnh hưởng xem trực tiếp</div>
+            </div>
+            <button class="btn">Khởi động lại</button>
+          </div>
+          <div class="action-row">
+            <div>
+              <div class="ar-title">Khởi động lại AI Engine</div>
+              <div class="ar-desc">Nạp lại toàn bộ model AI đang chạy, gián đoạn phân tích AI khoảng 30-60 giây</div>
+            </div>
+            <button class="btn">Khởi động lại</button>
+          </div>
+          <div class="action-row">
+            <div>
+              <div class="ar-title">Đồng bộ lại thời gian hệ thống</div>
+              <div class="ar-desc">So khớp với máy chủ NTP nội bộ 10.20.0.1 — lệch hiện tại: 0,08 giây</div>
+            </div>
+            <button class="btn">Đồng bộ ngay</button>
+          </div>
+          <div class="action-row">
+            <div>
+              <div class="ar-title">Xoá bộ nhớ đệm tạm (cache/tmp)</div>
+              <div class="ar-desc">Giải phóng khoảng 6,4 GB trên ổ hệ thống, không ảnh hưởng dữ liệu ghi hình</div>
+            </div>
+            <button class="btn">Dọn dẹp</button>
+          </div>
+          <div class="action-row">
+            <div>
+              <div class="ar-title">Khởi động lại toàn bộ hệ thống</div>
+              <div class="ar-desc">Toàn bộ dịch vụ tạm dừng khoảng 3-5 phút — hệ thống sẽ cảnh báo trước khi thực hiện</div>
+            </div>
+            <button class="btn" style="border-color:var(--warning);color:var(--warning);">Khởi động lại hệ thống</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Tự động bảo trì theo lịch</h2>
+          <div class="chk-line" style="margin-bottom:16px;">
+            <input type="checkbox" checked id="auto-on"> <label for="auto-on" style="font-weight:600;">Bật tự động bảo trì theo lịch</label>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Tần suất</label>
+              <select><option>Hàng tuần</option><option>Hàng ngày</option></select>
+            </div>
+            <div class="field">
+              <label>Giờ thực hiện</label>
+              <input type="text" value="02:00">
+            </div>
+            <div class="field full">
+              <label>Ngày trong tuần</label>
+              <div class="day-pick">
+                <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="on">CN</span>
+              </div>
+            </div>
+            <div class="field full">
+              <label>Hành động thực hiện</label>
+              <div class="chk-group">
+                <label class="chk-line"><input type="checkbox" checked> Khởi động lại toàn bộ hệ thống</label>
+                <label class="chk-line"><input type="checkbox" checked> Xoá nhật ký cũ hơn 90 ngày</label>
+                <label class="chk-line"><input type="checkbox"> Kiểm tra sức khoẻ ổ đĩa toàn diện (S.M.A.R.T đầy đủ)</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="run-meta">
+            <span>Lần chạy gần nhất: <b>Chủ nhật, 08/09/2026 02:00</b> — <span class="chip c-ok" style="display:inline-flex;"><i class="dot ok"></i>Thành công</span></span>
+            <span>Lần chạy kế tiếp: <b>Chủ nhật, 22/09/2026 02:00</b></span>
+          </div>
+
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary">Lưu lịch bảo trì</button>
+          </div>
+        </div>
+
+        <div class="danger-zone">
+          <h2><span class="wi">⚠</span> Khôi phục cấu hình mặc định</h2>
+          <div class="dz-sub">Vùng nguy hiểm — thao tác không thể hoàn tác, tách biệt hoàn toàn khỏi các thao tác bảo trì thông thường ở trên.</div>
+
+          <div class="warn-box">
+            <span class="wi">⚠</span>
+            <span>Thao tác này sẽ xoá <b>toàn bộ cấu hình thiết bị, tài khoản, lịch ghi hình và cấu hình AI</b>, đưa hệ thống về trạng thái xuất xưởng. Dữ liệu ghi hình đã lưu trên ổ đĩa <b>KHÔNG</b> bị xoá nhưng sẽ không thể truy xuất cho tới khi cấu hình lại toàn bộ hệ thống. Thao tác <b>KHÔNG THỂ hoàn tác</b>.</span>
+          </div>
+
+          <div class="confirm-line">
+            <input type="checkbox" id="confirm-restore" onchange="toggleRestoreBtn(this)">
+            <label for="confirm-restore">Tôi hiểu rõ hậu quả và xác nhận muốn khôi phục cấu hình mặc định của máy chủ IVSS-NOC-01.</label>
+          </div>
+
+          <button class="btn btn-danger" id="btn-restore-default" disabled>Khôi phục mặc định</button>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function switchMainTab(ev, id){
+    document.querySelectorAll('.main-pane > .tabs .tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.main-pane > .tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  function toggleRestoreBtn(cb){
+    document.getElementById('btn-restore-default').disabled = !cb.checked;
+  }
+
+  document.querySelectorAll('.day-pick span').forEach(d=>{
+    d.addEventListener('click', ()=> d.classList.toggle('on'));
+  });
+</script>
+
+</body>
+</html>

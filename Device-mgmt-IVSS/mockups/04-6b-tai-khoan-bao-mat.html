@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tài khoản &amp; Bảo mật · Device-mgmt-IVSS</title>
+
+<!--
+  04-6b · Quản lý hệ thống — PHẦN 2: Tài khoản / phân quyền / bảo mật / chứng
+  chỉ số. Kế thừa hệ thống thiết kế đã chốt (hướng 🧠 Thiết kế sư hàng đầu /
+  triết lý Edward Tufte) — KHÔNG chạy lại quy trình 3-hướng, xem
+  ../direction-approved.md dòng cuối: "19 nhóm còn lại ... kế thừa shared.css,
+  không lặp lại quy trình 3-hướng." Màn neo tham chiếu: 04-cau-hinh-1-quan-ly-thiet-bi.html.
+  shared.css KHÔNG bị sửa — mọi pattern mới nằm trong <style> scoped bên dưới.
+
+  Một agent khác đang dựng song song PHẦN 1 (hệ thống cơ bản/thời gian/hiển
+  thị/bản đồ/lịch trực, file 04-6a-he-thong-co-ban.html, nguồn fig8-82→8-88).
+  File này KHÔNG động tới phạm vi đó.
+
+  Nguồn cấu trúc — refs/04-cau-hinh/6-quan-ly-he-thong/, đúng 19 ảnh:
+  fig8-89 user-group-property, fig8-90 permission, fig8-91 user-attributes,
+  fig8-92 onvif-user-group, fig8-93 security-status, fig8-94 details,
+  fig8-96 https, fig8-97 firewall, fig8-98 + fig8-99 account-lockout
+  (cùng cụm tab Firewall/Account Lockout/Anti-DoS/Sync Time),
+  fig8-101 device-certificate, fig8-102 create-certificate,
+  fig8-103 certificate-information, fig8-105 trusted-ca-certificate,
+  fig8-106 video-encryption, fig8-107 security-warning,
+  p335 basic-services, p342 import-the-certificate.
+  → fig8-100 (sync-time) CHỦ ĐỘNG BỎ QUA: đã thuộc phạm vi PHẦN 1 (đồng bộ
+  thời gian hệ thống), tránh trùng lặp — đúng gợi ý trong đề bài.
+
+  ═══ Cấu trúc trang ═══
+  1 trang "Tài khoản & Bảo mật", điều hướng bằng 4 tab lớn cấp trang (dùng lại
+  .tabs/.tab-btn/.tab-panel có sẵn trong shared.css, bọc trong wrapper mới
+  .tabgroup để switchTab() hoạt động được cho cả tab cấp trang lẫn tab lồng
+  trong modal mà không cần viết 2 hàm riêng):
+    ① "Tài khoản & Phân quyền" — bảng nhóm quyền + modal thuộc tính nhóm
+       (2 tab con Thuộc tính/Phân quyền, đúng cấu trúc fig8-89+8-90), ma trận
+       phân quyền tổng quan (.matrix có sẵn) theo 4 nhóm quyền, bảng tài khoản
+       người dùng hệ thống + modal thuộc tính tài khoản (fig8-91), nhóm người
+       dùng ONVIF (fig8-92).
+    ② "Trạng thái bảo mật" — thay khối icon tròn to nhiều màu trong ảnh gốc
+       (không hợp triết lý Tufte đã chốt: tối thiểu icon trang trí, ưu tiên
+       data-ink) bằng: 1 dòng điểm bảo mật dạng số + 3 thẻ trạng thái phát
+       hiện người dùng/dịch vụ (fig8-93) + panel "Chi tiết" tối ưu (fig8-94) +
+       lưới 10 module quét bảo mật dạng thẻ có chấm trạng thái (tái dùng
+       .dot/.chip đã có, không vẽ icon mới) + 1 .warn-box cảnh báo bảo mật
+       thật (đúng yêu cầu đề bài).
+    ③ "Dịch vụ & Tường lửa" — dịch vụ cơ bản bật/tắt (p335), HTTPS (fig8-96),
+       tường lửa dạng bảng quy tắc IP/MAC + bộ lọc phân đoạn (fig8-97, bảng là
+       diễn giải hợp lý vì ảnh gốc chỉ có 3 lựa chọn All/Allowlist/Blocklist
+       không có ảnh chụp bảng quy tắc cụ thể), khoá tài khoản khi đăng nhập
+       sai (fig8-98+99), chống tấn công từ chối dịch vụ Anti-DoS (fig8-98).
+    ④ "Chứng chỉ số" — bảng chứng chỉ thiết bị + modal wizard 3 bước tạo/nhập
+       chứng chỉ (dùng lại .wizard-rail có sẵn, đúng fig8-102→103→p342), CA
+       tin cậy (fig8-105), mã hoá video (fig8-106), cảnh báo bảo mật chi tiết
+       (fig8-107).
+
+  ═══ Pattern MỚI (scoped trong <style> dưới, KHÔNG thêm vào shared.css) ═══
+  .tabgroup      — wrapper trung lập cho .tabs/.tab-panel để switchTab() dùng
+                   chung cho cả tab cấp trang và tab lồng trong modal
+  .switch/.slider/.toggle-row — toggle bật/tắt (đặt tên giống file 04-6a để
+                   nhất quán xuyên 2 phần của cùng nhóm màn hình, dù 2 file
+                   là 2 lần định nghĩa scoped độc lập — không import chéo)
+  .info-box      — khối thông tin nền xanh nhạt (shared.css chỉ có .warn-box
+                   màu hổ phách cho cảnh báo; các mô tả trung tính "HTTPS là
+                   gì", "CA tin cậy dùng để làm gì"... cần tông trung tính
+                   riêng, không lạm dụng .warn-box cho nội dung không phải
+                   cảnh báo thật)
+  .score-row     — dòng điểm bảo mật tổng quan dạng số (tiếp nối ngôn ngữ
+                   bullet graph ở .resource-strip đã chốt, không vẽ khiên/huy
+                   hiệu tròn nhiều màu)
+  .detect-grid/.detect-card — 3 thẻ phát hiện người dùng & dịch vụ
+  .detail-panel  — panel "Chi tiết" liệt kê mục cần tối ưu, ẩn/hiện bằng JS
+  .module-grid/.module-item — lưới 10 module quét bảo mật, thay icon tròn màu
+                   bằng thẻ text + chấm trạng thái .dot có sẵn
+  .seg           — bộ lọc dạng phân đoạn (Tất cả/Cho phép/Chặn) cho tường lửa
+  .perm-cols     — 3 cột checkbox Cấu hình/Vận hành/Điều khiển trong modal
+                   phân quyền theo nhóm (fig8-90), tách khỏi .matrix tổng quan
+                   (matrix dùng để XEM tổng quan nhiều nhóm, perm-cols dùng để
+                   SỬA quyền của 1 nhóm — 2 mục đích khác nhau nên không ép
+                   dùng chung 1 component)
+
+  ═══ Giả định dữ liệu (không có trong ảnh gốc, suy luận hợp lý) ═══
+  - 4 nhóm quyền: Quản trị viên, Kỹ thuật viên NOC, Người xem, Vận hành ONVIF
+    — đúng gợi ý đề bài, ma trận phân quyền phân biệt rõ 4 nhóm.
+  - Tài khoản người dùng, địa chỉ IP tái dùng đúng quy ước dải mạng đã thiết
+    lập ở màn neo Quản lý thiết bị (10.20.14.0/24 khu Cầu Giấy, 10.60.5.0/24
+    tuyến cao tốc HN-HP) để dữ liệu nhất quán xuyên các màn hình.
+  - Kịch bản "2 lần đăng nhập sai từ IP lạ 203.113.x.x bị khoá" trong tab
+    Dịch vụ & Tường lửa và cảnh báo dò mật khẩu ở tab Trạng thái bảo mật là
+    cùng 1 câu chuyện minh hoạ, không phải 2 sự kiện rời rạc.
+  - Chứng chỉ số: tên miền/IP "noc-hanoi.vnptai.vn", tổ chức "VNPT AI",
+    CA nội bộ "IVSS Root CA" — số serial là chuỗi hex minh hoạ, không phải
+    chứng chỉ thật.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ───────── Scoped: wrapper trung lập cho hệ thống tab (cấp trang + trong modal) ───────── */
+  .tabgroup{margin-bottom:4px;}
+  .tabs.tabs-lg{margin-bottom:20px;}
+  .tabs.tabs-lg .tab-btn{font-size:14px;padding:10px 2px;margin-right:26px;}
+
+  /* ───────── Scoped: toggle bật/tắt (đặt tên nhất quán với 04-6a-he-thong-co-ban.html) ───────── */
+  .switch{position:relative;display:inline-block;width:38px;height:22px;flex:none;}
+  .switch input{opacity:0;width:0;height:0;position:absolute;}
+  .switch .slider{position:absolute;inset:0;background:var(--line-strong);border-radius:22px;cursor:pointer;transition:background .15s;}
+  .switch .slider::before{content:"";position:absolute;height:16px;width:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,20,50,.25);}
+  .switch input:checked + .slider{background:var(--primary);}
+  .switch input:checked + .slider::before{transform:translateX(16px);}
+  .switch input:disabled + .slider{opacity:.45;cursor:not-allowed;}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-row .tr-label{font-size:13px;color:var(--text);font-weight:500;}
+  .toggle-row .tr-label .tr-sub{display:block;font-size:11px;color:var(--text-faint);font-weight:400;margin-top:2px;line-height:1.4;}
+  .toggle-row.with-extra{align-items:flex-start;}
+  .toggle-row .tr-extra{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);white-space:nowrap;}
+  .toggle-row .tr-extra input{border:1px solid var(--line-strong);border-radius:3px;padding:5px 7px;font-size:12px;width:56px;text-align:center;font-family:inherit;}
+  .toggle-row .tr-extra select{border:1px solid var(--line-strong);border-radius:3px;padding:5px 7px;font-size:12px;font-family:inherit;}
+
+  /* ───────── Scoped: khối thông tin trung tính (khác .warn-box — không phải cảnh báo) ───────── */
+  .info-box{
+    background:#EAF4FE;border:1px solid #BEDCFA;border-left:3px solid var(--accent2);
+    padding:10px 13px;font-size:12px;color:#0A3A66;line-height:1.55;margin:10px 0 14px;
+  }
+  .hint-text{font-size:11px;color:var(--text-faint);line-height:1.5;}
+
+  /* ───────── Scoped: form 2 cột dùng chung nhiều card ───────── */
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  @media (max-width:1180px){.row-2{grid-template-columns:1fr;}}
+
+  /* ───────── Scoped: dòng điểm bảo mật tổng quan (nối ngôn ngữ .resource-strip) ───────── */
+  .score-row{
+    display:flex;align-items:center;gap:28px;background:var(--bg);
+    border:1px solid var(--line);padding:16px 22px;margin-bottom:14px;flex-wrap:wrap;
+  }
+  .score-row .sc-figure{font-size:30px;font-weight:800;color:var(--navy);line-height:1;white-space:nowrap;}
+  .score-row .sc-figure small{font-size:13px;font-weight:600;color:var(--text-faint);}
+  .score-row .sc-sep{width:1px;align-self:stretch;background:var(--line);}
+  .score-row .sc-meta{font-size:12px;color:var(--text-muted);line-height:1.6;}
+  .score-row .sc-meta b{color:var(--text);font-weight:700;}
+  .score-row .fill{flex:1;}
+
+  /* ───────── Scoped: 3 thẻ phát hiện người dùng & dịch vụ ───────── */
+  .detect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+  @media (max-width:1180px){.detect-grid{grid-template-columns:1fr;}}
+  .detect-card{border:1px solid var(--line);background:var(--bg);padding:13px 16px;}
+  .detect-card .dc-status{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+  .detect-card.ok .dc-status{color:var(--primary);}
+  .detect-card.warn .dc-status{color:var(--warning);}
+  .detect-card .dc-name{font-size:13.5px;font-weight:700;color:var(--navy);}
+  .detect-card .dc-desc{font-size:11.5px;color:var(--text-muted);margin-top:3px;line-height:1.5;}
+  .detect-card .btn{margin-top:9px;padding:5px 11px;font-size:11.5px;}
+
+  /* ───────── Scoped: panel "Chi tiết" liệt kê mục cần tối ưu ───────── */
+  .detail-panel{border:1px solid var(--line);background:var(--bg);margin-bottom:16px;}
+  .detail-panel .dp-head{display:flex;align-items:center;gap:9px;padding:11px 14px;background:var(--warning-bg);border-bottom:1px solid #EAD9AE;font-size:12.5px;color:#6B4400;}
+  .detail-panel .dp-head .wi{font-size:14px;}
+  .detail-panel .dp-head .fill{flex:1;}
+  .detail-panel .dp-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font-size:12.5px;border-bottom:1px solid var(--line);}
+  .detail-panel .dp-item:last-child{border-bottom:none;}
+  .detail-panel .dp-item .di-name{font-weight:600;color:var(--text);}
+  .detail-panel .dp-item .di-sub{display:block;font-weight:400;color:var(--warning);font-size:11.5px;margin-top:2px;}
+
+  /* ───────── Scoped: lưới 10 module quét bảo mật (thay icon tròn = thẻ text + dot) ───────── */
+  .module-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:2px;}
+  @media (max-width:1180px){.module-grid{grid-template-columns:repeat(2,1fr);}}
+  .module-item{border:1px solid var(--line);background:var(--bg);padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);}
+
+  /* .dot (chấm trạng thái) trong shared.css chỉ định kích thước qua selector
+     ".chip .dot" — module-grid và detect-card dùng .dot đứng riêng (không bọc
+     trong .chip) nên cần khai lại kích thước ở đây, màu vẫn kế thừa nguyên
+     từ .dot.ok/.warn/.err/.neutral trong shared.css. */
+  .module-item .dot, .detect-card .dc-status .dot{
+    display:inline-block;width:7px;height:7px;border-radius:50%;flex:none;
+  }
+
+  /* ───────── Scoped: bộ lọc dạng phân đoạn (tường lửa) ───────── */
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:3px;overflow:hidden;margin-bottom:14px;}
+  .seg button{appearance:none;border:none;background:var(--bg);color:var(--text-muted);font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 16px;cursor:pointer;border-right:1px solid var(--line-strong);}
+  .seg button:last-child{border-right:none;}
+  .seg button.active{background:var(--primary);color:#fff;}
+
+  /* ───────── Scoped: 3 cột checkbox Cấu hình/Vận hành/Điều khiển (sửa quyền 1 nhóm) ───────── */
+  .perm-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:4px;}
+  .perm-col h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);margin:0 0 8px;}
+  .perm-col label{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text);padding:5px 0;cursor:pointer;}
+  .perm-col label.select-all{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:4px;}
+
+  /* ───────── Scoped: mini meter dùng lại ngôn ngữ .mini-bullet cho độ mạnh mật khẩu ───────── */
+  .pw-meter{display:flex;align-items:center;gap:8px;margin-top:6px;}
+  .pw-meter .pm-track{flex:1;height:5px;background:var(--bg-soft2);position:relative;}
+  .pw-meter .pm-fill{position:absolute;left:0;top:0;bottom:0;background:var(--warning);}
+  .pw-meter .pm-label{font-size:10.5px;color:var(--warning);font-weight:700;white-space:nowrap;}
+
+  .stack-14 > * + *{margin-top:14px;}
+
+  /* File HTML thuần này không có UA reset "[hidden]{display:none!important}"
+     — .btn/.btn-primary tự đặt display:inline-flex nên đè mất thuộc tính
+     [hidden] gốc của trình duyệt (cùng độ đặc hiệu, author > UA). Khai lại
+     tường minh cho mọi nút bấm ẩn/hiện bằng JS trong wizard chứng chỉ. */
+  .btn[hidden]{display:none;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Cấu hình &nbsp;/&nbsp; Quản lý hệ thống &nbsp;/&nbsp; <b>Tài khoản &amp; Bảo mật</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Tài khoản &amp; Bảo mật</h1>
+        <span class="scope">Nhóm quyền, tài khoản người dùng, trạng thái bảo mật, dịch vụ mạng và chứng chỉ số của hệ thống</span>
+      </div>
+
+      <!-- ═══════════ TAB NHÓM LỚN CẤP TRANG ═══════════ -->
+      <div class="tabgroup">
+        <div class="tabs tabs-lg">
+          <button class="tab-btn active" data-target="tab-accounts" onclick="switchTab(event,'tab-accounts')">Tài khoản &amp; Phân quyền</button>
+          <button class="tab-btn" data-target="tab-security" onclick="switchTab(event,'tab-security')">Trạng thái bảo mật</button>
+          <button class="tab-btn" data-target="tab-services" onclick="switchTab(event,'tab-services')">Dịch vụ &amp; Tường lửa</button>
+          <button class="tab-btn" data-target="tab-certs" onclick="switchTab(event,'tab-certs')">Chứng chỉ số</button>
+        </div>
+
+        <!-- ═══════════════════════════ TAB 1: TÀI KHOẢN & PHÂN QUYỀN ═══════════════════════════ -->
+        <div class="tab-panel active" id="tab-accounts">
+
+          <div class="card">
+            <h2>Nhóm quyền người dùng</h2>
+            <div class="toolbar" style="margin-bottom:10px;">
+              <button class="btn btn-primary" id="btn-add-group" onclick="openModal('modal-group')"><span class="btn-icon">＋</span> Thêm nhóm quyền</button>
+              <div class="fill"></div>
+            </div>
+            <div class="table-scroll">
+              <table class="devices" style="min-width:920px;">
+                <thead>
+                  <tr>
+                    <th>Tên nhóm</th>
+                    <th>Mô tả</th>
+                    <th>Số người dùng</th>
+                    <th>Node cha</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="chname">Quản trị viên</td>
+                    <td style="white-space:normal;">Toàn quyền cấu hình, vận hành và điều khiển toàn bộ hệ thống</td>
+                    <td class="tabular">2</td>
+                    <td class="mono-cell">IVSS</td>
+                    <td><a class="op-link" onclick="openModal('modal-group')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                  <tr>
+                    <td class="chname">Kỹ thuật viên NOC</td>
+                    <td style="white-space:normal;">Vận hành, bảo trì thiết bị và bảo dưỡng định kỳ — không có quyền cấu hình bảo mật</td>
+                    <td class="tabular">8</td>
+                    <td class="mono-cell">IVSS</td>
+                    <td><a class="op-link" onclick="openModal('modal-group')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                  <tr>
+                    <td class="chname">Người xem</td>
+                    <td style="white-space:normal;">Chỉ xem trực tiếp và xem lại, không có quyền cấu hình hoặc điều khiển</td>
+                    <td class="tabular">14</td>
+                    <td class="mono-cell">IVSS</td>
+                    <td><a class="op-link" onclick="openModal('modal-group')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                  <tr>
+                    <td class="chname">Vận hành ONVIF</td>
+                    <td style="white-space:normal;">Tài khoản tích hợp cho phần mềm VMS bên thứ ba kết nối qua giao thức ONVIF</td>
+                    <td class="tabular">3</td>
+                    <td class="mono-cell">IVSS</td>
+                    <td><a class="op-link" onclick="openModal('modal-group')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Ma trận phân quyền chi tiết</h2>
+            <p class="hint-text" style="margin:-6px 0 12px;">Tổng quan quyền của 4 nhóm trên các nhóm chức năng chính. Để sửa quyền từng nhóm, mở "Sửa" trong bảng nhóm quyền ở trên.</p>
+
+            <div class="matrix" style="grid-template-columns:minmax(200px,1.7fr) repeat(4,1fr);">
+              <div class="mx-cell mx-head">Nhóm chức năng</div>
+              <div class="mx-cell mx-head">Quản trị viên</div>
+              <div class="mx-cell mx-head">KTV NOC</div>
+              <div class="mx-cell mx-head">Người xem</div>
+              <div class="mx-cell mx-head">Vận hành ONVIF</div>
+
+              <div class="mx-cell" style="font-weight:700;color:var(--navy);grid-column:1/-1;background:var(--bg-soft);">Cấu hình</div>
+              <div class="mx-cell mx-head" style="grid-column:1/-1;display:none;"></div>
+
+              <div class="mx-cell">Hệ thống</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Sự kiện</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Lưu trữ</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Mạng</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-on">✓</div>
+              <div class="mx-cell">Bảo mật</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Quản lý truy cập</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Thiết bị ngoại vi</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-on">✓</div>
+              <div class="mx-cell">PTZ</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+
+              <div class="mx-cell" style="font-weight:700;color:var(--navy);grid-column:1/-1;background:var(--bg-soft);">Vận hành</div>
+
+              <div class="mx-cell">Sao lưu</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Bảo trì hệ thống</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Bảo dưỡng thiết bị</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+              <div class="mx-cell">Quản lý tác vụ</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-off">—</div>
+
+              <div class="mx-cell" style="font-weight:700;color:var(--navy);grid-column:1/-1;background:var(--bg-soft);">Điều khiển</div>
+
+              <div class="mx-cell">Điều khiển thủ công (PTZ)</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-on">✓</div><div class="mx-cell mx-off">—</div><div class="mx-cell mx-on">✓</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Tài khoản người dùng hệ thống</h2>
+            <div class="toolbar" style="margin-bottom:10px;">
+              <button class="btn btn-primary" onclick="openModal('modal-user')"><span class="btn-icon">＋</span> Thêm tài khoản</button>
+              <div class="fill"></div>
+            </div>
+            <div class="table-scroll">
+              <table class="devices" style="min-width:1040px;">
+                <thead>
+                  <tr>
+                    <th>Tên đăng nhập</th>
+                    <th>Họ tên</th>
+                    <th>Nhóm quyền</th>
+                    <th>Trạng thái</th>
+                    <th>Đăng nhập cuối</th>
+                    <th>Mô tả</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="mono-cell">admin</td>
+                    <td>Quản trị hệ thống</td>
+                    <td>Quản trị viên</td>
+                    <td><span class="chip c-ok"><i class="dot ok"></i>Đang hoạt động</span></td>
+                    <td class="mono-cell tabular">15/09/2026 08:42</td>
+                    <td>Tài khoản quản trị mặc định</td>
+                    <td><a class="op-link" onclick="openModal('modal-user')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                  <tr>
+                    <td class="mono-cell">nvdat.noc</td>
+                    <td>Nguyễn Văn Đạt</td>
+                    <td>Kỹ thuật viên NOC</td>
+                    <td><span class="chip c-ok"><i class="dot ok"></i>Đang hoạt động</span></td>
+                    <td class="mono-cell tabular">15/09/2026 09:10</td>
+                    <td>Ca trực sáng khu vực Hà Nội</td>
+                    <td><a class="op-link" onclick="openModal('modal-user')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                  <tr>
+                    <td class="mono-cell">tranminh.noc</td>
+                    <td>Trần Minh Quân</td>
+                    <td>Kỹ thuật viên NOC</td>
+                    <td><span class="chip c-ok"><i class="dot ok"></i>Đang hoạt động</span></td>
+                    <td class="mono-cell tabular">14/09/2026 22:05</td>
+                    <td>Ca trực đêm</td>
+                    <td><a class="op-link" onclick="openModal('modal-user')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                  <tr>
+                    <td class="mono-cell">lethiha.view</td>
+                    <td>Lê Thị Hà</td>
+                    <td>Người xem</td>
+                    <td><span class="chip c-err"><i class="dot err"></i>Tạm khoá</span></td>
+                    <td class="mono-cell tabular">12/09/2026 16:20</td>
+                    <td>Nhân viên giám sát ca ngày</td>
+                    <td><a class="op-link" onclick="openModal('modal-user')">Sửa</a><a class="op-link">Mở khoá</a></td>
+                  </tr>
+                  <tr>
+                    <td class="mono-cell">phamvan.view</td>
+                    <td>Phạm Văn Tùng</td>
+                    <td>Người xem</td>
+                    <td><span class="chip c-ok"><i class="dot ok"></i>Đang hoạt động</span></td>
+                    <td class="mono-cell tabular">15/09/2026 07:55</td>
+                    <td>—</td>
+                    <td><a class="op-link" onclick="openModal('modal-user')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Nhóm người dùng ONVIF</h2>
+            <div class="toolbar" style="margin-bottom:10px;">
+              <button class="btn btn-primary" onclick="openModal('modal-onvif')"><span class="btn-icon">＋</span> Thêm nhóm ONVIF</button>
+              <div class="fill"></div>
+            </div>
+            <div class="table-scroll">
+              <table class="devices" style="min-width:820px;">
+                <thead>
+                  <tr>
+                    <th>Tên nhóm</th>
+                    <th>Node cha</th>
+                    <th>Số người dùng</th>
+                    <th>Mô tả</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="chname">Tích hợp VMS bên thứ ba</td>
+                    <td class="mono-cell">Onvif</td>
+                    <td class="tabular">2</td>
+                    <td style="white-space:normal;">Tài khoản dùng cho phần mềm VMS ngoài kết nối qua giao thức ONVIF</td>
+                    <td><a class="op-link" onclick="openModal('modal-onvif')">Sửa</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ═══════════════════════════ TAB 2: TRẠNG THÁI BẢO MẬT ═══════════════════════════ -->
+        <div class="tab-panel" id="tab-security">
+
+          <div class="score-row">
+            <div class="sc-figure tabular">82<small>/100 điểm bảo mật</small></div>
+            <div class="sc-sep"></div>
+            <div class="sc-meta">Lần quét gần nhất: <b class="tabular">15/09/2026 08:30</b> · <b>1</b> mục cần tối ưu, <b>2</b> module đang tắt</div>
+            <div class="fill"></div>
+            <button class="btn btn-primary">Quét lại</button>
+          </div>
+
+          <div class="warn-box" style="margin:0 0 18px;">
+            <span class="wi">⚠</span>
+            <span><b>Phát hiện dò mật khẩu từ địa chỉ IP lạ 203.113.44.x</b> — 2 tài khoản (admin, guest) bị khoá tự động lúc 03:14–03:15 sáng nay do đăng nhập sai liên tiếp. Xem chi tiết tại tab <b>Dịch vụ &amp; Tường lửa</b> — mục Khoá tài khoản khi đăng nhập sai.</span>
+          </div>
+
+          <div class="card">
+            <h2>Phát hiện người dùng &amp; dịch vụ</h2>
+            <p class="hint-text" style="margin:-6px 0 12px;">Kiểm tra cấu hình hiện tại có tuân theo khuyến nghị bảo mật hay không.</p>
+            <div class="detect-grid">
+              <div class="detect-card ok">
+                <div class="dc-status"><i class="dot ok"></i>Đạt yêu cầu</div>
+                <div class="dc-name">Xác thực đăng nhập</div>
+                <div class="dc-desc">Đang dùng chế độ bảo mật (mã hoá thông tin đăng nhập), không có tài khoản dùng mật khẩu yếu.</div>
+              </div>
+              <div class="detect-card warn">
+                <div class="dc-status"><i class="dot warn"></i>Cần chú ý</div>
+                <div class="dc-name">Trạng thái tài khoản</div>
+                <div class="dc-desc">1 mục cấu hình chưa theo khuyến nghị — xem chi tiết bên dưới.</div>
+                <button class="btn" id="btn-security-detail" onclick="toggleDetail()">Chi tiết</button>
+              </div>
+              <div class="detect-card ok">
+                <div class="dc-status"><i class="dot ok"></i>Đạt yêu cầu</div>
+                <div class="dc-name">Bảo mật cấu hình</div>
+                <div class="dc-desc">Tệp cấu hình và nhật ký hệ thống được mã hoá đúng chuẩn.</div>
+              </div>
+            </div>
+
+            <div class="detail-panel" id="detail-panel" hidden>
+              <div class="dp-head">
+                <span class="wi">⚠</span>
+                <span><b>1 mục có thể tối ưu.</b> Khuyến nghị xử lý ngay để đảm bảo an toàn phiên quản trị.</span>
+                <div class="fill"></div>
+                <button class="btn" style="padding:5px 11px;font-size:11.5px;" onclick="toggleDetail()">Bỏ qua</button>
+              </div>
+              <div class="dp-item">
+                <span class="di-name">Cấu hình bảo mật HTTPS<span class="di-sub">Đang tắt trên thiết bị trung tâm NOC Cầu Giấy. Vui lòng bật để mã hoá toàn bộ phiên quản trị.</span></span>
+                <a class="op-link" onclick="switchTab({target:document.querySelector('.tab-btn[data-target=tab-services]')},'tab-services')">Tối ưu ngay →</a>
+              </div>
+            </div>
+
+            <h2 style="margin-top:20px;">Quét module bảo mật</h2>
+            <p class="hint-text" style="margin:-6px 0 12px;">Kiểm tra trạng thái hoạt động của từng module bảo mật trên hệ thống.</p>
+            <div class="module-grid">
+              <div class="module-item"><i class="dot warn"></i>Mã hoá truyền audio/video</div>
+              <div class="module-item"><i class="dot ok"></i>Bảo vệ tin cậy</div>
+              <div class="module-item"><i class="dot ok"></i>Cảnh báo bảo mật</div>
+              <div class="module-item"><i class="dot ok"></i>Chống tấn công (Anti-DoS)</div>
+              <div class="module-item"><i class="dot ok"></i>Mã hoá firmware</div>
+              <div class="module-item"><i class="dot ok"></i>Secure Shell</div>
+              <div class="module-item"><i class="dot ok"></i>Bảo mật tệp cấu hình</div>
+              <div class="module-item"><i class="dot ok"></i>Chứng chỉ CA</div>
+              <div class="module-item"><i class="dot ok"></i>Bảo mật nhật ký</div>
+              <div class="module-item"><i class="dot ok"></i>Bảo mật phiên làm việc</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ═══════════════════════════ TAB 3: DỊCH VỤ & TƯỜNG LỬA ═══════════════════════════ -->
+        <div class="tab-panel" id="tab-services">
+
+          <div class="row-2 stack-14">
+            <div class="card">
+              <h2>Dịch vụ cơ bản</h2>
+              <div class="toggle-row"><span class="tr-label">SSH</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">Multicast / Broadcast</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">CGI</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">ONVIF</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">Đẩy thông báo di động</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">Nhật ký vận hành</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">LLDP</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">TLS 1.1<span class="tr-sub">Khuyến nghị tắt — giao thức cũ, còn nguy cơ bảo mật đã biết</span></span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+              <div class="toggle-row"><span class="tr-label">Giao thức riêng (Private Protocol)</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+
+              <div class="form-grid" style="margin-top:16px;">
+                <div class="field">
+                  <label>Chế độ đăng nhập</label>
+                  <select><option>Chế độ bảo mật (khuyến nghị)</option><option>Chế độ tương thích</option></select>
+                </div>
+                <div class="field">
+                  <label>Hết hạn mật khẩu</label>
+                  <select><option>Không bao giờ</option><option>30 ngày</option><option>90 ngày</option><option>180 ngày</option></select>
+                  <span class="hint">Khuyến nghị đặt thời hạn để tăng bảo mật tài khoản</span>
+                </div>
+              </div>
+              <div class="toolbar" style="margin-top:16px;margin-bottom:0;">
+                <button class="btn btn-primary">Áp dụng</button>
+                <button class="btn">Làm mới</button>
+                <button class="btn">Mặc định</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>HTTPS</h2>
+              <div class="toggle-row"><span class="tr-label">Bật HTTPS</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+              <div class="info-box">HTTPS là dịch vụ truy cập dựa trên TLS, áp dụng cho dịch vụ web, dịch vụ truy cập ONVIF và dịch vụ truy cập RTSP.</div>
+              <div class="toggle-row"><span class="tr-label">Tự động chuyển hướng HTTP → HTTPS</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+
+              <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12px;font-weight:600;color:var(--text-muted);">Chọn chứng chỉ thiết bị</span>
+                <a class="op-link" onclick="switchTab({target:document.querySelector('.tab-btn[data-target=tab-certs]')},'tab-certs')">Quản lý chứng chỉ →</a>
+              </div>
+              <table class="ip-select-table">
+                <thead><tr><th style="width:28px;"></th><th>Tên tuỳ chỉnh</th><th>Số chứng chỉ</th><th>Dùng cho</th></tr></thead>
+                <tbody>
+                  <tr><td><input type="radio" name="https-cert" checked></td><td>CN Trung tâm NOC</td><td class="mono-cell">64:3F:A1…12:E0</td><td>HTTPS, RTSP over TLS</td></tr>
+                </tbody>
+              </table>
+              <div class="toolbar" style="margin-top:4px;margin-bottom:0;">
+                <button class="btn btn-primary">Áp dụng</button>
+                <button class="btn">Làm mới</button>
+                <button class="btn">Mặc định</button>
+                <button class="btn">Tải chứng chỉ gốc</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Tường lửa</h2>
+            <div class="seg" id="fw-seg">
+              <button class="active" onclick="setFirewall('all',this)">Tất cả</button>
+              <button onclick="setFirewall('allow',this)">Danh sách cho phép</button>
+              <button onclick="setFirewall('block',this)">Danh sách chặn</button>
+            </div>
+
+            <div id="fw-all">
+              <div class="info-box" style="margin-top:0;">Tất cả địa chỉ IP/MAC nguồn được phép truy cập mọi cổng dịch vụ trên thiết bị. Chuyển sang "Danh sách cho phép" hoặc "Danh sách chặn" để giới hạn theo quy tắc.</div>
+            </div>
+
+            <div id="fw-allow" hidden>
+              <div class="toolbar" style="margin-bottom:10px;">
+                <button class="btn btn-primary" onclick="openModal('modal-fw-rule')"><span class="btn-icon">＋</span> Thêm quy tắc</button>
+                <div class="fill"></div>
+              </div>
+              <div class="table-scroll">
+                <table class="devices" style="min-width:860px;">
+                  <thead><tr><th>STT</th><th>Loại</th><th>Địa chỉ</th><th>Cổng áp dụng</th><th>Mô tả</th><th>Thao tác</th></tr></thead>
+                  <tbody>
+                    <tr><td class="tabular">1</td><td>Dải IP</td><td class="mono-cell">10.20.14.0/24</td><td>Tất cả cổng</td><td>Mạng nội bộ khu vực NOC Cầu Giấy</td><td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td></tr>
+                    <tr><td class="tabular">2</td><td>Địa chỉ IP</td><td class="mono-cell">10.20.0.15</td><td class="mono-cell">443, 37777</td><td>Máy trạm quản trị viên hệ thống</td><td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td></tr>
+                    <tr><td class="tabular">3</td><td>Dải IP</td><td class="mono-cell">10.60.5.0/24</td><td>Tất cả cổng</td><td>Mạng vận hành tuyến cao tốc HN - Hải Phòng</td><td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="fw-block" hidden>
+              <div class="toolbar" style="margin-bottom:10px;">
+                <button class="btn btn-primary" onclick="openModal('modal-fw-rule')"><span class="btn-icon">＋</span> Thêm quy tắc</button>
+                <div class="fill"></div>
+              </div>
+              <div class="table-scroll">
+                <table class="devices" style="min-width:860px;">
+                  <thead><tr><th>STT</th><th>Loại</th><th>Địa chỉ</th><th>Cổng áp dụng</th><th>Mô tả</th><th>Thao tác</th></tr></thead>
+                  <tbody>
+                    <tr><td class="tabular">1</td><td>Dải IP</td><td class="mono-cell">203.113.44.0/24</td><td>Tất cả cổng</td><td>Nguồn dò mật khẩu phát hiện sáng 15/09/2026</td><td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="toolbar" style="margin-top:14px;margin-bottom:0;">
+              <button class="btn btn-primary">Áp dụng</button>
+              <button class="btn">Làm mới</button>
+              <button class="btn">Mặc định</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Khoá tài khoản khi đăng nhập sai</h2>
+            <div class="toggle-row with-extra">
+              <span class="tr-label">Tài khoản thiết bị</span>
+              <div class="tr-extra">Sai <select><option>3 lần</option><option selected>5 lần</option><option>10 lần</option></select> → khoá <input value="30"> phút (5–120)</div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row with-extra">
+              <span class="tr-label">Đăng nhập cục bộ</span>
+              <div class="tr-extra">Sai <select><option>3 lần</option><option selected>5 lần</option><option>10 lần</option></select> → khoá <input value="30"> phút (5–120)</div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row with-extra">
+              <span class="tr-label">Tài khoản ONVIF</span>
+              <div class="tr-extra">Sai <select><option selected>3 lần</option><option>5 lần</option><option>10 lần</option></select> → khoá <input value="30"> phút (5–120)</div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row with-extra">
+              <span class="tr-label">Người dùng SNMP</span>
+              <div class="tr-extra">Sai <select><option>10 lần</option><option selected>30 lần</option></select> → khoá <input value="5"> phút (5–120)</div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+
+            <div class="toolbar" style="margin:16px 0 10px;">
+              <button class="btn" id="btn-unlock" disabled>Mở khoá đã chọn</button>
+              <div class="fill"></div>
+            </div>
+            <div class="table-scroll">
+              <table class="devices" style="min-width:760px;">
+                <thead>
+                  <tr><th><input type="checkbox" id="lock-check-all" onclick="toggleLockAll(this)"></th><th>Tên đăng nhập</th><th>IP / Tên miền</th><th>Thời điểm khoá</th><th>Mở khoá lúc</th><th>Thao tác</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="checkbox" class="lock-check" onclick="onLockCheck(this)"></td>
+                    <td class="mono-cell">admin</td>
+                    <td class="mono-cell">203.113.44.18</td>
+                    <td class="mono-cell tabular">15/09/2026 03:14</td>
+                    <td class="mono-cell tabular">15/09/2026 03:44</td>
+                    <td><a class="op-link">Mở khoá</a></td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" class="lock-check" onclick="onLockCheck(this)"></td>
+                    <td class="mono-cell">guest</td>
+                    <td class="mono-cell">203.113.44.18</td>
+                    <td class="mono-cell tabular">15/09/2026 03:15</td>
+                    <td class="mono-cell tabular">15/09/2026 03:45</td>
+                    <td><a class="op-link">Mở khoá</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="toolbar" style="margin-top:14px;margin-bottom:0;">
+              <button class="btn btn-primary">Áp dụng</button>
+              <button class="btn">Làm mới</button>
+              <button class="btn">Mặc định</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Chống tấn công từ chối dịch vụ (Anti-DoS)</h2>
+            <div class="row-2">
+              <div>
+                <div class="toggle-row"><span class="tr-label">Chống tấn công SYN Flood</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+                <div class="info-box">Kẻ tấn công có thể gửi liên tục gói tin SYN khiến thiết bị tồn đọng nhiều kết nối TCP nửa vời, dẫn tới treo hệ thống. Khi phát hiện tấn công SYN Flood, thiết bị tự phòng vệ bằng cách loại bỏ gói tin đầu tiên.</div>
+              </div>
+              <div>
+                <div class="toggle-row"><span class="tr-label">Chống tấn công ICMP Flood</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+                <div class="info-box">Kẻ tấn công có thể gửi số lượng lớn bất thường gói tin ICMP khiến thiết bị cạn tài nguyên xử lý. Khi phát hiện tấn công ICMP Flood, thiết bị tự phòng vệ bằng cách lọc gói tin ICMP.</div>
+              </div>
+            </div>
+            <div class="toolbar" style="margin-top:2px;margin-bottom:0;">
+              <button class="btn btn-primary">Áp dụng</button>
+              <button class="btn">Làm mới</button>
+              <button class="btn">Mặc định</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ═══════════════════════════ TAB 4: CHỨNG CHỈ SỐ ═══════════════════════════ -->
+        <div class="tab-panel" id="tab-certs">
+
+          <div class="card">
+            <h2>Chứng chỉ thiết bị</h2>
+            <div class="info-box" style="margin-top:0;">Chứng chỉ thiết bị là bằng chứng xác nhận trạng thái hợp lệ của thiết bị. Khi trình duyệt truy cập thiết bị qua HTTPS, chứng chỉ thiết bị sẽ được xác thực.</div>
+            <div class="toolbar" style="margin-bottom:10px;">
+              <button class="btn btn-primary" id="btn-open-cert-wizard" onclick="openModal('modal-cert-wizard')">Cài đặt chứng chỉ thiết bị</button>
+              <div class="fill"></div>
+            </div>
+            <div class="table-scroll">
+              <table class="devices" style="min-width:1200px;">
+                <thead>
+                  <tr><th>STT</th><th>Tên tuỳ chỉnh</th><th>Số chứng chỉ</th><th>Thời hạn hiệu lực</th><th>Người dùng</th><th>Cấp bởi</th><th>Dùng cho</th><th>Trạng thái</th><th>Mặc định</th><th>Thao tác</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tabular">1</td>
+                    <td>CN Trung tâm NOC</td>
+                    <td class="mono-cell">64:3F:A1:0C:9E:22:B7:45:D8:01:F3:6A:12:E0</td>
+                    <td class="mono-cell tabular">10/07/2055 08:11:56</td>
+                    <td class="mono-cell">admin</td>
+                    <td>IVSS Root CA</td>
+                    <td>HTTPS, RTSP over TLS</td>
+                    <td><span class="badge b-init">Bình thường</span></td>
+                    <td style="color:var(--primary);font-weight:700;text-align:center;">✓</td>
+                    <td><a class="op-link">Tải xuống</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Chứng chỉ CA tin cậy</h2>
+            <div class="info-box" style="margin-top:0;">Chứng chỉ CA tin cậy dùng để xác thực tính hợp lệ của một máy chủ khác. Ví dụ, cần cài chứng chỉ CA của switch để xác thực 802.1x.</div>
+            <div class="toolbar" style="margin-bottom:10px;">
+              <button class="btn" onclick="openModal('modal-ca')">Cài đặt chứng chỉ tin cậy</button>
+              <div class="fill"></div>
+            </div>
+            <div class="table-scroll">
+              <table class="devices" style="min-width:1160px;">
+                <thead>
+                  <tr><th>STT</th><th>Tên tuỳ chỉnh</th><th>Số chứng chỉ</th><th>Thời hạn hiệu lực</th><th>Người dùng</th><th>Cấp bởi</th><th>Dùng cho</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tabular">1</td>
+                    <td>CA nội bộ VNPT AI</td>
+                    <td class="mono-cell">36:0C:5D:E4:A8:91:2F:7B:C3:0E:5B:2</td>
+                    <td class="mono-cell tabular">28/07/2028 17:00:12</td>
+                    <td class="mono-cell">IVSS</td>
+                    <td>IVSS</td>
+                    <td>Xác thực switch truy cập 802.1x</td>
+                    <td><span class="badge b-init">Bình thường</span></td>
+                    <td><a class="op-link">Tải xuống</a><a class="op-link danger">Xoá</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row-2 stack-14">
+            <div class="card">
+              <h2>Mã hoá video — Giao thức riêng</h2>
+              <div class="toggle-row"><span class="tr-label">Bật mã hoá giao thức riêng</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+              <div class="info-box">Luồng truyền video/âm thanh được mã hoá bằng giao thức riêng của hệ thống.</div>
+              <div class="warn-box" style="margin:0 0 12px;"><span class="wi">⚠</span><span>Đảm bảo phần mềm/thiết bị đầu nhận hỗ trợ giải mã video trước khi bật mục này.</span></div>
+              <div class="form-grid">
+                <div class="field"><label>Loại mã hoá</label><select><option>AES256-OFB</option></select></div>
+                <div class="field"><label>Chu kỳ cập nhật khoá</label><input value="12"><span class="hint">Giờ (0–720)</span></div>
+              </div>
+              <div class="toolbar" style="margin-top:14px;margin-bottom:0;">
+                <button class="btn btn-primary">Áp dụng</button>
+                <button class="btn">Làm mới</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Mã hoá video — RTSP over TLS</h2>
+              <div class="toggle-row"><span class="tr-label">Bật RTSP over TLS</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+              <div class="info-box">Luồng RTSP được mã hoá qua đường hầm TLS trước khi truyền đi.</div>
+              <div class="warn-box" style="margin:0 0 12px;"><span class="wi">⚠</span><span>Đảm bảo phần mềm/thiết bị đầu nhận hỗ trợ giải mã video trước khi bật mục này.</span></div>
+              <table class="ip-select-table">
+                <thead><tr><th style="width:28px;"></th><th>Tên tuỳ chỉnh</th><th>Số chứng chỉ</th></tr></thead>
+                <tbody><tr><td><input type="radio" name="rtsp-cert" checked></td><td>CN Trung tâm NOC</td><td class="mono-cell">64:3F:A1…12:E0</td></tr></tbody>
+              </table>
+              <div class="toolbar" style="margin-top:4px;margin-bottom:0;">
+                <button class="btn btn-primary">Áp dụng</button>
+                <button class="btn">Làm mới</button>
+                <button class="btn">Mặc định</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Cảnh báo bảo mật</h2>
+            <div class="toggle-row"><span class="tr-label">Bật cảnh báo bảo mật</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <p style="font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;margin:14px 0 8px;">Giám sát sự kiện</p>
+            <div class="form-grid">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;"><input type="checkbox" checked>Chương trình thực thi không hợp lệ cố chạy</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;"><input type="checkbox" checked>Dò mật khẩu qua Session ID</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;"><input type="checkbox" checked>Dò thư mục Web</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;"><input type="checkbox" checked>Số kết nối phiên vượt ngưỡng</label>
+            </div>
+            <div class="info-box">Cảnh báo bảo mật giúp phát hiện trạng thái bất thường của hệ thống theo thời gian thực và thông báo ngay các sự kiện nghi vấn để xử lý kịp thời, hạn chế rủi ro bảo mật.</div>
+            <div class="toolbar" style="margin-top:2px;margin-bottom:0;">
+              <button class="btn btn-primary">Áp dụng</button>
+              <button class="btn">Làm mới</button>
+              <button class="btn">Mặc định</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════ MODAL: Thuộc tính nhóm quyền (Attribute / Permission) ═══════════ -->
+  <div class="overlay" id="modal-group">
+    <div class="modal w-wide">
+      <div class="modal-head">
+        <h2>Nhóm quyền — Kỹ thuật viên NOC</h2>
+        <button class="x" onclick="closeModal('modal-group')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tabgroup">
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event,'grp-attr')">Thuộc tính</button>
+            <button class="tab-btn" onclick="switchTab(event,'grp-perm')">Phân quyền</button>
+          </div>
+
+          <div class="tab-panel active" id="grp-attr">
+            <div class="form-grid">
+              <div class="field"><label>Tên nhóm</label><input value="Kỹ thuật viên NOC"></div>
+              <div class="field"><label>Node cha</label><input value="IVSS" disabled></div>
+              <div class="field full"><label>Mô tả</label><textarea rows="2">Vận hành, bảo trì thiết bị và bảo dưỡng định kỳ — không có quyền cấu hình bảo mật</textarea></div>
+              <div class="field full"><span class="hint-text">Tên nhóm chỉ gồm chữ, số, dấu gạch dưới, dấu chấm và @.</span></div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+              <h2>Danh sách người dùng trong nhóm</h2>
+              <table class="scan-table" style="margin-top:0;">
+                <thead><tr><th>Tên đăng nhập</th><th>Mật khẩu</th><th>Mô tả</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono-cell">nvdat.noc</td><td><span class="pw-mask">●●●●●●●●</span></td><td>Ca trực sáng khu vực Hà Nội</td></tr>
+                  <tr><td class="mono-cell">tranminh.noc</td><td><span class="pw-mask">●●●●●●●●</span></td><td>Ca trực đêm</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="grp-perm">
+            <div class="perm-cols">
+              <div class="perm-col">
+                <h3>Cấu hình</h3>
+                <label class="select-all"><input type="checkbox">Chọn tất cả</label>
+                <label><input type="checkbox" checked>Hệ thống</label>
+                <label><input type="checkbox" checked>Sự kiện</label>
+                <label><input type="checkbox" checked>Lưu trữ</label>
+                <label><input type="checkbox" checked>Mạng</label>
+                <label><input type="checkbox">Bảo mật</label>
+                <label><input type="checkbox">Quản lý truy cập</label>
+                <label><input type="checkbox" checked>Thiết bị ngoại vi</label>
+                <label><input type="checkbox" checked>PTZ</label>
+              </div>
+              <div class="perm-col">
+                <h3>Vận hành</h3>
+                <label class="select-all"><input type="checkbox" checked>Chọn tất cả</label>
+                <label><input type="checkbox" checked>Sao lưu</label>
+                <label><input type="checkbox" checked>Bảo trì hệ thống</label>
+                <label><input type="checkbox" checked>Bảo dưỡng thiết bị</label>
+                <label><input type="checkbox" checked>Quản lý tác vụ</label>
+              </div>
+              <div class="perm-col">
+                <h3>Điều khiển</h3>
+                <label class="select-all"><input type="checkbox" checked>Chọn tất cả</label>
+                <label><input type="checkbox" checked>Điều khiển thủ công</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-group')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-group')">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Thuộc tính tài khoản người dùng ═══════════ -->
+  <div class="overlay" id="modal-user">
+    <div class="modal w-narrow">
+      <div class="modal-head">
+        <h2>Thuộc tính tài khoản</h2>
+        <button class="x" onclick="closeModal('modal-user')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field" style="margin-bottom:14px;"><label>Tên đăng nhập</label><input placeholder="vd: nvdat.noc"></div>
+        <div class="field" style="margin-bottom:14px;"><label>Nhóm quyền</label>
+          <select><option>Quản trị viên</option><option selected>Kỹ thuật viên NOC</option><option>Người xem</option><option>Vận hành ONVIF</option></select>
+        </div>
+        <div class="field" style="margin-bottom:4px;"><label>Mật khẩu</label><input type="password" value="••••••••••"></div>
+        <div class="pw-meter"><span class="pm-track"><span class="pm-fill" style="width:60%"></span></span><span class="pm-label">Trung bình</span></div>
+        <div class="field" style="margin:14px 0;"><label>Xác nhận mật khẩu</label><input type="password" value="••••••••••"></div>
+        <div class="field"><label>Mô tả</label><textarea rows="2" placeholder="vd: Ca trực sáng khu vực Hà Nội"></textarea></div>
+        <div class="info-box">Tên đăng nhập chỉ gồm chữ, số, dấu gạch dưới, dấu chấm và @.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-user')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-user')">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Nhóm người dùng ONVIF ═══════════ -->
+  <div class="overlay" id="modal-onvif">
+    <div class="modal w-wide">
+      <div class="modal-head">
+        <h2>Nhóm người dùng ONVIF</h2>
+        <button class="x" onclick="closeModal('modal-onvif')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field"><label>Tên nhóm</label><input value="Tích hợp VMS bên thứ ba"></div>
+          <div class="field"><label>Node cha</label><input value="Onvif" disabled></div>
+          <div class="field full"><label>Mô tả</label><textarea rows="2">Tài khoản dùng cho phần mềm VMS ngoài kết nối qua giao thức ONVIF</textarea></div>
+        </div>
+        <div class="info-box">Tên đăng nhập chỉ gồm chữ, số, dấu gạch dưới, dấu chấm và @.</div>
+        <div class="card" style="margin-top:6px;">
+          <h2>Danh sách người dùng ONVIF</h2>
+          <table class="scan-table" style="margin-top:0;">
+            <thead><tr><th>Tên đăng nhập</th><th>Mật khẩu</th><th>Mô tả</th></tr></thead>
+            <tbody>
+              <tr><td class="mono-cell">onvif_vms01</td><td><span class="pw-mask">●●●●●●●●</span></td><td>Kết nối phần mềm VMS khu vực Hà Nội</td></tr>
+              <tr><td class="mono-cell">onvif_vms02</td><td><span class="pw-mask">●●●●●●●●</span></td><td>Kết nối phần mềm giám sát bên thứ ba tại KCN Bắc Thăng Long</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-onvif')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-onvif')">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Thêm quy tắc tường lửa ═══════════ -->
+  <div class="overlay" id="modal-fw-rule">
+    <div class="modal w-narrow">
+      <div class="modal-head">
+        <h2>Thêm quy tắc tường lửa</h2>
+        <button class="x" onclick="closeModal('modal-fw-rule')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field full"><label>Loại</label><select><option>Địa chỉ IP</option><option>Dải IP</option><option>Địa chỉ MAC</option></select></div>
+          <div class="field full"><label>Địa chỉ</label><input placeholder="vd: 10.20.14.0/24"></div>
+          <div class="field"><label>Cổng áp dụng</label><input placeholder="vd: 443, 37777 (để trống = tất cả)"></div>
+          <div class="field full"><label>Mô tả</label><input placeholder="vd: Mạng nội bộ khu vực NOC"></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-fw-rule')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-fw-rule')">Thêm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Cài đặt chứng chỉ tin cậy CA ═══════════ -->
+  <div class="overlay" id="modal-ca">
+    <div class="modal w-narrow">
+      <div class="modal-head">
+        <h2>Cài đặt chứng chỉ tin cậy</h2>
+        <button class="x" onclick="closeModal('modal-ca')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field" style="margin-bottom:14px;"><label>Tên tuỳ chỉnh</label><input placeholder="vd: CA nội bộ VNPT AI"></div>
+        <div class="dropzone">
+          Kéo thả tệp chứng chỉ CA (.pem, .crt, .cer) vào đây, hoặc <b>chọn tệp từ máy tính</b>.
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('modal-ca')">Huỷ</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-ca')">Cài đặt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL: Wizard cài đặt chứng chỉ thiết bị (3 bước) ═══════════ -->
+  <div class="overlay" id="modal-cert-wizard">
+    <div class="modal w-wide">
+      <div class="modal-head">
+        <h2>Cài đặt chứng chỉ thiết bị</h2>
+        <button class="x" onclick="closeModal('modal-cert-wizard')">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="wizard-rail">
+          <div class="step done" id="cert-rail-1"><span class="num">1</span>Chọn phương thức</div>
+          <div class="rail-line"></div>
+          <div class="step" id="cert-rail-2"><span class="num">2</span>Điền thông tin</div>
+          <div class="rail-line"></div>
+          <div class="step" id="cert-rail-3"><span class="num">3</span>Nhập chứng chỉ đã ký</div>
+        </div>
+
+        <!-- Step 1 -->
+        <div id="cert-step-1">
+          <div class="field"><label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:600;color:var(--text);font-size:13px;"><input type="radio" name="cert-mode" checked onchange="setCertMode('create')"> Tạo chứng chỉ</label>
+            <span class="hint-text" style="margin-left:22px;">Điền thông tin chứng chỉ, thiết bị sẽ tự tạo và cấp chứng chỉ.</span>
+          </div>
+          <div class="field" style="margin-top:14px;"><label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:600;color:var(--text);font-size:13px;"><input type="radio" name="cert-mode" onchange="setCertMode('ca')"> Đăng ký chứng chỉ CA và nhập (khuyến nghị)</label>
+            <span class="hint-text" style="margin-left:22px;">Sau khi điền thông tin, thiết bị tạo tệp yêu cầu chứng chỉ (CSR). Gửi tệp này cho tổ chức CA để xin chữ ký, sau đó nhập lại vào thiết bị.</span>
+          </div>
+          <div class="field" style="margin-top:14px;"><label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:600;color:var(--text);font-size:13px;"><input type="radio" name="cert-mode" onchange="setCertMode('existing')"> Cài đặt chứng chỉ có sẵn</label>
+            <span class="hint-text" style="margin-left:22px;">Nếu đã có tệp chứng chỉ và khoá riêng tư, nhập trực tiếp vào thiết bị theo cách này.</span>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="cert-step-2" hidden>
+          <div class="form-grid">
+            <div class="field"><label>Tên tuỳ chỉnh</label><input placeholder="vd: CN Trung tâm NOC 02"></div>
+            <div class="field"><label>IP / Tên miền *</label><input placeholder="noc-hanoi.vnptai.vn"></div>
+            <div class="field"><label>Đơn vị</label><input placeholder="Trung tâm điều hành NOC"></div>
+            <div class="field"><label>Tổ chức</label><input placeholder="VNPT AI"></div>
+            <div class="field"><label>Thời hạn hiệu lực *</label><input value="365"><span class="hint">Số ngày (1–5000)</span></div>
+            <div class="field"><label>Khu vực *</label><input placeholder="VN"></div>
+            <div class="field"><label>Tỉnh / Thành</label><input placeholder="Hà Nội"></div>
+            <div class="field"><label>Thành phố</label><input placeholder="Cầu Giấy"></div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="cert-step-3" hidden>
+          <p class="hint-text" style="margin:0 0 10px;">Chỉ áp dụng khi chọn "Đăng ký chứng chỉ CA và nhập" — tải tệp chứng chỉ đã được tổ chức CA ký trở lại.</p>
+          <div class="field"><label>Tệp chứng chỉ đã ký</label>
+            <div style="display:flex;gap:8px;"><input placeholder="Chưa chọn tệp" style="flex:1;" disabled><button class="btn">Chọn tệp</button></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-foot">
+        <button class="btn" id="cert-btn-cancel" onclick="closeModal('modal-cert-wizard')">Huỷ</button>
+        <button class="btn" id="cert-btn-back" onclick="certStep(-1)" hidden>Quay lại</button>
+        <button class="btn" id="cert-btn-later" onclick="closeModal('modal-cert-wizard')" hidden>Nhập sau</button>
+        <button class="btn" id="cert-btn-recreate" onclick="certGoto(1)" hidden>Tạo lại</button>
+        <button class="btn btn-primary" id="cert-btn-next" onclick="certStep(1)">Tiếp theo</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function openModal(id){
+    document.getElementById(id).classList.add('open');
+    if(id==='modal-cert-wizard'){ certGoto(1); }
+  }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  /* Dùng chung cho tab cấp trang lẫn tab lồng trong modal — mỗi cặp .tabs/.tab-panel
+     nằm trực tiếp trong 1 wrapper .tabgroup nên chỉ cần tìm .tabgroup gần nhất. */
+  function switchTab(ev, id){
+    const group = ev.target.closest('.tabgroup');
+    group.querySelectorAll(':scope > .tabs > .tab-btn').forEach(b=>b.classList.remove('active'));
+    group.querySelectorAll(':scope > .tab-panel').forEach(p=>p.classList.remove('active'));
+    ev.target.classList.add('active');
+    group.querySelector('#'+id).classList.add('active');
+  }
+
+  function setFirewall(mode, btn){
+    document.querySelectorAll('#fw-seg button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('fw-all').hidden = mode!=='all';
+    document.getElementById('fw-allow').hidden = mode!=='allow';
+    document.getElementById('fw-block').hidden = mode!=='block';
+  }
+
+  function toggleDetail(){
+    const p = document.getElementById('detail-panel');
+    p.hidden = !p.hidden;
+  }
+
+  function toggleLockAll(src){
+    document.querySelectorAll('.lock-check').forEach(cb=>cb.checked=src.checked);
+    updateLockSelection();
+  }
+  function onLockCheck(){ updateLockSelection(); }
+  function updateLockSelection(){
+    const n = document.querySelectorAll('.lock-check:checked').length;
+    document.getElementById('btn-unlock').disabled = n===0;
+  }
+
+  /* Wizard chứng chỉ thiết bị — 3 bước tuyến tính */
+  let certStepIdx = 1;
+  function certGoto(step){
+    certStepIdx = step;
+    [1,2,3].forEach(i=>{
+      document.getElementById('cert-step-'+i).hidden = i!==step;
+      const rail = document.getElementById('cert-rail-'+i);
+      rail.classList.toggle('active', i===step);
+      rail.classList.toggle('done', i<step);
+    });
+    document.getElementById('cert-btn-back').hidden = step===1;
+    document.getElementById('cert-btn-next').hidden = step===3;
+    document.getElementById('cert-btn-cancel').hidden = step===3;
+    document.getElementById('cert-btn-later').hidden = step!==3;
+    document.getElementById('cert-btn-recreate').hidden = step!==3;
+  }
+  function certStep(delta){ certGoto(Math.min(3, Math.max(1, certStepIdx+delta))); }
+  function setCertMode(mode){ /* placeholder: mockup không phân nhánh nội dung theo phương thức đã chọn */ }
+</script>
+
+</body>
+</html>

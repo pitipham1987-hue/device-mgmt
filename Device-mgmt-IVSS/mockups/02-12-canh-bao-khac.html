@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cảnh báo thông minh khác · Device-mgmt-IVSS</title>
+
+<!--
+  Nhóm màn: 02-van-hanh-ai / 12-canh-bao-khac.
+  Ảnh tham khảo: refs/02-van-hanh-ai/12-canh-bao-khac/
+    fig6-69_smart-motion-detection.png (Enable + preview camera thật + Effective
+      Target checkbox Người/Phương tiện + Sensitivity dropdown),
+    fig6-70_live-view.png (khung xem trực tiếp có overlay đếm số người/xe/xe máy
+      góc trên-phải, nhãn tên camera + timestamp góc trên-trái),
+    fig6-71_smart-sound-detection.png (Enable + Sound Type checkbox nhiều loại
+      + Sensitivity slider 1-10 + Threshold dạng waveform + Schedule +
+      Anti-dither + Event Linkage + Local Linkage Record/Picture Storage).
+  LÝ DO BỔ SUNG: nhóm này CÓ ảnh gốc (3 ảnh, đã liệt kê ở trên) nhưng CHƯA
+  được ghi vào refs/INDEX.md — bảng mục lục dừng ở nhóm 10-doi-sanh-bien-so
+  rồi nhảy sang chương 8 (04-cau-hinh); phần "Cảnh báo khác" (chương 6, các
+  loại cảnh báo AI bổ sung ngoài IVS/ANPR/khuôn mặt) bị bỏ sót khi biên mục
+  lục gốc. Bổ sung theo đúng brief người dùng: trang "Cảnh báo thông minh
+  khác" gồm 3 card cấu hình. Preview camera dùng khối xám giả lập (fig6-69
+  là ảnh thật có người — không tái tạo, không copy pixel-for-pixel).
+  Kế thừa nguyên vẹn shared.css — CSS mới (cam-frame, toggle, sensitivity
+  gauge, waveform, counter badge) scoped riêng trong file này.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ───────── Scoped: toggle switch ───────── */
+  .toggle{position:relative;display:inline-block;width:36px;height:20px;flex:none;}
+  .toggle input{opacity:0;width:0;height:0;position:absolute;}
+  .toggle .slider{position:absolute;inset:0;background:var(--line-strong);border-radius:20px;cursor:pointer;transition:background .15s;}
+  .toggle .slider::before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3);}
+  .toggle input:checked + .slider{background:var(--primary);}
+  .toggle input:checked + .slider::before{transform:translateX(16px);}
+  .toggle-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);font-weight:600;margin-bottom:16px;}
+
+  /* ───────── Scoped: khung camera giả lập ───────── */
+  .cam-wrap{background:var(--bg);border:1px solid var(--line);}
+  .cam-frame{position:relative;background:#232B33;aspect-ratio:16/9;overflow:hidden;}
+  .cam-frame .cam-tag{position:absolute;top:8px;left:10px;font-size:11px;color:#fff;background:rgba(0,0,0,.42);padding:2px 8px;border-radius:2px;}
+  .cam-frame .cam-time{position:absolute;top:8px;right:10px;font-size:11px;color:#fff;font-family:var(--mono);background:rgba(0,0,0,.42);padding:2px 8px;border-radius:2px;}
+  .cam-frame .cam-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#7B8794;text-align:center;padding:0 24px;}
+  .cam-frame .counter-strip{position:absolute;top:34px;right:10px;display:flex;flex-direction:column;gap:4px;align-items:flex-end;}
+  .cam-frame .counter-chip{background:rgba(0,23,61,.72);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:2px;display:flex;gap:6px;align-items:center;font-family:var(--mono);}
+  .cam-frame .counter-chip .c-label{font-family:'Be Vietnam Pro',sans-serif;font-weight:500;color:rgba(255,255,255,.78);}
+
+  .stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:16px;}
+  .stat-cell{background:#fff;padding:11px 14px;}
+  .stat-cell .s-label{font-size:10.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;font-weight:600;}
+  .stat-cell .s-value{font-size:19px;font-weight:800;color:var(--navy);margin-top:3px;}
+
+  /* ───────── Scoped: thang độ nhạy 1-10 ───────── */
+  .sens-gauge{display:flex;gap:3px;align-items:center;}
+  .sens-gauge .sg-tick{width:20px;height:9px;background:var(--bg-soft2);}
+  .sens-gauge .sg-tick.filled{background:var(--primary);}
+  .sens-gauge .sg-value{margin-left:10px;font-weight:700;color:var(--navy);font-size:13px;}
+
+  /* ───────── Scoped: waveform ngưỡng âm thanh ───────── */
+  .waveform{display:flex;align-items:flex-end;gap:2px;height:64px;padding:0 2px;border:1px solid var(--line);background:var(--bg-soft);max-width:420px;}
+  .waveform i{flex:1;background:var(--error);opacity:.55;min-width:2px;}
+  .waveform i:nth-child(3n){opacity:.85;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Vận hành AI &nbsp;/&nbsp; <b>Cảnh báo thông minh khác</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <div class="shell no-tree">
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1>Cảnh báo thông minh khác</h1>
+        <span class="scope">Các loại phát hiện AI bổ sung ngoài IVS hành vi / ANPR / khuôn mặt — chuyển động thông minh, xem trực tiếp có cảnh báo, âm thanh bất thường</span>
+      </div>
+
+      <!-- ═══════════ CARD 1: SMART MOTION DETECTION ═══════════ -->
+      <div class="card">
+        <h2>Phát hiện chuyển động thông minh</h2>
+        <div class="toggle-row"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Bật phát hiện chuyển động thông minh</div>
+
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start;">
+          <div class="cam-wrap">
+            <div class="cam-frame">
+              <span class="cam-tag">Camera Bãi đỗ xe nhà máy Canon</span>
+              <span class="cam-time tabular">15/09/2026 14:35:10</span>
+              <span class="cam-label">Xem trước camera (giả lập) — vùng toàn khung hình được giám sát chuyển động</span>
+            </div>
+          </div>
+          <div class="form-grid" style="grid-template-columns:1fr;">
+            <div class="field">
+              <label>Đối tượng áp dụng</label>
+              <div style="display:flex;gap:16px;font-size:12.5px;color:var(--text);padding-top:4px;">
+                <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" checked> Người</label>
+                <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" checked> Phương tiện</label>
+              </div>
+            </div>
+            <div class="field"><label>Độ nhạy</label><select><option>Thấp</option><option>Trung bình</option><option selected>Cao</option></select></div>
+            <div class="field"><label>Lịch áp dụng</label><select><option>Cả ngày (00:00–24:00)</option><option>Ngoài giờ hành chính</option></select></div>
+            <div class="field"><label></label><button class="btn" style="width:fit-content;">Liên kết sự kiện ▸</button></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-cell"><div class="s-label">Số lần cảnh báo hôm nay</div><div class="s-value tabular">37</div></div>
+            <div class="stat-cell"><div class="s-label">Lần cảnh báo gần nhất</div><div class="s-value" style="font-size:15px;">14:35:10</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ CARD 2: LIVE VIEW WITH ALERT ═══════════ -->
+      <div class="card">
+        <h2>Xem trực tiếp có cảnh báo</h2>
+
+        <div class="cam-wrap">
+          <div class="cam-frame">
+            <span class="cam-tag">Camera Km12+400 cao tốc HN - Hải Phòng</span>
+            <span class="cam-time tabular">15/09/2026 14:32:07</span>
+            <div class="counter-strip">
+              <span class="counter-chip"><span class="c-label">Người</span> 128</span>
+              <span class="counter-chip"><span class="c-label">Ô tô</span> 3.482</span>
+              <span class="counter-chip"><span class="c-label">Xe máy</span> 941</span>
+            </div>
+            <span class="cam-label">Xem trực tiếp camera (giả lập) — chip góc trên-phải là bộ đếm đối tượng theo thời gian thực, cập nhật liên tục</span>
+          </div>
+          <div class="cam-toolbar" style="display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--line);background:var(--bg-soft);">
+            <button class="btn" style="font-size:12px;padding:6px 11px;">Phóng to</button>
+            <button class="btn" style="font-size:12px;padding:6px 11px;">Chụp ảnh</button>
+            <button class="btn" style="font-size:12px;padding:6px 11px;">Xem lại 30 giây trước</button>
+          </div>
+        </div>
+
+        <div class="warn-box">
+          <span class="wi">⚠</span>
+          <span><b>14:32:07</b> — Phát hiện chuyển động bất thường tại <b>Làn khẩn cấp Km12+400, cao tốc HN - Hải Phòng</b>. Đã tự động ghi hình kênh 12 và gửi cảnh báo về Trung tâm điều hành VEC-NOC.</span>
+        </div>
+      </div>
+
+      <!-- ═══════════ CARD 3: SMART SOUND DETECTION ═══════════ -->
+      <div class="card">
+        <h2>Phát hiện âm thanh bất thường</h2>
+        <div class="toggle-row"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label> Bật phát hiện âm thanh bất thường</div>
+
+        <div class="field" style="margin-bottom:14px;">
+          <label>Loại âm thanh</label>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--text);padding-top:4px;">
+            <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" checked> Tất cả</label>
+            <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" checked> Vỡ kính</label>
+            <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" checked> Hét lớn / kêu cứu</label>
+            <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" checked> Tiếng súng</label>
+            <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" checked> Tiếng nổ</label>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Độ nhạy (1–10)</label>
+            <div class="sens-gauge">
+              <i class="sg-tick filled"></i><i class="sg-tick filled"></i><i class="sg-tick filled"></i><i class="sg-tick filled"></i><i class="sg-tick filled"></i><i class="sg-tick filled"></i><i class="sg-tick filled"></i>
+              <i class="sg-tick"></i><i class="sg-tick"></i><i class="sg-tick"></i>
+              <span class="sg-value">7</span>
+            </div>
+          </div>
+          <div class="field"><label>Chống rung (Anti-dither)</label><input type="text" value="0" style="max-width:120px;"><span class="hint">Đơn vị giây, khoảng 0–100s</span></div>
+        </div>
+
+        <div class="field" style="margin-top:14px;margin-bottom:16px;">
+          <label>Ngưỡng âm thanh (Threshold)</label>
+          <div class="waveform">
+            <i style="height:28%"></i><i style="height:44%"></i><i style="height:22%"></i><i style="height:61%"></i><i style="height:38%"></i><i style="height:70%"></i><i style="height:33%"></i><i style="height:52%"></i>
+            <i style="height:25%"></i><i style="height:46%"></i><i style="height:80%"></i><i style="height:35%"></i><i style="height:58%"></i><i style="height:29%"></i><i style="height:66%"></i><i style="height:41%"></i>
+            <i style="height:24%"></i><i style="height:55%"></i><i style="height:37%"></i><i style="height:73%"></i><i style="height:31%"></i><i style="height:48%"></i><i style="height:20%"></i><i style="height:60%"></i>
+            <i style="height:34%"></i><i style="height:42%"></i><i style="height:27%"></i><i style="height:64%"></i><i style="height:39%"></i><i style="height:50%"></i>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field"><label>Lịch áp dụng</label><select><option>Lịch mặc định (cả ngày)</option><option>Ban đêm (22:00–05:00)</option></select></div>
+          <div class="field"><label></label><button class="btn" style="width:fit-content;">＋ Thêm lịch mới</button></div>
+          <div class="field"><label>Liên kết sự kiện</label><button class="btn" style="width:fit-content;">＋ Chọn</button></div>
+        </div>
+
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);">
+          <div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:10px;">Liên kết cục bộ (Local Linkage)</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--text);margin-bottom:10px;">
+            <b>Ghi hình</b>
+            Ghi trước/sau <input type="text" value="10" style="width:48px;text-align:center;border:1px solid var(--line-strong);border-radius:3px;padding:6px 4px;font-size:12.5px;"> giây (10–300s)
+            Thiết bị: <select style="border:1px solid var(--line-strong);border-radius:3px;padding:6px 9px;font-size:12.5px;font-family:inherit;"><option>Camera Sảnh chờ ga Cầu Giấy (BRT)</option><option>Camera Km12+400 cao tốc HN-HP</option></select>
+            <label><input type="checkbox" checked> Bắt đầu ghi</label>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--text);">
+            <b>Chụp ảnh lưu trữ</b>
+            Thiết bị: <select style="border:1px solid var(--line-strong);border-radius:3px;padding:6px 9px;font-size:12.5px;font-family:inherit;"><option>Camera Sảnh chờ ga Cầu Giấy (BRT)</option><option>Camera Km12+400 cao tốc HN-HP</option></select>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:8px;"><button class="btn btn-primary">Lưu</button><button class="btn">Làm mới</button></div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

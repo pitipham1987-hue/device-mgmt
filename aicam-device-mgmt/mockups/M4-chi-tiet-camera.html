@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>AICAM — M4 Chi tiết camera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Source+Sans+3:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .content{padding:16px 20px;}
+  .cam-head{display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px;}
+  .cam-title{font-size:18px; font-weight:700; color:var(--text-heading);}
+  .cam-sub{font-size:12.5px; color:var(--text-secondary); margin-top:2px;}
+  .cam-status-row{display:flex; gap:8px; margin-top:8px;}
+  .cam-actions{display:flex; gap:8px;}
+
+  .layout{display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+  .video-panel{background:#0d1117; border-radius:var(--radius); aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; color:#8892a3; font-size:13px; position:relative;}
+  .video-controls{position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent,rgba(0,0,0,.55)); padding:24px 14px 10px; display:flex; justify-content:space-between; align-items:center; color:#fff; font-size:12px;}
+
+  .tabs{display:flex; gap:18px; border-bottom:1px solid var(--border-split); margin-top:14px;}
+  .tab{padding:9px 2px; font-size:13px; font-weight:600; color:var(--text-secondary); cursor:pointer; border-bottom:2px solid transparent;}
+  .tab.active{color:var(--primary); border-bottom-color:var(--primary);}
+
+  .info-panel{background:var(--bg-container); border:1px solid var(--border-split); border-radius:var(--radius); padding:16px;}
+  .info-panel h4{margin:0 0 12px; font-size:13.5px; color:var(--text-heading);}
+  .info-row{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--border-split); font-size:13px;}
+  .info-row:last-child{border-bottom:none;}
+  .info-row .k{color:var(--text-secondary);}
+  .info-row .v{color:var(--text-heading); font-weight:500;}
+
+  .ai-feed{margin-top:14px;}
+  .event-item{display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border-split);}
+  .event-thumb{width:56px;height:40px;border-radius:4px; background:#e9edf2; flex:none; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-disabled);}
+  .event-body{flex:1;}
+  .event-label{font-size:12.5px; font-weight:600; color:var(--text-heading);}
+  .event-time{font-size:11px; color:var(--text-disabled);}
+
+  .compliance-note{margin-top:14px; background:var(--primary-bg); border:1px solid #c8dafc; border-radius:var(--radius); padding:10px 12px; font-size:12px; color:#0a3a8c; display:flex; gap:8px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><img src="../assets/vnptai-brand/logo.svg" alt="VNPT AI"></div>
+    <div class="menu">
+      <div class="menu-item">Trang chủ</div>
+      <div class="menu-item active">Danh sách thiết bị</div>
+      <div class="menu-item">Thêm thiết bị</div>
+      <div class="menu-item">Cấu hình AI</div>
+      <div class="menu-item">Sự kiện &amp; cảnh báo</div>
+      <div class="menu-item">Cấu hình hệ thống</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <div class="breadcrumb">Danh sách thiết bị / <b>CAM-HN-207</b></div>
+      <div class="user-mini"><div class="avatar-sq">TV</div> Trực vận hành</div>
+    </div>
+
+    <div class="content">
+      <div class="cam-head">
+        <div>
+          <div class="cam-title">CAM-HN-207 · Cổng khu công nghiệp</div>
+          <div class="cam-sub">Hà Nội · Đông Anh · IP 10.22.5.44 · AICAM-IPC-4M</div>
+          <div class="cam-status-row">
+            <span class="status-tag tag-degraded"><span class="d" style="background:#722ed1"></span>Kết nối: Đang xuống cấp</span>
+            <span class="status-tag tag-ok"><span class="d" style="background:#52c41a"></span>Ghi hình: Đang ghi</span>
+            <span class="status-tag tag-warn"><span class="d" style="background:#faad14"></span>AI: Lỗi tài nguyên</span>
+          </div>
+        </div>
+        <div class="cam-actions">
+          <button class="btn">Sửa cấu hình</button>
+          <button class="btn btn-primary">Cấu hình AI</button>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div>
+          <div class="video-panel">
+            Luồng trực tiếp — placeholder (chưa nối RTSP thật)
+            <div class="video-controls">
+              <span>● TRỰC TIẾP · độ trễ 640ms</span>
+              <span>1080p · H.265 · 25fps</span>
+            </div>
+          </div>
+          <div class="tabs">
+            <div class="tab active">Sự kiện AI</div>
+            <div class="tab">Lịch sử ghi hình</div>
+            <div class="tab">Nhật ký thiết bị</div>
+          </div>
+          <div class="ai-feed">
+            <div class="event-item">
+              <div class="event-thumb">ảnh chụp</div>
+              <div class="event-body"><div class="event-label">Phát hiện xâm nhập vùng cấm</div><div class="event-time">14:31:52 · Phát hiện xâm nhập</div></div>
+            </div>
+            <div class="event-item">
+              <div class="event-thumb">ảnh chụp</div>
+              <div class="event-body"><div class="event-label">Khung hình rớt liên tục 12 giây</div><div class="event-time">14:28:10 · Cảnh báo chất lượng luồng</div></div>
+            </div>
+            <div class="event-item">
+              <div class="event-thumb">ảnh chụp</div>
+              <div class="event-body"><div class="event-label">Phát hiện xâm nhập vùng cấm</div><div class="event-time">13:59:03 · Phát hiện xâm nhập</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="info-panel">
+            <h4>Thông tin thiết bị</h4>
+            <div class="info-row"><span class="k">Model</span><span class="v">AICAM-IPC-4M</span></div>
+            <div class="info-row"><span class="k">Firmware</span><span class="v tabular">v3.2.1</span></div>
+            <div class="info-row"><span class="k">Địa chỉ IP</span><span class="v tabular">10.22.5.44</span></div>
+            <div class="info-row"><span class="k">MAC</span><span class="v tabular">3C:A6:2F:07:E2</span></div>
+            <div class="info-row"><span class="k">Độ trễ hiện tại</span><span class="v tabular" style="color:var(--degraded)">640ms</span></div>
+            <div class="info-row"><span class="k">Lắp đặt</span><span class="v">12/03/2025</span></div>
+          </div>
+
+          <div class="info-panel" style="margin-top:14px;">
+            <h4>Cấu hình AI đang chạy</h4>
+            <div class="info-row"><span class="k">Thuật toán</span><span class="v">Phát hiện xâm nhập</span></div>
+            <div class="info-row"><span class="k">Tài nguyên GPU</span><span class="v tabular" style="color:var(--warning)">Lỗi cấp phát</span></div>
+            <div class="info-row"><span class="k">Vùng phát hiện</span><span class="v">2 vùng đã đặt</span></div>
+          </div>
+
+          <div class="compliance-note">
+            🛡️ Camera này không xử lý dữ liệu sinh trắc học. Không thuộc phạm vi lưu vết Nghị định 13.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

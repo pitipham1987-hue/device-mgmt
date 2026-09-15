@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý mạng · Device-mgmt-IVSS</title>
+
+<!--
+  Màn "Quản lý mạng" (04-cau-hinh/2-quan-ly-mang) — kế thừa hệ thống thiết kế
+  đã chốt hướng ③ Thiết kế sư hàng đầu (Tufte), dùng chung mockups/shared.css,
+  KHÔNG sửa shared.css. Đây là màn thứ 2 trong 20 nhóm màn hình tham chiếu,
+  không lặp lại quy trình 3-hướng (xem ../direction-approved.md).
+
+  ĐÃ DỰNG 9 mục giao thức con (điều hướng trái, panel ẩn/hiện bằng JS,
+  không route thật):
+    1. GB28181 Client — 2 card: "Cấu hình máy chủ GB28181" + "Trạng thái đăng ký"
+    2. RTMP — đẩy luồng theo từng kênh
+    3. ONVIF — bật dịch vụ + bảng tài khoản ONVIF
+    4. Email (SMTP) — cấu hình máy chủ gửi + danh sách người nhận
+    5. Trung tâm cảnh báo — 2 BIẾN THỂ gộp trong 1 mục, chuyển bằng dropdown
+       "Chế độ tải lên" (Giao thức riêng / HTTP-HTTPS), giống hành vi UI gốc
+    6. UPnP — ánh xạ cổng + bảng Port Mapping List
+    7. DDNS — tên miền động
+    8. SNMP — SNMP v3 (đọc/ghi riêng biệt)
+    9. Đăng nhập qua Multicast — cấu hình địa chỉ multicast luồng chính/phụ
+
+  GIẢ ĐỊNH quan trọng:
+  - File refs/04-cau-hinh/2-quan-ly-mang/fig8-26_onvif.png trong bộ ảnh nguồn
+    bị trùng nội dung với p258_register.png (lỗi crop/nguồn, không phải ảnh
+    ONVIF thật) — form ONVIF dưới đây dựng theo cấu trúc chuẩn thực tế của
+    dịch vụ ONVIF trên đầu ghi (Enable, Authentication, Port, bảng tài khoản),
+    không theo ảnh lỗi đó.
+  - Thiết bị đang được cấu hình là 1 đầu ghi IVSS đặt tại trụ sở NOC quận Cầu
+    Giấy (IP quản trị 10.20.14.5) — cùng bối cảnh địa bàn với màn neo "Quản lý
+    thiết bị". Các máy chủ đích (GB28181 SIP server, RTMP relay, Trung tâm
+    cảnh báo, SNMP trap receiver) đặt tại dải mạng lõi NOC 10.10.200.0/24.
+  - DDNS và UPnP mặc định TẮT vì thiết bị dùng IP tĩnh trong mạng lõi VNPT,
+    không cần NAT/tên miền động — phản ánh đúng thực tế vận hành thay vì bật
+    giả cho đẹp; UPnP có warn-box giải thích, DDNS giữ nguyên trạng thái mặc
+    định như ảnh gốc.
+  - Không nhúng ảnh refs/*.png, không logo Dahua/Hikvision, không #1890ff.
+  - Toggle switch (.switch) là pattern mới chưa có trong shared.css → CSS
+    scoped riêng trong <style> bên dưới, KHÔNG thêm vào shared.css.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+<style>
+  /* ───────── Scoped pattern mới: protocol nav (thay cho region tree) ───────── */
+  .proto-list{padding:4px 8px;display:flex;flex-direction:column;gap:2px;}
+  .proto-item{
+    appearance:none;border:none;background:none;font-family:inherit;text-align:left;
+    display:grid;grid-template-columns:28px 1fr 14px;align-items:center;gap:10px;
+    padding:8px 8px;border-radius:4px;cursor:pointer;width:100%;
+  }
+  .proto-item:hover{background:var(--bg-soft);}
+  .proto-item.active{background:#E9F0FC;}
+  .proto-badge{
+    width:26px;height:26px;border-radius:5px;background:var(--bg-soft2);color:var(--text-muted);
+    display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;
+    letter-spacing:.2px;
+  }
+  .proto-item.active .proto-badge{background:var(--primary);color:#fff;}
+  .proto-name{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .proto-name b{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .proto-item.active .proto-name b{color:var(--primary);}
+  .proto-name small{font-size:10.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .proto-dot{display:flex;justify-content:flex-end;}
+
+  .proto-panel{display:none;}
+  .proto-panel.active{display:block;}
+
+  /* ───────── Scoped pattern mới: toggle switch ───────── */
+  .switch{position:relative;display:inline-block;width:38px;height:21px;flex:none;}
+  .switch input{opacity:0;width:0;height:0;position:absolute;}
+  .switch .sw-track{
+    position:absolute;inset:0;background:var(--line-strong);border-radius:22px;cursor:pointer;transition:background .15s;
+  }
+  .switch .sw-track::before{
+    content:"";position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;
+    transition:transform .15s;box-shadow:0 1px 2px rgba(0,10,30,.3);
+  }
+  .switch input:checked + .sw-track{background:var(--primary);}
+  .switch input:checked + .sw-track::before{transform:translateX(17px);}
+  .switch-row{display:flex;align-items:center;gap:10px;}
+  .switch-row .sw-state{font-size:11.5px;font-weight:600;color:var(--text-muted);}
+
+  .card-sub{font-size:11.5px;color:var(--text-faint);margin:-10px 0 14px;line-height:1.55;}
+  .card .hr{border:none;border-top:1px solid var(--line);margin:16px 0;}
+  .field .field-icon-wrap{position:relative;}
+  .field .unit{font-size:11px;color:var(--text-faint);margin-left:2px;}
+  .readonly-hint{background:var(--bg-soft);color:var(--text-faint);}
+  .kv-note{font-size:11px;color:var(--text-faint);margin-top:4px;line-height:1.5;}
+  .test-row{display:flex;gap:8px;align-items:center;}
+  .test-row select{flex:1;}
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BRAND BAR ═══════════ -->
+  <div class="topbar">
+    <div class="brand"><span class="mark">AI</span>VNPT AI · Device-mgmt-IVSS</div>
+    <div class="divider"></div>
+    <div class="crumb">Cấu hình &nbsp;/&nbsp; Quản lý mạng &nbsp;/&nbsp; <b id="crumb-proto">GB28181 Client</b></div>
+    <div class="spacer"></div>
+    <div class="who"><span class="avatar">NV</span> Nguyễn Văn Đạt · Kỹ thuật viên NOC</div>
+  </div>
+
+  <!-- ═══════════ SHELL: protocol nav + main ═══════════ -->
+  <div class="shell">
+
+    <!-- ─────── LEFT: protocol navigation ─────── -->
+    <nav class="tree-pane">
+      <div class="tp-heading">Giao thức mạng · IVSS-CG-01 (10.20.14.5)</div>
+
+      <div class="proto-list" id="proto-list">
+        <button class="proto-item active" data-target="panel-gb28181" data-title="GB28181 Client" data-desc="Đăng ký đầu ghi lên nền tảng giám sát tập trung theo chuẩn GB/T 28181">
+          <span class="proto-badge">GB</span>
+          <span class="proto-name"><b>GB28181 Client</b><small>Nền tảng giám sát tập trung</small></span>
+          <span class="proto-dot"><i class="dot ok"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-rtmp" data-title="RTMP" data-desc="Đẩy luồng trực tiếp tới máy chủ relay nội bộ NOC">
+          <span class="proto-badge">RT</span>
+          <span class="proto-name"><b>RTMP</b><small>Đẩy luồng trực tiếp</small></span>
+          <span class="proto-dot"><i class="dot ok"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-onvif" data-title="ONVIF" data-desc="Tương thích phần mềm VMS thứ ba qua chuẩn ONVIF">
+          <span class="proto-badge">ON</span>
+          <span class="proto-name"><b>ONVIF</b><small>Tương thích VMS thứ ba</small></span>
+          <span class="proto-dot"><i class="dot ok"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-email" data-title="Email (SMTP)" data-desc="Gửi cảnh báo sự kiện qua email tới trực ban NOC">
+          <span class="proto-badge">EM</span>
+          <span class="proto-name"><b>Email (SMTP)</b><small>Gửi cảnh báo qua email</small></span>
+          <span class="proto-dot"><i class="dot ok"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-alarm" data-title="Trung tâm cảnh báo" data-desc="Đẩy sự kiện cảnh báo lên nền tảng VNPT AI NOC">
+          <span class="proto-badge">AC</span>
+          <span class="proto-name"><b>Trung tâm cảnh báo</b><small>Đẩy sự kiện lên NOC</small></span>
+          <span class="proto-dot"><i class="dot ok"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-upnp" data-title="UPnP" data-desc="Ánh xạ cổng tự động qua router — khuyến nghị tắt trên mạng lõi VNPT">
+          <span class="proto-badge">UP</span>
+          <span class="proto-name"><b>UPnP</b><small>Ánh xạ cổng tự động</small></span>
+          <span class="proto-dot"><i class="dot neutral"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-ddns" data-title="DDNS" data-desc="Tên miền động cho thiết bị dùng IP WAN thay đổi">
+          <span class="proto-badge">DD</span>
+          <span class="proto-name"><b>DDNS</b><small>Tên miền động</small></span>
+          <span class="proto-dot"><i class="dot neutral"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-snmp" data-title="SNMP" data-desc="Giám sát thiết bị từ hệ thống NOC qua giao thức SNMP">
+          <span class="proto-badge">SN</span>
+          <span class="proto-name"><b>SNMP</b><small>Giám sát từ hệ thống NOC</small></span>
+          <span class="proto-dot"><i class="dot ok"></i></span>
+        </button>
+
+        <button class="proto-item" data-target="panel-multicast" data-title="Đăng nhập qua Multicast" data-desc="Nhiều người xem cùng lúc dùng chung địa chỉ multicast, giảm tải băng thông LAN">
+          <span class="proto-badge">MC</span>
+          <span class="proto-name"><b>Đăng nhập qua Multicast</b><small>Giảm tải băng thông LAN</small></span>
+          <span class="proto-dot"><i class="dot ok"></i></span>
+        </button>
+      </div>
+
+      <div class="tree-legend">
+        Chấm xanh = giao thức đang <b>bật</b> trên thiết bị này.<br>
+        Chấm xám = đang <b>tắt</b>.
+      </div>
+    </nav>
+
+    <!-- ─────── RIGHT: main pane, 1 card set / giao thức ─────── -->
+    <main class="main-pane">
+
+      <div class="panel-heading">
+        <h1 id="panel-title">GB28181 Client</h1>
+        <span class="scope" id="panel-desc">Đăng ký đầu ghi lên nền tảng giám sát tập trung theo chuẩn GB/T 28181</span>
+      </div>
+
+      <!-- ═══ 1. GB28181 CLIENT ═══ -->
+      <section class="proto-panel active" id="panel-gb28181">
+        <div class="card">
+          <h2>Cấu hình máy chủ GB28181</h2>
+          <p class="card-sub">Thông số kết nối tới máy chủ SIP của nền tảng giám sát tập trung VNPT AI NOC.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label>Địa chỉ IP máy chủ (Server IP)</label>
+              <input type="text" value="10.10.200.15">
+            </div>
+            <div class="field">
+              <label>Server ID</label>
+              <input type="text" value="34020000002000000001" class="mono-cell">
+              <span class="hint">Mã nền tảng cấp bởi VNPT AI NOC (chuẩn 20 chữ số GB/T 28181)</span>
+            </div>
+            <div class="field">
+              <label>Cổng (Port)</label>
+              <input type="text" value="5060">
+              <span class="hint">1025–65535</span>
+            </div>
+            <div class="field">
+              <label>Mật khẩu đăng ký</label>
+              <input type="password" value="••••••••••••">
+            </div>
+            <div class="field">
+              <label>Chu kỳ giữ kết nối (Keep Alive)</label>
+              <input type="text" value="60"><span class="unit">giây (30–3600)</span>
+            </div>
+            <div class="field">
+              <label>Số lần lỗi tối đa (Max Failure)</label>
+              <input type="text" value="3"><span class="unit">lần (3–3600)</span>
+            </div>
+          </div>
+          <div class="toolbar" style="margin-top:18px;margin-bottom:0;">
+            <button class="btn btn-primary">Áp dụng</button>
+            <button class="btn">Làm mới</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Trạng thái đăng ký</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label>Bật GB28181</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Trạng thái</label>
+              <span class="chip c-ok" style="font-size:12.5px;"><i class="dot ok"></i>Trực tuyến — đã đăng ký</span>
+            </div>
+            <div class="field">
+              <label>Loại địa chỉ</label>
+              <select><option>IPv4</option><option>IPv6</option></select>
+            </div>
+            <div class="field">
+              <label>Địa chỉ IP đầu ghi</label>
+              <input type="text" value="10.20.14.5" class="mono-cell" readonly>
+            </div>
+            <div class="field">
+              <label>Cổng nội bộ</label>
+              <input type="text" value="5070">
+              <span class="hint">1025–65535</span>
+            </div>
+            <div class="field">
+              <label>Device ID</label>
+              <input type="text" value="34020000001180000105" class="mono-cell">
+              <span class="hint">Mã thiết bị trong nền tảng — định dạng &lt;mã địa bàn&gt;&lt;loại&gt;&lt;số thứ tự&gt;</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 2. RTMP ═══ -->
+      <section class="proto-panel" id="panel-rtmp">
+        <div class="card">
+          <h2>Đẩy luồng RTMP</h2>
+          <p class="card-sub">Đẩy luồng video trực tiếp của một kênh tới máy chủ relay nội bộ để hiển thị trên bảng điều khiển NOC công khai.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label>Kênh</label>
+              <select>
+                <option>Kênh 1 — Camera Cổng chính Toà nhà VNPT Cầu Giấy</option>
+                <option>Kênh 2 — Camera Ngã tư Nguyễn Trãi - Khuất Duy Tiến</option>
+                <option>Kênh 3 — Camera Sảnh chờ ga Cầu Giấy (BRT)</option>
+                <option>Kênh 4 — Camera Vòng xuyến Cầu Giấy - Xuân Thuỷ</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Bật đẩy luồng</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Loại luồng</label>
+              <select><option>Luồng chính (Main Stream)</option><option>Luồng phụ 1 (Sub Stream 1)</option><option>Luồng phụ 2 (Sub Stream 2)</option></select>
+            </div>
+            <div class="field">
+              <label>Loại địa chỉ</label>
+              <select><option>Mặc định (Non-custom)</option><option>Tuỳ chỉnh (Custom)</option></select>
+            </div>
+            <div class="field">
+              <label>Mã hoá</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox"><span class="sw-track"></span></label>
+                <span class="sw-state">Đang tắt</span>
+              </div>
+            </div>
+            <div class="field"></div>
+            <div class="field">
+              <label>Địa chỉ IP máy chủ nhận luồng</label>
+              <input type="text" value="10.10.200.40" class="mono-cell">
+            </div>
+            <div class="field">
+              <label>Cổng (Port)</label>
+              <input type="text" value="1935"><span class="unit">1–65535</span>
+            </div>
+          </div>
+          <div class="toolbar" style="margin-top:18px;margin-bottom:0;">
+            <button class="btn btn-primary">Áp dụng</button>
+            <button class="btn">Làm mới</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 3. ONVIF ═══ -->
+      <section class="proto-panel" id="panel-onvif">
+        <div class="card">
+          <h2>Dịch vụ ONVIF</h2>
+          <p class="card-sub">Cho phép phần mềm quản lý video (VMS) của bên thứ ba kết nối tới đầu ghi qua chuẩn ONVIF.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label>Bật ONVIF</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Yêu cầu xác thực</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Cổng (Port)</label>
+              <input type="text" value="80"><span class="unit">1–65535</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Tài khoản ONVIF</h2>
+          <div class="toolbar" style="margin-bottom:10px;">
+            <button class="btn"><span class="btn-icon">＋</span> Thêm tài khoản</button>
+            <button class="btn">Xoá</button>
+          </div>
+          <table class="scan-table">
+            <thead>
+              <tr><th><input type="checkbox"></th><th>Tài khoản</th><th>Quyền</th><th>Trạng thái</th><th>Thao tác</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="mono-cell">onvif-admin</td>
+                <td>Quản trị (đọc/ghi)</td>
+                <td><span class="chip c-ok"><i class="dot ok"></i>Hoạt động</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td class="mono-cell">noc-view</td>
+                <td>Chỉ xem (VMS giám sát)</td>
+                <td><span class="chip c-ok"><i class="dot ok"></i>Hoạt động</span></td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══ 4. EMAIL (SMTP) ═══ -->
+      <section class="proto-panel" id="panel-email">
+        <div class="card">
+          <h2>Máy chủ gửi email (SMTP)</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label>Bật gửi email</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Máy chủ</label>
+              <select><option>Tuỳ chỉnh (Custom)</option><option>Gmail</option><option>Outlook</option></select>
+            </div>
+            <div class="field">
+              <label>Địa chỉ máy chủ (SMTP)</label>
+              <input type="text" value="smtp.vnptit.vn" class="mono-cell">
+            </div>
+            <div class="field">
+              <label>Kiểu mã hoá</label>
+              <select><option>TLS</option><option>SSL</option><option>KHÔNG</option></select>
+            </div>
+            <div class="field">
+              <label>Cổng (Port)</label>
+              <input type="text" value="587"><span class="unit">1–65535</span>
+            </div>
+            <div class="field">
+              <label>Đính kèm ảnh sự kiện</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Tài khoản gửi</label>
+              <input type="text" value="noc-alert@vnptai.vn">
+            </div>
+            <div class="field">
+              <label>Mật khẩu xác thực</label>
+              <input type="password" value="••••••••••••••">
+            </div>
+            <div class="field full test-row">
+              <select><option>ky-thuat.camgiay@vnptai.vn</option><option>canhbao.hanoi@vnptai.vn</option></select>
+              <button class="btn" style="height:35px;">→ Gửi thử</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Danh sách người nhận</h2>
+          <div class="toolbar" style="margin-bottom:10px;">
+            <button class="btn"><span class="btn-icon">＋</span> Thêm</button>
+            <button class="btn">Xoá</button>
+          </div>
+          <table class="scan-table">
+            <thead>
+              <tr><th><input type="checkbox"></th><th>Email</th><th>Vai trò</th><th>Thao tác</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" checked></td>
+                <td>ca-truc.noc@vnptai.vn</td>
+                <td>Trực ban NOC 24/7</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" checked></td>
+                <td>ky-thuat.camgiay@vnptai.vn</td>
+                <td>Kỹ thuật viên khu vực Cầu Giấy</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>canhbao.hanoi@vnptai.vn</td>
+                <td>Nhóm cảnh báo khu vực Hà Nội</td>
+                <td><a class="op-link">Sửa</a><a class="op-link danger">Xoá</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══ 5. TRUNG TÂM CẢNH BÁO (2 biến thể) ═══ -->
+      <section class="proto-panel" id="panel-alarm">
+        <div class="card">
+          <h2>Trung tâm cảnh báo</h2>
+          <p class="card-sub">Đẩy sự kiện cảnh báo (mất kết nối, cảnh báo AI, cảnh báo hệ thống) lên nền tảng tổng hợp VNPT AI NOC.</p>
+          <div class="form-grid">
+            <div class="field full">
+              <label>Chế độ tải lên (Upload Mode)</label>
+              <select id="alarm-mode-select" onchange="switchAlarmMode(this.value)">
+                <option value="private">Giao thức riêng (Private Protocol)</option>
+                <option value="http">HTTP/HTTPS</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Variant A: Private Protocol -->
+          <div id="alarm-private">
+            <hr class="hr">
+            <div class="form-grid">
+              <div class="field">
+                <label>Bật</label>
+                <div class="switch-row">
+                  <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                  <span class="sw-state">Đang bật</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Loại địa chỉ IP</label>
+                <select><option>IPv4</option><option>IPv6</option></select>
+              </div>
+              <div class="field">
+                <label>Địa chỉ máy chủ 1 (chính)</label>
+                <input type="text" value="10.10.200.55" class="mono-cell">
+              </div>
+              <div class="field">
+                <label>Địa chỉ máy chủ 2 (dự phòng)</label>
+                <input type="text" value="10.10.200.56" class="mono-cell">
+              </div>
+              <div class="field">
+                <label>Cổng (Port)</label>
+                <input type="text" value="8000"><span class="unit">1–65535</span>
+              </div>
+              <div class="field"></div>
+              <div class="field">
+                <label>Lịch tự động báo cáo</label>
+                <select><option>Hằng ngày</option><option>Hằng tuần</option><option>Không</option></select>
+              </div>
+              <div class="field">
+                <label>Giờ báo cáo</label>
+                <input type="text" value="08:00:00">
+              </div>
+            </div>
+          </div>
+
+          <!-- Variant B: HTTP/HTTPS -->
+          <div id="alarm-http" style="display:none;">
+            <hr class="hr">
+            <div class="form-grid">
+              <div class="field">
+                <label>Bật</label>
+                <div class="switch-row">
+                  <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                  <span class="sw-state">Đang bật</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Device ID</label>
+                <input type="text" value="VNTA-IVSS-CG-01" class="mono-cell">
+              </div>
+              <div class="field"></div>
+              <div class="field full"><span class="hint" style="text-transform:none;font-weight:700;color:var(--text-muted);">Máy chủ 1 (chính)</span></div>
+              <div class="field">
+                <label>Loại địa chỉ IP</label>
+                <select><option>IPv4</option><option>IPv6</option></select>
+              </div>
+              <div class="field test-row" style="align-items:flex-end;">
+                <div class="field" style="flex:1;">
+                  <label>Địa chỉ máy chủ 1</label>
+                  <input type="text" value="10.10.200.60" class="mono-cell">
+                </div>
+                <button class="btn" style="height:35px;">Kiểm tra</button>
+              </div>
+              <div class="field">
+                <label>Cổng (Port)</label>
+                <input type="text" value="80"><span class="unit">1–65535</span>
+              </div>
+              <div class="field">
+                <label>Dùng HTTPS</label>
+                <div class="switch-row">
+                  <label class="switch"><input type="checkbox"><span class="sw-track"></span></label>
+                  <span class="sw-state">Đang tắt</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Yêu cầu xác thực</label>
+                <div class="switch-row">
+                  <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                  <span class="sw-state">Đang bật</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Chu kỳ giữ kết nối</label>
+                <input type="text" value="2"><span class="unit">giây (0–300)</span>
+              </div>
+              <div class="field full">
+                <label>Đường dẫn tải ảnh sự kiện</label>
+                <input type="text" value="/alarm/ivss-cg-01/">
+                <span class="hint">Ví dụ: /alarm/&lt;mã-thiết-bị&gt;/</span>
+              </div>
+
+              <div class="field full"><span class="hint" style="text-transform:none;font-weight:700;color:var(--text-muted);">Máy chủ 2 (dự phòng)</span></div>
+              <div class="field">
+                <label>Loại địa chỉ IP</label>
+                <select><option>IPv4</option><option>IPv6</option></select>
+              </div>
+              <div class="field">
+                <label>Địa chỉ máy chủ 2</label>
+                <input type="text" value="10.10.200.61" class="mono-cell">
+              </div>
+              <div class="field">
+                <label>Cổng (Port)</label>
+                <input type="text" value="80"><span class="unit">1–65535</span>
+              </div>
+              <div class="field">
+                <label>Dùng HTTPS</label>
+                <div class="switch-row">
+                  <label class="switch"><input type="checkbox"><span class="sw-track"></span></label>
+                  <span class="sw-state">Đang tắt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolbar" style="margin-top:18px;margin-bottom:0;">
+            <button class="btn btn-primary">Áp dụng</button>
+            <button class="btn">Làm mới</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 6. UPnP ═══ -->
+      <section class="proto-panel" id="panel-upnp">
+        <div class="card">
+          <h2>UPnP</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label>Ánh xạ cổng (Port Mapping)</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox"><span class="sw-track"></span></label>
+                <span class="sw-state">Đang tắt</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Cho phép thiết bị được phát hiện (Device Discovery)</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox"><span class="sw-track"></span></label>
+                <span class="sw-state">Đang tắt</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>LAN IP</label>
+              <input type="text" value="10.20.14.5" class="mono-cell readonly-hint" readonly>
+            </div>
+            <div class="field">
+              <label>WAN IP</label>
+              <input type="text" value="—" class="mono-cell readonly-hint" readonly>
+            </div>
+          </div>
+
+          <div class="warn-box">
+            <span class="wi">⚠</span>
+            <span>Thiết bị hoạt động trong <b>mạng lõi VNPT</b> với IP tĩnh, không đi qua router NAT gia dụng — khuyến nghị <b>giữ UPnP tắt</b> theo chính sách an toàn thông tin nội bộ. Chỉ bật khi triển khai tại điểm lẻ không có VPN nội bộ.</span>
+          </div>
+
+          <h2 style="margin-top:20px;">Danh sách ánh xạ cổng</h2>
+          <table class="scan-table">
+            <thead>
+              <tr><th>Tên dịch vụ</th><th>Giao thức</th><th>Cổng nội bộ</th><th>Cổng ngoài</th><th>Trạng thái</th><th>Thao tác</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>HTTP</td><td>TCP</td><td class="tabular">80</td><td class="tabular">8080</td><td><span class="badge b-error">Ánh xạ thất bại</span></td><td><a class="op-link">Sửa</a></td></tr>
+              <tr><td>TCP</td><td>TCP</td><td class="tabular">37777</td><td class="tabular">37777</td><td><span class="badge b-error">Ánh xạ thất bại</span></td><td><a class="op-link">Sửa</a></td></tr>
+              <tr><td>UDP</td><td>UDP</td><td class="tabular">37778</td><td class="tabular">37778</td><td><span class="badge b-error">Ánh xạ thất bại</span></td><td><a class="op-link">Sửa</a></td></tr>
+              <tr><td>RTSP</td><td>TCP</td><td class="tabular">554</td><td class="tabular">554</td><td><span class="badge b-error">Ánh xạ thất bại</span></td><td><a class="op-link">Sửa</a></td></tr>
+              <tr><td>RTSP</td><td>UDP</td><td class="tabular">554</td><td class="tabular">554</td><td><span class="badge b-error">Ánh xạ thất bại</span></td><td><a class="op-link">Sửa</a></td></tr>
+              <tr><td>SNMP</td><td>UDP</td><td class="tabular">161</td><td class="tabular">161</td><td><span class="badge b-error">Ánh xạ thất bại</span></td><td><a class="op-link">Sửa</a></td></tr>
+              <tr><td>HTTPS</td><td>TCP</td><td class="tabular">443</td><td class="tabular">443</td><td><span class="badge b-error">Ánh xạ thất bại</span></td><td><a class="op-link">Sửa</a></td></tr>
+            </tbody>
+          </table>
+
+          <div class="toolbar" style="margin-top:18px;margin-bottom:0;">
+            <button class="btn btn-primary">Áp dụng</button>
+            <button class="btn">Làm mới</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 7. DDNS ═══ -->
+      <section class="proto-panel" id="panel-ddns">
+        <div class="card">
+          <h2>DDNS</h2>
+          <div class="form-grid">
+            <div class="field full">
+              <label>Bật</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox"><span class="sw-track"></span></label>
+                <span class="sw-state">Đang tắt</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="warn-box">
+            <span class="wi">⚠</span>
+            <span>Sau khi bật DDNS, máy chủ bên thứ ba có thể thu thập thông tin thiết bị của bạn. Thiết bị hiện dùng <b>IP tĩnh trong mạng lõi VNPT</b> nên không cần bật mục này — chỉ dùng cho điểm lắp đặt lẻ, không có kết nối VPN nội bộ.</span>
+          </div>
+
+          <div class="form-grid" style="margin-top:16px;">
+            <div class="field">
+              <label>Nhà cung cấp</label>
+              <select><option>CN99 DDNS</option><option>NO-IP DDNS</option><option>Dyndns DDNS</option></select>
+            </div>
+            <div class="field">
+              <label>Địa chỉ máy chủ</label>
+              <input type="text" value="members.3322.org" class="mono-cell readonly-hint" readonly>
+            </div>
+            <div class="field">
+              <label>Tên miền</label>
+              <input type="text" placeholder="vd: ivss-cg01.3322.org">
+            </div>
+            <div class="field">
+              <label>Chu kỳ cập nhật</label>
+              <select><option>10 phút</option><option selected>30 phút</option><option>60 phút</option></select>
+            </div>
+            <div class="field">
+              <label>Tài khoản</label>
+              <input type="text" placeholder="Chưa cấu hình">
+            </div>
+            <div class="field">
+              <label>Mật khẩu</label>
+              <input type="password" placeholder="Chưa cấu hình">
+            </div>
+            <div class="field">
+              <label>WAN IP</label>
+              <span class="chip c-neutral"><i class="dot neutral"></i>Đã tắt</span>
+            </div>
+            <div class="field">
+              <label>Trạng thái</label>
+              <span class="chip c-neutral"><i class="dot neutral"></i>Đã tắt</span>
+            </div>
+          </div>
+
+          <div class="toolbar" style="margin-top:18px;margin-bottom:0;">
+            <button class="btn btn-primary">Áp dụng</button>
+            <button class="btn">Làm mới</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 8. SNMP ═══ -->
+      <section class="proto-panel" id="panel-snmp">
+        <div class="card">
+          <h2>SNMP</h2>
+          <p class="card-sub">Cho phép hệ thống giám sát hạ tầng của NOC (Zabbix nội bộ) truy vấn chỉ số vận hành thiết bị.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label>Bật</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Phiên bản</label>
+              <select><option>SNMP v3 (khuyến nghị)</option><option>SNMP v2c</option><option>SNMP v1</option></select>
+            </div>
+            <div class="field">
+              <label>Cổng (Port)</label>
+              <input type="text" value="161"><span class="unit">1–65535</span>
+            </div>
+            <div class="field">
+              <label>Địa chỉ nhận Trap</label>
+              <input type="text" value="10.10.200.20" class="mono-cell">
+            </div>
+            <div class="field">
+              <label>Cổng Trap</label>
+              <input type="text" value="162"><span class="unit">1–65535</span>
+            </div>
+          </div>
+
+          <hr class="hr">
+          <div class="form-grid">
+            <div class="field full"><span class="hint" style="text-transform:none;font-weight:700;color:var(--text-muted);">Tài khoản chỉ đọc</span></div>
+            <div class="field">
+              <label>Tên tài khoản</label>
+              <input type="text" value="vnptai-view">
+            </div>
+            <div class="field">
+              <label>Kiểu xác thực</label>
+              <select><option>MD5</option><option>SHA</option></select>
+            </div>
+            <div class="field">
+              <label>Mật khẩu xác thực</label>
+              <input type="password" value="••••••••••••••">
+            </div>
+            <div class="field">
+              <label>Kiểu mã hoá</label>
+              <select><option>CBC-DES</option><option>AES</option></select>
+            </div>
+            <div class="field full">
+              <label>Mật khẩu mã hoá</label>
+              <input type="password" value="••••••••••••••">
+            </div>
+          </div>
+
+          <hr class="hr">
+          <div class="form-grid">
+            <div class="field full"><span class="hint" style="text-transform:none;font-weight:700;color:var(--text-muted);">Tài khoản đọc/ghi</span></div>
+            <div class="field">
+              <label>Tên tài khoản</label>
+              <input type="text" value="vnptai-admin">
+            </div>
+            <div class="field">
+              <label>Kiểu xác thực</label>
+              <select><option>MD5</option><option>SHA</option></select>
+            </div>
+            <div class="field">
+              <label>Mật khẩu xác thực</label>
+              <input type="password" value="••••••••••••••">
+            </div>
+            <div class="field">
+              <label>Kiểu mã hoá</label>
+              <select><option>CBC-DES</option><option>AES</option></select>
+            </div>
+            <div class="field full">
+              <label>Mật khẩu mã hoá</label>
+              <input type="password" value="••••••••••••••">
+            </div>
+          </div>
+
+          <div class="toolbar" style="margin-top:18px;margin-bottom:0;">
+            <button class="btn btn-primary">Áp dụng</button>
+            <button class="btn">Làm mới</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 9. ĐĂNG NHẬP QUA MULTICAST ═══ -->
+      <section class="proto-panel" id="panel-multicast">
+        <div class="card">
+          <h2>Cấu hình Multicast</h2>
+          <p class="card-sub">Nhiều đầu xem trong cùng mạng LAN có thể dùng chung 1 địa chỉ multicast thay vì mỗi đầu xem mở 1 kết nối riêng tới thiết bị — giảm tải băng thông khi nhiều người xem cùng lúc.</p>
+
+          <div class="form-grid">
+            <div class="field full"><span class="hint" style="text-transform:none;font-weight:700;color:var(--text-muted);">Luồng chính (Main Stream)</span></div>
+            <div class="field">
+              <label>Bật</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Địa chỉ Multicast</label>
+              <input type="text" value="224.1.20.11" class="mono-cell">
+            </div>
+            <div class="field">
+              <label>Cổng (Port)</label>
+              <input type="text" value="40000"><span class="unit">1–65535</span>
+            </div>
+            <div class="field">
+              <label>TTL</label>
+              <input type="text" value="64"><span class="unit">1–255</span>
+            </div>
+
+            <div class="field full"><span class="hint" style="text-transform:none;font-weight:700;color:var(--text-muted);">Luồng phụ 1 (Sub Stream 1)</span></div>
+            <div class="field">
+              <label>Bật</label>
+              <div class="switch-row">
+                <label class="switch"><input type="checkbox" checked><span class="sw-track"></span></label>
+                <span class="sw-state">Đang bật</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Địa chỉ Multicast</label>
+              <input type="text" value="224.1.20.12" class="mono-cell">
+            </div>
+            <div class="field">
+              <label>Cổng (Port)</label>
+              <input type="text" value="40016"><span class="unit">1–65535</span>
+            </div>
+            <div class="field">
+              <label>TTL</label>
+              <input type="text" value="64"><span class="unit">1–255</span>
+            </div>
+          </div>
+
+          <div class="kv-note">
+            Sau khi bật, phần mềm xem trực tiếp (VMS/ứng dụng di động NOC) có thể chọn <b>Multicast</b> ở ô giao thức đăng nhập luồng (bên cạnh TCP, UDP) để nhận cùng 1 luồng cho nhiều người xem, thay vì mở nhiều kết nối riêng lẻ tới đầu ghi.
+          </div>
+
+          <div class="toolbar" style="margin-top:18px;margin-bottom:0;">
+            <button class="btn btn-primary">Áp dụng</button>
+            <button class="btn">Làm mới</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+  function switchProto(btn){
+    document.querySelectorAll('.proto-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.proto-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+    document.getElementById('panel-title').textContent = btn.dataset.title;
+    document.getElementById('panel-desc').textContent = btn.dataset.desc;
+    document.getElementById('crumb-proto').textContent = btn.dataset.title;
+  }
+  document.getElementById('proto-list').addEventListener('click', function(ev){
+    const btn = ev.target.closest('.proto-item');
+    if(btn) switchProto(btn);
+  });
+
+  function switchAlarmMode(mode){
+    document.getElementById('alarm-private').style.display = (mode === 'private') ? '' : 'none';
+    document.getElementById('alarm-http').style.display = (mode === 'http') ? '' : 'none';
+  }
+</script>
+
+</body>
+</html>

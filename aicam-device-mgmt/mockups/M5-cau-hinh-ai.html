@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>AICAM — M5 Cấu hình AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Source+Sans+3:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .content{padding:16px 20px;}
+  .page-title{font-size:18px; font-weight:700; color:var(--text-heading); margin-bottom:2px;}
+  .page-sub{font-size:12.5px; color:var(--text-secondary); margin-bottom:14px;}
+
+  .layout{display:grid; grid-template-columns:1fr 340px; gap:16px;}
+
+  /* Left: algorithm picker + canvas */
+  .algo-row{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .algo-chip{border:1px solid var(--border-base); border-radius:999px; padding:7px 16px; font-size:12.5px; font-weight:600; color:var(--text-body); background:#fff; cursor:pointer; display:flex; align-items:center; gap:6px;}
+  .algo-chip.active{background:var(--primary); border-color:var(--primary); color:#fff;}
+
+  .canvas-panel{background:var(--bg-container); border:1px solid var(--border-split); border-radius:var(--radius); padding:14px;}
+  .canvas-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .canvas-toolbar .ct-title{font-size:13.5px; font-weight:600; color:var(--text-heading);}
+  .canvas-tools{display:flex; gap:6px;}
+  .tool-btn{width:30px;height:30px; border:1px solid var(--border-base); border-radius:var(--radius); background:#fff; cursor:pointer; font-size:13px;}
+  .tool-btn.active{background:var(--primary-bg); border-color:var(--primary); color:var(--primary);}
+
+  .frame{position:relative; aspect-ratio:16/9; background:#0d1117; border-radius:4px; overflow:hidden;}
+  .frame-label{position:absolute; top:10px; left:10px; color:#8892a3; font-size:11.5px;}
+  svg{position:absolute; inset:0; width:100%; height:100%;}
+  .zone{fill:rgba(0,71,187,.22); stroke:#3B82F6; stroke-width:2;}
+  .zone-alt{fill:rgba(114,46,209,.18); stroke:#9254de; stroke-width:2; stroke-dasharray:5 3;}
+  .handle{fill:#fff; stroke:#3B82F6; stroke-width:2;}
+  .zone-label{fill:#fff; font-size:11px; font-family:'Be Vietnam Pro',sans-serif; font-weight:600;}
+
+  .zone-list{display:flex; gap:8px; margin-top:10px;}
+  .zone-tag{display:flex; align-items:center; gap:6px; font-size:12px; padding:5px 10px; border-radius:999px; background:var(--bg-header); color:var(--text-body);}
+  .zone-tag .sq{width:9px;height:9px;border-radius:2px;}
+
+  /* Right: threshold + schedule */
+  .side-panel{background:var(--bg-container); border:1px solid var(--border-split); border-radius:var(--radius); padding:16px; margin-bottom:14px;}
+  .side-panel h4{margin:0 0 12px; font-size:13.5px; color:var(--text-heading);}
+  .slider-row{margin-bottom:16px;}
+  .slider-row:last-child{margin-bottom:0;}
+  .slider-row .sr-top{display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px;}
+  .slider-row .sr-top .k{color:var(--text-body); font-weight:500;}
+  .slider-row .sr-top .v{color:var(--primary); font-weight:700; font-family:'Source Sans 3',sans-serif;}
+  .slider-track{height:6px; background:var(--border-split); border-radius:3px; position:relative;}
+  .slider-fill{position:absolute; left:0; top:0; height:100%; background:var(--primary); border-radius:3px;}
+  .slider-thumb{position:absolute; top:50%; width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid var(--primary); transform:translate(-50%,-50%);}
+
+  .schedule-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:3px;}
+  .sch-cell{aspect-ratio:1; border-radius:2px; background:var(--border-split);}
+  .sch-cell.on{background:var(--primary);}
+  .sch-label{font-size:10px; color:var(--text-disabled); text-align:center; margin-top:4px;}
+
+  .form-actions{display:flex; gap:10px; justify-content:flex-end;}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><img src="../assets/vnptai-brand/logo.svg" alt="VNPT AI"></div>
+    <div class="menu">
+      <div class="menu-item">Trang chủ</div>
+      <div class="menu-item">Danh sách thiết bị</div>
+      <div class="menu-item">Thêm thiết bị</div>
+      <div class="menu-item active">Cấu hình AI</div>
+      <div class="menu-item">Sự kiện &amp; cảnh báo</div>
+      <div class="menu-item">Cấu hình hệ thống</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <div class="breadcrumb">Cấu hình AI / <b>CAM-HN-207</b></div>
+      <div class="user-mini"><div class="avatar-sq">TV</div> Trực vận hành</div>
+    </div>
+
+    <div class="content">
+      <div class="page-title">Cấu hình thuật toán — CAM-HN-207</div>
+      <div class="page-sub">Cổng khu công nghiệp · Hà Nội · Đông Anh</div>
+
+      <div class="algo-row">
+        <div class="algo-chip active">🚧 Phát hiện xâm nhập</div>
+        <div class="algo-chip">🚗 Nhận diện biển số</div>
+        <div class="algo-chip">🙂 Nhận diện khuôn mặt</div>
+        <div class="algo-chip">👥 Mật độ đám đông</div>
+        <div class="algo-chip">➕ Thêm thuật toán</div>
+      </div>
+
+      <div class="layout">
+        <div>
+          <div class="canvas-panel">
+            <div class="canvas-toolbar">
+              <div class="ct-title">Vùng phát hiện</div>
+              <div class="canvas-tools">
+                <button class="tool-btn active">⬠</button>
+                <button class="tool-btn">➖</button>
+                <button class="tool-btn">🗑️</button>
+              </div>
+            </div>
+            <div class="frame">
+              <div class="frame-label">Khung hình tham chiếu — placeholder, chưa nối luồng thật</div>
+              <svg viewBox="0 0 400 225">
+                <polygon class="zone" points="60,150 160,110 260,130 220,200 90,205"></polygon>
+                <text class="zone-label" x="120" y="165">Vùng cấm 1</text>
+                <polygon class="zone-alt" points="260,60 360,55 370,110 280,120"></polygon>
+                <text class="zone-label" x="290" y="90">Vùng cấm 2</text>
+                <circle class="handle" cx="60" cy="150" r="4"></circle>
+                <circle class="handle" cx="160" cy="110" r="4"></circle>
+                <circle class="handle" cx="260" cy="130" r="4"></circle>
+                <circle class="handle" cx="220" cy="200" r="4"></circle>
+                <circle class="handle" cx="90" cy="205" r="4"></circle>
+              </svg>
+            </div>
+            <div class="zone-list">
+              <div class="zone-tag"><span class="sq" style="background:#3B82F6"></span>Vùng cấm 1 — kích hoạt 24/7</div>
+              <div class="zone-tag"><span class="sq" style="background:#9254de"></span>Vùng cấm 2 — theo lịch</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="side-panel">
+            <h4>Ngưỡng cảnh báo</h4>
+            <div class="slider-row">
+              <div class="sr-top"><span class="k">Độ nhạy phát hiện</span><span class="v">72%</span></div>
+              <div class="slider-track"><div class="slider-fill" style="width:72%"></div><div class="slider-thumb" style="left:72%"></div></div>
+            </div>
+            <div class="slider-row">
+              <div class="sr-top"><span class="k">Thời gian tối thiểu trong vùng</span><span class="v">3 giây</span></div>
+              <div class="slider-track"><div class="slider-fill" style="width:30%"></div><div class="slider-thumb" style="left:30%"></div></div>
+            </div>
+            <div class="slider-row">
+              <div class="sr-top"><span class="k">Ngưỡng độ tin cậy AI</span><span class="v">85%</span></div>
+              <div class="slider-track"><div class="slider-fill" style="width:85%"></div><div class="slider-thumb" style="left:85%"></div></div>
+            </div>
+          </div>
+
+          <div class="side-panel">
+            <h4>Lịch kích hoạt — Vùng cấm 2</h4>
+            <div class="schedule-grid">
+              <div class="sch-cell"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell"></div>
+              <div class="sch-cell"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell on"></div><div class="sch-cell"></div>
+            </div>
+            <div class="sch-label">Chỉ áp dụng 18:00–06:00 các ngày trong tuần</div>
+          </div>
+
+          <div class="side-panel">
+            <h4>Tài nguyên tính toán</h4>
+            <div class="slider-row">
+              <div class="sr-top"><span class="k">GPU cấp cho camera này</span><span class="v" style="color:var(--warning)">Lỗi cấp phát</span></div>
+              <div class="slider-track"><div class="slider-fill" style="width:0%; background:var(--warning)"></div></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn">Huỷ</button>
+            <button class="btn btn-primary">Gửi thuật toán xuống thiết bị</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
