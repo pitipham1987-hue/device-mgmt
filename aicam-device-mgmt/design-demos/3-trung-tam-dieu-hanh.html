@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>AICAM — Danh sách thiết bị (Hướng 3: Trung tâm điều hành)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Source+Sans+3:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#3B82F6;
+    --primary-deep:#0047BB;
+    --accent:#02AAFA;
+    --chrome-bg:#0B1220;
+    --chrome-bg-2:#0F1A2E;
+    --panel:#111C31;
+    --panel-2:#16223B;
+    --border:#22314D;
+    --text-hi:#EAF0FB;
+    --text-body:#A9B7CE;
+    --text-muted:#6B7A93;
+    --ok:#33D17A;
+    --ok-dim:#12321F;
+    --warn:#F5B93F;
+    --warn-dim:#3A2C0F;
+    --err:#F0555A;
+    --err-dim:#3A1416;
+    --degraded:#B385F2;
+    --degraded-dim:#291640;
+    --panel-light:#FFFFFF;
+    --panel-light-text:#1B2536;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--chrome-bg); color:var(--text-body); font-family:'Be Vietnam Pro',sans-serif; font-size:14px;}
+  .tabular{font-family:'Source Sans 3',sans-serif; font-variant-numeric:tabular-nums; font-weight:600;}
+  .app{display:flex; min-height:100vh;}
+
+  /* Dark left rail */
+  .rail{width:220px; flex:none; background:var(--chrome-bg-2); border-right:1px solid var(--border); padding:18px 14px; display:flex; flex-direction:column; gap:24px;}
+  .brand-wrap{background:#fff; border-radius:10px; padding:8px 12px; display:flex; align-items:center;}
+  .brand-wrap img{height:22px;}
+  .rail-label{font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); padding:0 8px;}
+  .rail-item{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; color:var(--text-body); font-weight:600; font-size:13.5px; cursor:pointer;}
+  .rail-item.active{background:linear-gradient(90deg,rgba(59,130,246,.22),rgba(2,170,250,.06)); color:var(--text-hi); border-left:3px solid var(--primary); padding-left:7px;}
+  .region-list{display:flex; flex-direction:column; gap:1px;}
+  .region-item{display:flex; justify-content:space-between; align-items:center; padding:7px 10px; border-radius:6px; font-size:12.5px; cursor:pointer;}
+  .region-item.selected{background:var(--panel-2); color:var(--text-hi);}
+  .region-count{color:var(--text-muted); font-size:11.5px;}
+  .region-count.alert{color:var(--err); font-weight:700;}
+  .ops-status{margin-top:auto; padding:12px; border-radius:10px; background:var(--panel-2); border:1px solid var(--border);}
+  .ops-status .t{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em;}
+  .ops-status .v{font-size:13px; color:var(--ok); font-weight:700; margin-top:4px; display:flex; align-items:center; gap:6px;}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--ok); box-shadow:0 0 0 4px rgba(51,209,122,.18);}
+
+  /* Main */
+  .main{flex:1; display:flex; flex-direction:column; min-width:0;}
+  .topbar{height:60px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:var(--chrome-bg-2);}
+  .topbar .title{color:var(--text-hi); font-weight:800; font-size:17px;}
+  .topbar .clock{font-family:'Source Sans 3',sans-serif; color:var(--text-body); font-size:13px;}
+  .op-chip{display:flex; align-items:center; gap:8px; background:var(--panel-2); border:1px solid var(--border); border-radius:999px; padding:5px 12px 5px 5px;}
+  .op-avatar{width:26px;height:26px;border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; color:#04101F; font-weight:800; font-size:11px;}
+
+  .body-grid{flex:1; display:grid; grid-template-columns:1.15fr 1fr; gap:1px; background:var(--border); overflow:hidden;}
+
+  /* Left: overview panel — regional summary FIRST, not a flat table */
+  .overview{background:var(--chrome-bg); padding:20px 22px; display:flex; flex-direction:column; gap:16px; overflow:auto;}
+  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  .kpi{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 14px;}
+  .kpi .k-label{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em;}
+  .kpi .k-value{font-size:20px; color:var(--text-hi); font-weight:800; margin-top:4px;}
+  .kpi .k-value.warn{color:var(--warn);}
+  .kpi .k-value.degraded{color:var(--degraded);}
+  .kpi-track{height:4px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden;}
+  .kpi-fill{height:100%; background:var(--primary);}
+  .kpi-fill.warn{background:var(--warn);}
+
+  .map-panel{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px; flex:1; display:flex; flex-direction:column; gap:12px;}
+  .map-panel .mp-title{color:var(--text-hi); font-weight:700; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;}
+  .map-canvas{flex:1; border-radius:10px; background:
+      radial-gradient(circle at 30% 30%, rgba(59,130,246,.18), transparent 40%),
+      radial-gradient(circle at 70% 60%, rgba(2,170,250,.14), transparent 45%),
+      var(--panel-2);
+    border:1px dashed var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; min-height:180px; position:relative;
+  }
+  .map-dot{position:absolute; width:10px; height:10px; border-radius:50%; box-shadow:0 0 0 6px rgba(51,209,122,.15);}
+
+  .region-cards{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  .rc{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 14px;}
+  .rc .rc-name{color:var(--text-hi); font-weight:700; font-size:13px;}
+  .rc .rc-nums{display:flex; gap:12px; margin-top:8px; font-size:11.5px;}
+  .rc .rc-nums span{color:var(--text-muted);}
+  .rc .rc-nums b{color:var(--text-hi); font-family:'Source Sans 3',sans-serif;}
+  .rc.alert{border-color:rgba(240,85,90,.4);}
+  .rc .rc-nums .bad{color:var(--err);}
+
+  /* Right: detail table — the drill-down layer, light panel to read long */
+  .detail{background:var(--panel-light); color:var(--panel-light-text); padding:0; display:flex; flex-direction:column; overflow:hidden;}
+  .detail-head{padding:16px 20px 10px; display:flex; flex-direction:column; gap:10px; border-bottom:1px solid #E7EAEE;}
+  .detail-head .dh-title{font-weight:800; font-size:15px;}
+  .detail-toolbar{display:flex; gap:8px; align-items:center;}
+  .d-btn{border:1px solid #D9DEE7; background:#fff; border-radius:8px; padding:7px 13px; font-size:12.5px; font-weight:700; cursor:pointer; color:#33415C;}
+  .d-btn.primary{background:var(--primary-deep); border-color:var(--primary-deep); color:#fff;}
+  .d-search{flex:1; border:1px solid #D9DEE7; border-radius:8px; padding:7px 12px; font-size:12.5px; color:#33415C;}
+  .detail-table{flex:1; overflow:auto;}
+  table{width:100%; border-collapse:collapse; font-size:12.8px;}
+  thead th{position:sticky; top:0; background:#F5F7FA; text-align:left; padding:9px 12px; font-weight:700; color:#33415C; border-bottom:1px solid #E7EAEE; white-space:nowrap;}
+  tbody td{padding:8px 12px; border-bottom:1px solid #F0F2F5; color:#465470;}
+  tbody tr:hover td{background:#F8FAFD;}
+  .cn{font-weight:700; color:#1B2536;}
+  .cs{font-size:11px; color:#8A93A2;}
+  .triplet{display:flex; gap:5px;}
+  .tdot{width:9px;height:9px;border-radius:50%; display:inline-block;}
+  .tag{font-size:11px; font-weight:700; padding:2px 7px; border-radius:6px;}
+  .tag-ok{background:#E7F7EF; color:#1EA672;}
+  .tag-warn{background:#FCF1DD; color:#B57A0C;}
+  .tag-err{background:#FBE9E9; color:#D64545;}
+  .tag-degraded{background:#F1EAFB; color:#8054C7;}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand-wrap"><img src="../assets/vnptai-brand/logo.svg" alt="VNPT AI"></div>
+    <div>
+      <div class="rail-label" style="margin-bottom:8px;">Vận hành</div>
+      <div class="rail-item active">📊 Danh sách thiết bị</div>
+      <div class="rail-item">🏠 Trang chủ</div>
+      <div class="rail-item">➕ Thêm thiết bị</div>
+      <div class="rail-item">🧠 Cấu hình AI</div>
+      <div class="rail-item">🚨 Sự kiện &amp; cảnh báo</div>
+    </div>
+    <div>
+      <div class="rail-label" style="margin-bottom:6px;">Địa bàn</div>
+      <div class="region-list">
+        <div class="region-item selected"><span>Toàn hệ thống</span><span class="region-count tabular">2.184</span></div>
+        <div class="region-item"><span>TP. Hồ Chí Minh</span><span class="region-count tabular">842</span></div>
+        <div class="region-item"><span>Hà Nội</span><span class="region-count alert tabular">613 · 4 lỗi</span></div>
+        <div class="region-item"><span>Đà Nẵng</span><span class="region-count tabular">311</span></div>
+        <div class="region-item"><span>Cần Thơ</span><span class="region-count tabular">218</span></div>
+        <div class="region-item"><span>Khác</span><span class="region-count tabular">200</span></div>
+      </div>
+    </div>
+    <div class="ops-status">
+      <div class="t">Trạng thái hệ thống</div>
+      <div class="v"><span class="pulse"></span> Ổn định</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="title">Trung tâm điều hành thiết bị</div>
+      <div style="display:flex; align-items:center; gap:18px;">
+        <div class="clock tabular">15/09/2026 — 14:32:07</div>
+        <div class="op-chip"><div class="op-avatar">TV</div><span style="color:var(--text-hi); font-weight:600; font-size:12.5px;">Trực vận hành</span></div>
+      </div>
+    </div>
+
+    <div class="body-grid">
+      <!-- LEFT: overview first -->
+      <div class="overview">
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="k-label">Kênh đang dùng</div>
+            <div class="k-value tabular">2.184<span style="font-size:12px;color:var(--text-muted);font-weight:600;"> /5.000</span></div>
+            <div class="kpi-track"><div class="kpi-fill" style="width:44%"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="k-label">Băng thông</div>
+            <div class="k-value tabular">3,1<span style="font-size:12px;color:var(--text-muted);font-weight:600;"> /8 Gbps</span></div>
+            <div class="kpi-track"><div class="kpi-fill" style="width:39%"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="k-label">GPU cho AI</div>
+            <div class="k-value warn tabular">78%</div>
+            <div class="kpi-track"><div class="kpi-fill warn" style="width:78%"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="k-label">Đang xuống cấp</div>
+            <div class="k-value degraded tabular">17</div>
+            <div class="kpi-track"><div class="kpi-fill" style="width:12%; background:var(--degraded)"></div></div>
+          </div>
+        </div>
+
+        <div class="map-panel">
+          <div class="mp-title">Phân bố theo địa bàn <span style="color:var(--text-muted); font-weight:500; font-size:11.5px;">placeholder bản đồ — chưa tích hợp GIS</span></div>
+          <div class="map-canvas">
+            <div class="map-dot" style="background:var(--ok); top:38%; left:28%;"></div>
+            <div class="map-dot" style="background:var(--err); top:52%; left:55%;"></div>
+            <div class="map-dot" style="background:var(--ok); top:65%; left:70%;"></div>
+            <div class="map-dot" style="background:var(--degraded); top:30%; left:62%;"></div>
+            Bản đồ tổng quan trạng thái theo địa bàn
+          </div>
+        </div>
+
+        <div class="region-cards">
+          <div class="rc"><div class="rc-name">TP. Hồ Chí Minh</div><div class="rc-nums"><span>Trực tuyến <b>821</b></span><span>AI bật <b>790</b></span></div></div>
+          <div class="rc alert"><div class="rc-name">Hà Nội</div><div class="rc-nums"><span class="bad">Lỗi <b>4</b></span><span>Xuống cấp <b>9</b></span></div></div>
+          <div class="rc"><div class="rc-name">Đà Nẵng</div><div class="rc-nums"><span>Trực tuyến <b>305</b></span><span>AI bật <b>298</b></span></div></div>
+          <div class="rc"><div class="rc-name">Cần Thơ</div><div class="rc-nums"><span>Trực tuyến <b>212</b></span><span>Lỗi lưu trữ <b>3</b></span></div></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: drill-down table, light panel -->
+      <div class="detail">
+        <div class="detail-head">
+          <div class="dh-title">Chi tiết thiết bị · Hà Nội (đang lọc)</div>
+          <div class="detail-toolbar">
+            <button class="d-btn primary">+ Thêm</button>
+            <button class="d-btn">Sửa IP</button>
+            <button class="d-btn">Xuất</button>
+            <input class="d-search" placeholder="Tìm theo tên, IP, mã thiết bị…">
+          </div>
+        </div>
+        <div class="detail-table">
+          <table>
+            <thead>
+              <tr><th>Kênh</th><th>Trạng thái</th><th>Tên thiết bị</th><th>IP</th><th>Độ trễ</th><th>Thuật toán</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="tabular">HN-207</td>
+                <td><div class="triplet"><span class="tag tag-degraded">Xuống cấp</span></div></td>
+                <td><div class="cn">Cổng khu công nghiệp</div><div class="cs">Đông Anh</div></td>
+                <td class="tabular">10.22.5.44</td>
+                <td class="tabular">640ms</td>
+                <td>Phát hiện xâm nhập</td>
+              </tr>
+              <tr>
+                <td class="tabular">HN-088</td>
+                <td><div class="triplet"><span class="tag tag-err">Mất kết nối</span></div></td>
+                <td><div class="cn">Bãi đỗ trung tâm</div><div class="cs">Cầu Giấy</div></td>
+                <td class="tabular">10.22.7.12</td>
+                <td class="tabular">—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="tabular">HN-113</td>
+                <td><div class="triplet"><span class="tag tag-ok">Trực tuyến</span></div></td>
+                <td><div class="cn">Trường ĐH Bách Khoa</div><div class="cs">Hai Bà Trưng</div></td>
+                <td class="tabular">10.22.1.90</td>
+                <td class="tabular">22ms</td>
+                <td>Đếm lượt qua lại</td>
+              </tr>
+              <tr>
+                <td class="tabular">HN-160</td>
+                <td><div class="triplet"><span class="tag tag-warn">Lỗi lưu trữ</span></div></td>
+                <td><div class="cn">Ga Hà Nội</div><div class="cs">Hoàn Kiếm</div></td>
+                <td class="tabular">10.22.9.31</td>
+                <td class="tabular">35ms</td>
+                <td>Nhận diện biển số</td>
+              </tr>
+              <tr>
+                <td class="tabular">HN-201</td>
+                <td><div class="triplet"><span class="tag tag-ok">Trực tuyến</span></div></td>
+                <td><div class="cn">Hồ Gươm — Bờ Đông</div><div class="cs">Hoàn Kiếm</div></td>
+                <td class="tabular">10.22.9.55</td>
+                <td class="tabular">18ms</td>
+                <td>Mật độ đám đông</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

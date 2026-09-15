@@ -1,18 +1,13 @@
-# Graph Report - EdgeDeviceManagementPlatform  (2026-09-15)
+# Graph Report - EdgeDeviceManagementPlatform  (2026-09-14)
 
 ## Corpus Check
-- 164 files · ~1,827,615 words
+- 157 files · ~764,562 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1338 nodes · 1349 edges · 90 communities (69 shown, 20 thin omitted)
+- 1228 nodes · 1246 edges · 83 communities (63 shown, 20 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 10 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
-
-## Graph Freshness
-- Built from commit: `8b870db2`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - render-video-seek.js
@@ -98,12 +93,6 @@
 - CLAUDE.md
 - .claude/CLAUDE.md
 - extraction-spec.md
-- AICAM — Quản lý thiết bị · Bản đặc tả thiết kế hoàn chỉnh
-- 4. Ngôn ngữ thiết kế tham chiếu
-- reference-ivss-design.md
-- AICAM — Quản lý thiết bị · SPEC
-- 🎨 Tài sản hỗ trợ
-- Hướng thiết kế đã chốt
 
 ## God Nodes (most connected - your core abstractions)
 1. `Animation Pitfalls: Những Bài Học và Quy Tắc Bẫy Cần Tránh Khi Làm Hoạt Ảnh HTML` - 26 edges
@@ -113,9 +102,9 @@
 5. `Slide Decks: Quy chuẩn làm HTML Slide Presentation` - 16 edges
 6. `Huashu Design` - 14 edges
 7. `Part IV · Shot-by-Shot Storyboard` - 14 edges
-8. `AICAM — Quản lý thiết bị · SPEC` - 14 edges
-9. `main()` - 13 edges
-10. `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` - 13 edges
+8. `main()` - 13 edges
+9. `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` - 13 edges
+10. `Camera Language · Hệ thống Đạo diễn Quay phim (Camera Language & Direction)` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `verify-video.sh script` --calls--> `fail()`  [EXTRACTED]
@@ -128,7 +117,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (90 total, 20 thin omitted)
+## Communities (83 total, 20 thin omitted)
 
 ### Community 0 - "render-video-seek.js"
 Cohesion: 0.08
@@ -382,46 +371,22 @@ Nodes (4): Khung sườn mỗi trang, Nhân vật thị giác chính phải khá
 Cohesion: 0.67
 Nodes (3): Các điểm cần lưu ý khi viết Notes, Speaker Notes, Định dạng
 
-### Community 83 - "AICAM — Quản lý thiết bị · Bản đặc tả thiết kế hoàn chỉnh"
-Cohesion: 0.05
-Nodes (40): 10. Nguồn, 1. Cách chạy, 2. SPEC — copy phần này vào `spec.md`, 3.1 Khung màn quản lý thiết bị, 3.2 Trang chủ kiểu tile, 3.3 Màn xem trực tiếp, 3.4 Năm đường thêm thiết bị, 3. Kiến trúc thông tin trích từ IVSS (+32 more)
-
-### Community 84 - "4. Ngôn ngữ thiết kế tham chiếu"
-Cohesion: 0.11
-Nodes (17): 3.1 Khung màn quản lý thiết bị, 3.2 Trang chủ kiểu tile, 3.3 Màn xem trực tiếp, 3.4 Năm đường thêm thiết bị, 3. Kiến trúc thông tin trích từ IVSS, 4.1 Phát hiện nền tảng, 4.2 Token tham chiếu, 4.3 Ba chi tiết quyết định "cảm giác", đừng bỏ qua (+9 more)
-
-### Community 85 - "reference-ivss-design.md"
-Cohesion: 0.11
-Nodes (16): 1. Phát hiện nền tảng, 2. Token thiết kế tham chiếu, 3.1 Khung màn quản lý thiết bị, 3.2 Trang chủ kiểu tile, 3.3 Màn xem trực tiếp, 3.4 Năm đường thêm thiết bị, 3. Mẫu bố cục trích từ manual, 4.1 Màu chính — phải là màu VNPT AI, không phải `#1890ff` (+8 more)
-
-### Community 86 - "AICAM — Quản lý thiết bị · SPEC"
-Cohesion: 0.13
-Nodes (14): AICAM — Quản lý thiết bị · SPEC, Ba hướng thiết kế bắt buộc (vòng 1, chỉ M2), Kích thước và thích ứng, Mô hình trạng thái — bắt buộc thống nhất trên cả 5 màn, Mô-típ thị giác — trả lời trước khi thiết kế, Mật độ thông tin — CAO, Ngôn ngữ, Người dùng và bối cảnh (+6 more)
-
-### Community 87 - "🎨 Tài sản hỗ trợ"
-Cohesion: 0.17
-Nodes (11): Bảng màu, Chi tiết chữ ký, Font chữ, Hình sản phẩm, Logo, 🎯 Tài sản cốt lõi (Công dân hạng nhất), 🎨 Tài sản hỗ trợ, Từ khóa khí chất (+3 more)
-
-### Community 88 - "Hướng thiết kế đã chốt"
-Cohesion: 0.40
-Nodes (4): Ba bản đã trình bày (vòng 1, M2 · Danh sách thiết bị), Hướng thiết kế đã chốt, Lựa chọn của người dùng, Áp dụng cho phần còn lại
-
 ## Knowledge Gaps
-- **941 isolated node(s):** `androidFrameStyles`, `browserWindowStyles`, `CursorEasing`, `CURSOR_PATHS`, `canvasStyles` (+936 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1028 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **859 isolated node(s):** `androidFrameStyles`, `browserWindowStyles`, `CursorEasing`, `CURSOR_PATHS`, `canvasStyles` (+854 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 939 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` connect `Animation Best Practices · Ngữ pháp Thiết kế Hoạt ảnh Tích cực` to `Xuất Video: Animation HTML sang MP4/GIF`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
-- **Why does `Quy tắc Thiết kế Âm thanh · huashu-design` connect `Quy tắc Thiết kế Âm thanh · huashu-design` to `Xuất Video: Animation HTML sang MP4/GIF`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Why does `Apple Gallery Showcase · Phong cách Animation Tường Trưng bày Phòng tranh` connect `Apple Gallery Showcase · Phong cách Animation Tường Trưng bày Phòng tranh` to `Xuất Video: Animation HTML sang MP4/GIF`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `Quy tắc Thiết kế Âm thanh · huashu-design` connect `Quy tắc Thiết kế Âm thanh · huashu-design` to `Xuất Video: Animation HTML sang MP4/GIF`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `androidFrameStyles`, `browserWindowStyles`, `CursorEasing` to the rest of the system?**
-  _941 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _859 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `render-video-seek.js` be split into smaller, more focused modules?**
   _Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected._
 - **Should `html2pptx.js` be split into smaller, more focused modules?**

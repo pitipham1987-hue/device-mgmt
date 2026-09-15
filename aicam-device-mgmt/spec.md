@@ -1,114 +1,80 @@
 # AICAM — Quản lý thiết bị · SPEC
 
+> Vòng làm việc mới (15/09/2026), viết lại từ đầu theo yêu cầu người dùng — không phục hồi bản spec cũ đã xoá.
+
 ## Sản phẩm là gì
 
-AICAM là nền tảng quản lý camera AI của VNPT AI, triển khai cho khách hàng doanh nghiệp và khối chính quyền tại Việt Nam. Phần cần thiết kế là **cụm màn quản lý thiết bị** — nơi kỹ thuật viên và quản trị viên đưa camera vào hệ thống, theo dõi tình trạng, và cấu hình phân tích AI trên từng camera.
-
-Đây là xương sống vận hành của nền tảng. Nếu màn này khó dùng thì mọi năng lực AI phía sau đều không tới được người dùng.
+AICAM là nền tảng quản lý thiết bị camera AI của VNPT AI, dùng cho các đơn vị vận hành hạ tầng giám sát cấp tỉnh/thành, khu công nghiệp, giao thông. Đây là phần mềm quản trị B2G/B2B — người dùng là kỹ thuật viên vận hành trung tâm điều hành (NOC), không phải người tiêu dùng cuối. Sản phẩm không có giao diện quản trị công khai tham khảo được (không giống Dahua IVSS đã có manual PDF phát hành công khai), nên bố cục phải tự thiết kế, chỉ tham chiếu **cấu trúc chức năng** của IVSS (loại màn hình, mô hình tương tác) chứ không sao chép thị giác.
 
 ## Người dùng và bối cảnh
 
-Ba nhóm, độ thành thạo rất khác nhau. Màn phải phục vụ cả ba mà không bắt nhóm nào chịu giao diện tối ưu cho nhóm khác.
-
-| Nhóm | Bối cảnh | Việc chính |
-|---|---|---|
-| Kỹ thuật viên triển khai | Ngồi tại site, laptop màn nhỏ, mạng chập chờn | Thêm thiết bị hàng loạt, xử lý thiết bị không lên |
-| Nhân viên trực NOC | Màn hình lớn hoặc màn ghép, trực 8 tiếng | Quét trạng thái, khoanh vùng sự cố — cần biết trong 3 giây hôm nay bao nhiêu camera chết và chết ở đâu |
-| Quản trị viên hệ thống | Văn phòng | Cấu hình thuật toán AI, phân quyền, kiểm tra dung lượng |
+- Kỹ thuật viên NOC theo dõi hàng trăm–hàng nghìn camera cùng lúc, ca làm việc dài, cần quét trạng thái nhanh.
+- Quản trị viên hệ thống cấu hình mạng, thêm/xoá thiết bị hàng loạt.
+- Người phụ trách AI cấu hình thuật toán, ngưỡng cảnh báo cho từng camera hoặc nhóm camera.
+- Bối cảnh dùng: màn hình lớn tại phòng điều hành sáng đèn ban ngày, đôi khi laptop tại hiện trường lắp đặt.
 
 ## Quy mô
 
-Từ **vài chục camera một site** đến **hàng nghìn camera cấp tỉnh/thành**. Ràng buộc cứng, quyết định cấu trúc:
+Phải chịu được **vài nghìn thiết bị** trên một tổ chức (khác IVSS chỉ thiết kế cho ~128 kênh/đầu ghi). Điều này quyết định cơ chế duyệt dữ liệu: cuộn ảo, lọc phía máy chủ, cây địa bàn nhiều cấp có số liệu tổng hợp theo nhánh, tổng hợp trước–chi tiết sau.
 
-- Không dùng bảng phân trang thường cho danh sách lớn — cuộn ảo hoặc lọc phía máy chủ.
-- Cây thiết bị nhiều cấp: tỉnh → quận/huyện → phường/xã → site → camera. **Mỗi nút phải hiện số liệu tổng hợp của nhánh** (vd: 240 thiết bị · 7 lỗi) để khoanh vùng mà không cần mở ra.
-- Ở quy mô lớn, **lối vào mặc định là bảng tổng hợp trạng thái, không phải danh sách phẳng**. Danh sách phẳng là chế độ đào sâu.
-- Phải xử lý được trạng thái "đang tải một phần" — 5.000 dòng không tải hết cùng lúc.
+## Năm màn hình cốt lõi (vòng 1 tập trung dựng M2 trước, làm chuẩn hệ thống thiết kế)
 
-## Năm màn
+- **M1 · Trang chủ** — điều hướng dạng hub, không sidebar phức tạp.
+- **M2 · Danh sách thiết bị** — màn quan trọng nhất, tên trùng với tên nền tảng ("Device Management"). Kết hợp cây địa bàn, bảng dữ liệu mật độ cao, chỉ số tài nguyên hệ thống, ba trục trạng thái độc lập (kết nối / ghi hình / AI).
+- **M3 · Thêm thiết bị** — wizard nhiều đường vào (quét nhanh, nhập tay, tự đăng ký, RTSP, nhập hàng loạt).
+- **M4 · Chi tiết một camera** — thông tin thiết bị, luồng video, lịch sử sự kiện AI.
+- **M5 · Cấu hình AI/thuật toán** — chọn thuật toán, đặt vùng phát hiện, ngưỡng cảnh báo.
 
-**M1 · Trang chủ (kiểu tile)** — lối vào toàn nền tảng. Ô chức năng lớn, mỗi ô kèm tối đa 3 shortcut vào thẳng màn con. Một hàng cấu hình riêng bên dưới. Trên cùng là tình trạng hệ thống tổng quan.
+Vòng 1 chỉ dựng **M2** để chốt hệ thống thiết kế (màu, typography, spacing, component pattern: thẻ chỉ số, cây điều hướng, bảng dữ liệu, chip trạng thái) — các màn còn lại kế thừa sau khi chốt hướng.
 
-**M2 · Danh sách thiết bị** — màn trung tâm, làm trước. Gồm: thanh chỉ số tài nguyên trên cùng (kênh đã dùng/tổng, băng thông đã dùng/tổng, dung lượng lưu trữ), cây thiết bị nhiều cấp có số liệu tổng hợp, khu vực chính hiển thị thiết bị, thanh tác vụ hàng loạt chỉ sáng khi có dòng được chọn, bộ lọc theo trạng thái / site / hãng / model / có bật AI.
+## Mô hình trạng thái — bắt buộc thống nhất
 
-**M3 · Thêm thiết bị** — năm đường thêm (xem reference-design.md §3.4) trình bày sao cho người dùng chọn đúng đường ngay lần đầu, không phải thử từng cái. Gồm luồng khởi tạo thiết bị chưa đặt mật khẩu, và đổi IP hàng loạt theo bước tăng dần có xử lý trùng IP.
-
-**M4 · Chi tiết một camera** — thông tin nhận dạng, tình trạng kết nối và ghi hình theo thời gian, thông số luồng, lịch sử sự kiện gần đây, khung xem trực tiếp, và các thao tác (sửa, thử kết nối, khởi động lại, gỡ khỏi hệ thống).
-
-**M5 · Cấu hình AI / thuật toán** — gán bài toán phân tích cho camera (nhận diện khuôn mặt, biển số, đếm người, xâm nhập vùng…), cấu hình tham số, vẽ vùng quan tâm trên khung hình, quản lý tài nguyên tính toán đã cấp phát. **Đây là màn thể hiện giá trị khác biệt của AICAM so với đầu ghi thường — đầu tư thị giác nhiều nhất vào màn này.**
-
-## Mô hình trạng thái — bắt buộc thống nhất trên cả 5 màn
-
-**Ba trục độc lập, không được gộp:**
-
-| Trục | Các giá trị |
-|---|---|
-| Kết nối | trực tuyến · mất kết nối · kết nối thất bại · **đang xuống cấp** (kết nối được nhưng mất khung hình hoặc độ trễ cao) |
-| Ghi hình | đang ghi · không ghi · lỗi ghi |
-| AI | chưa bật · đang chạy · lỗi thuật toán · thiếu tài nguyên tính toán |
-
-Camera trực tuyến nhưng không ghi là sự cố khác hẳn camera mất kết nối. Camera đang ghi nhưng thuật toán chết là sự cố thứ ba. Thiết kế phải thể hiện cả ba cùng lúc mà không rối.
-
-🔴 **Không được mã hoá trạng thái chỉ bằng màu.** Mọi chỉ báo phải kèm hình dạng hoặc nhãn chữ — màn trực NOC thường bị ám màu, và có người dùng mù màu.
-
-## Tông và khí chất
-
-Đáng tin, điềm tĩnh, có thẩm quyền. Đây là công cụ người ta nhìn 8 tiếng một ngày, không phải trang bán hàng. Không hào nhoáng, không hoạt hoạ trang trí. Nhưng **không được nhạt** — phải nhìn ra ngay đây là sản phẩm có người thiết kế, không phải bảng Bootstrap mặc định.
-
-Khí chất thương hiệu VNPT AI (rút từ trang giới thiệu chính thức, xem `brand-spec.md`): **chủ quyền công nghệ**, giọng hạ tầng quốc gia chứ không phải giọng startup; có thẩm quyền dựa trên thành tích đã kiểm chứng; lấy con người làm trung tâm, coi trọng đạo đức AI và bảo mật dữ liệu. Gần với viễn thông hơn là với SaaS.
+Ba trục độc lập, không gộp:
+1. **Kết nối**: Trực tuyến / Mất kết nối / Kết nối thất bại (ba trạng thái, không phải hai — phân biệt "thiết bị tắt" với "có gì chặn ở giữa") / **Đang xuống cấp** (kết nối được nhưng mất khung hình hoặc độ trễ cao — bổ sung riêng cho AICAM, rất thật với camera ngoài trời Việt Nam).
+2. **Ghi hình**: Đang ghi / Không ghi / Lỗi lưu trữ.
+3. **AI**: Đang phân tích / Tắt / Lỗi tài nguyên — kèm thuật toán đang chạy. Đây là trục khác biệt của AICAM so với đầu ghi thường, phải thấy ngay ở danh sách, không giấu trong trang chi tiết.
 
 ## Mật độ thông tin — CAO
 
-Đây là sản phẩm dữ liệu và giám sát. Áp chế độ **高密度型** theo bảng xử lý ngoại lệ trong `SKILL.md` — mỗi màn tối thiểu 3 điểm thông tin *có nội dung*. **Nguyên tắc tiết chế mặc định của skill không áp dụng ở đây.**
+Đây là phần mềm vận hành hạ tầng, không phải SaaS tiêu dùng. Bảng dữ liệu ưu tiên hiển thị nhiều cột hơn là card đẹp thưa thớt. Chấp nhận mật độ cao có chủ đích — đối lập với "sự tối giản lười biếng" mà luật chống slop cấm, ở đây mật độ cao *là* yêu cầu chức năng thật.
 
-Nhưng "mật độ cao" nghĩa là **thêm thông tin thật**, không phải thêm trang trí. Icon trang trí vẫn bị cấm như thường.
+## Tông và khí chất
 
-## Kích thước và thích ứng
-
-Thiết kế ở **1920×1080**, nhưng bố cục theo **chiều rộng container, không theo chiều rộng khung nhìn** — màn này còn được nhúng làm module trong nền tảng IOC hiện có, nơi nó chỉ chiếm một phần màn hình. Kiểm tra ở cả 1920×1080 và 1440×900.
-
-Đáy cứng: chữ thân ≥14px, nhãn phụ ≥12px, tương phản chữ thân ≥4.5:1. Không phong cách nào được phá.
+Theo brand-spec.md: Chủ quyền công nghệ · Đáng tin · Có thẩm quyền dựa trên thành tích · Hạ tầng quốc gia — **không phải giọng startup**. Tránh mọi mô-típ "SaaS AI 2024" (gradient tím, glow neon, card bo tròn lớn). Nền sáng làm chủ đạo (theo phân tích ở `doc/reference-ivss-design.md` §3.3: nền sáng đọc tốt hơn trong phòng làm việc sáng đèn, đồng thời né được bẫy "nền xanh đậm + neon" của phần mềm giám sát Trung Quốc).
 
 ## Ngôn ngữ
 
-Toàn bộ nhãn, tiêu đề, thông báo bằng **tiếng Việt có dấu đầy đủ**. Thuật ngữ kỹ thuật đã quen giữ nguyên tiếng Anh (RTSP, ONVIF, IP, serial, stream). Không viết tắt kiểu chat.
+Tiếng Việt, có dấu đầy đủ. Số liệu dùng font tabular (Be Vietnam Pro tabular hoặc Source Sans 3) để cột số thẳng hàng.
 
-## Mô-típ thị giác — trả lời trước khi thiết kế
+## Kích thước và thích ứng
 
-Nội dung này có một đặc thù không sản phẩm nào khác có: **camera là vật thể có vị trí trong không gian thật, và nó hoặc đang nhìn thấy thứ gì đó, hoặc đang mù**. Mọi màn phải mọc ra từ hai ý niệm đó — *phủ sóng không gian* và *trạng thái nhìn thấy / mù*.
+Thiết kế cho màn hình desktop 1440×900 trở lên (bối cảnh NOC dùng màn lớn). Không cần tối ưu mobile ở vòng này.
 
-Đừng thiết kế nó như một bảng CRM có thêm cột trạng thái. Mỗi phương án phải nêu được: hình thức của nó mọc ra từ chỗ nào trong nội dung. Trả lời không được câu đó = đang áp khuôn mẫu.
+## Mô-típ thị giác — trả lời trước khi thiết kế (form suy ra từ nội dung)
+
+- **Vai trò tự sự của M2**: đây là màn "bảng điều khiển sự thật" — nơi kỹ thuật viên xác nhận hệ thống có ổn không trước khi đào sâu bất kỳ đâu khác.
+- **Mô-típ riêng của nội dung này**: ba trục trạng thái độc lập là thứ không sản phẩm giám sát tiêu dùng nào có — nên chip trạng thái ba màu/ba icon xếp cạnh nhau (không gộp thành một chấm) chính là "chữ ký thị giác" của toàn bộ hệ thống, lặp lại nhất quán ở mọi màn.
+- **Mật độ vs khoảng trắng**: khoảng trắng phải phục vụ việc quét nhanh hàng trăm dòng, không phải phục vụ cảm giác "sang trọng" — bất kỳ khoảng trắng nào không giúp mắt tìm ra dòng bất thường nhanh hơn đều là lãng phí.
 
 ## Phải đổi gì cho AICAM so với tham chiếu IVSS
 
-Không sao chép nguyên si. Ba nhóm thay đổi bắt buộc — chi tiết đầy đủ ở `reference-design.md` §5, tóm tắt:
-
-1. **Màu chính phải là màu VNPT AI** (`#0047BB`, xem `brand-spec.md`) — không giữ `#1890ff` mặc định Ant Design. Giữ nguyên 4 màu chức năng (success/warning/error + info).
-2. **Cơ chế duyệt dữ liệu phải chịu được quy mô nghìn thiết bị** — IVSS chỉ thiết kế cho ~128 kênh. Bảng phân trang → cuộn ảo + lọc phía máy chủ; cây một cấp → cây nhiều cấp có số liệu tổng hợp; lối vào danh sách phẳng → lối vào bảng tổng hợp trạng thái.
-3. **Bổ sung mà IVSS không có**: trạng thái "đang xuống cấp"; trục AI (bật/tắt, thuật toán, tài nguyên tính toán); dấu vết tuân thủ Nghị định 13 (camera nào xử lý dữ liệu sinh trắc học, lưu ở đâu, thời hạn lưu).
+Xem đầy đủ ở `doc/reference-ivss-design.md` §4. Tóm tắt bắt buộc:
+1. Màu chính = VNPT AI Primary `#0047BB`, sinh dải 10 sắc độ, không dùng `#1890ff`.
+2. Cơ chế duyệt dữ liệu phải chịu vài nghìn thiết bị (cuộn ảo, cây nhiều cấp có số liệu nhánh, tổng hợp trước–chi tiết sau).
+3. Thêm trạng thái "đang xuống cấp", trục AI, dấu vết tuân thủ Nghị định 13 (dữ liệu sinh trắc học) — IVSS không có ba thứ này.
 
 ## Vùng cấm
 
-- ❌ Dùng logo, tên, hoặc màu nhận diện của Dahua / Hikvision / Milestone ở bất kỳ đâu.
-- ❌ Sao chép nguyên ảnh chụp giao diện từ manual vào bản thiết kế.
-- ❌ Giữ `#1890ff` làm màu chính.
-- ❌ Để logic ① và ③ (xem dưới) bắt chước IVSS.
-- ❌ Đoán màu thương hiệu theo trí nhớ — dùng đúng mã trong `brand-spec.md`.
-- ❌ Bo góc 8px+ — mất chất công cụ vận hành.
-- ❌ Mã hoá trạng thái chỉ bằng màu.
-- ❌ Gradient tím, emoji làm icon.
-- ❌ Hiển thị mật khẩu thiết bị dạng chữ, kể cả trong bản mẫu.
-- ❌ Ảnh khuôn mặt thật trong dữ liệu mẫu — dùng ảnh đã che mặt hoặc khối giữ chỗ có nhãn (ràng buộc Nghị định 13 về dữ liệu sinh trắc học).
-- ❌ "Lorem ipsum", "Channel1 / Channel2", địa danh nước ngoài. Dùng địa danh Việt Nam thật và tên site tiếng Việt.
+- Không dùng logo/tên/màu Dahua, Hikvision, Milestone.
+- Không giữ `#1890ff` làm màu chính.
+- Không sao chép nguyên khung hình ảnh chụp màn hình từ manual IVSS.
+- Không dùng ảnh `ui-tinhnang-*.png` của VNPT AI làm nguồn bố cục (thuộc tính năng giao thông/OCR khác, không phải camera management — xem `brand-spec.md`).
+- Không dùng gradient tím/glow neon làm mô-típ chủ đạo (slop SaaS AI).
 
 ## Ba hướng thiết kế bắt buộc (vòng 1, chỉ M2)
 
-Ba bản **bắt buộc khác nhau về cấu trúc bố cục**, không chỉ khác bảng màu.
+Ba bản độc lập, khác nhau về **cấu trúc bố cục** chứ không chỉ đổi màu:
 
-| Logic | Neo vào | Kỳ vọng |
-|---|---|---|
-| ② Hiện thực tham chiếu | **IVSS** — đọc `reference-design.md` | Bản an toàn, người vận hành cũ nhận ra ngay. Giữ mô hình đã kiểm chứng, nâng cấp phần duyệt dữ liệu cho quy mô nghìn |
-| ① Bánh xe giây | Bốc ngẫu nhiên từ thư viện phong cách | Bản phá khuôn. Có thể ra thứ không giống NVR nào. Cứ để chạy — mục đích là thấy còn đường nào khác |
-| ③ Nhà thiết kế giỏi nhất | Triết lý terminal mật độ cao (Bloomberg Terminal / Datadog / Linear) | Bàn phím là chính, thông tin dày, không thừa pixel, dành cho người dùng chuyên nghiệp cả ngày |
-
-🔴 **Chỉ logic ② được đọc `reference-design.md`.** Nếu cả ba đều bắt chước IVSS thì cửa ba phương án mất sạch ý nghĩa — không còn gì để chọn.
+1. **🎲 Bánh xe giây** — random 20 phong cách web trong thư viện huashu-design, rơi vào *Friendly Geometric Candy* (nút nổi 3D, bo tròn, màu kẹo, hướng Duolingo). Áp dụng có tiết chế cho bối cảnh NOC nghiêm túc: giữ tinh thần "thân thiện, dễ quét bằng mắt, tap target lớn" nhưng bỏ hẳn màu kẹo bão hoà cao — thay bằng thẻ trạng thái lớn bo góc vừa phải, ưu tiên xem theo card/nhóm hơn bảng dày đặc.
+2. **🏆 Hiện thực tham chiếu** — bám sát `doc/reference-ivss-design.md`: token Ant Design 4 (bo góc 2px gần vuông, đen bán trong suốt, phân tầng nền nông ba mức), màu chính đổi sang VNPT AI, cấu trúc chỉ số tài nguyên trên cùng + cây địa bàn trái + bảng phải, nâng cấp mục §4.2 cho quy mô nghìn thiết bị.
+3. **🧠 Trung tâm điều hành (mission control)** — lấy cảm hứng từ các bảng điều khiển hạ tầng trọng yếu (Palantir Foundry, SpaceX Mission Control, phòng điều hành lưới điện): chrome tối làm khung, panel dữ liệu sáng nổi lên, bản đồ/số liệu tổng quan làm trung tâm thay vì bảng liệt kê tuyến tính. Khác biệt cấu trúc rõ rệt: điều hướng trái tối màu, khu trung tâm ưu tiên tổng quan trạng thái theo địa bàn (không phải bảng dòng-cột ngay từ đầu), bảng chi tiết là lớp đào sâu thứ hai.

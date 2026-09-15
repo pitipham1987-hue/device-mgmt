@@ -1,0 +1,401 @@
+{
+  "communities": {
+    "0": [
+      "claude_skills_huashu_design_scripts_render_video_seek",
+      "claude_skills_huashu_design_scripts_render_video_seek_arg",
+      "claude_skills_huashu_design_scripts_render_video_seek_basename",
+      "claude_skills_huashu_design_scripts_render_video_seek_chromium",
+      "claude_skills_huashu_design_scripts_render_video_seek_concurrency",
+      "claude_skills_huashu_design_scripts_render_video_seek_dir",
+      "claude_skills_huashu_design_scripts_render_video_seek_duration",
+      "claude_skills_huashu_design_scripts_render_video_seek_fps",
+      "claude_skills_huashu_design_scripts_render_video_seek_fs",
+      "claude_skills_huashu_design_scripts_render_video_seek_hasflag",
+      "claude_skills_huashu_design_scripts_render_video_seek_height",
+      "claude_skills_huashu_design_scripts_render_video_seek_hidechromebars",
+      "claude_skills_huashu_design_scripts_render_video_seek_html_abs",
+      "claude_skills_huashu_design_scripts_render_video_seek_injectstyle",
+      "claude_skills_huashu_design_scripts_render_video_seek_keep_chrome",
+      "claude_skills_huashu_design_scripts_render_video_seek_mp4_out",
+      "claude_skills_huashu_design_scripts_render_video_seek_path",
+      "claude_skills_huashu_design_scripts_render_video_seek_ready_timeout",
+      "claude_skills_huashu_design_scripts_render_video_seek_renderframes",
+      "claude_skills_huashu_design_scripts_render_video_seek_settle",
+      "claude_skills_huashu_design_scripts_render_video_seek_spawnsync",
+      "claude_skills_huashu_design_scripts_render_video_seek_tmp_dir",
+      "claude_skills_huashu_design_scripts_render_video_seek_total_frames",
+      "claude_skills_huashu_design_scripts_render_video_seek_waitraf",
+      "claude_skills_huashu_design_scripts_render_video_seek_width"
+    ],
+    "1": [
+      "claude_skills_huashu_design_package",
+      "claude_skills_huashu_design_package_dependencies",
+      "claude_skills_huashu_design_package_dependencies_pdf_lib",
+      "claude_skills_huashu_design_package_dependencies_playwright",
+      "claude_skills_huashu_design_package_dependencies_pptxgenjs",
+      "claude_skills_huashu_design_package_dependencies_sharp",
+      "claude_skills_huashu_design_scripts_export_deck_pdf",
+      "claude_skills_huashu_design_scripts_export_deck_pdf_main",
+      "claude_skills_huashu_design_scripts_export_deck_pdf_parseargs",
+      "claude_skills_huashu_design_scripts_export_deck_stage_pdf",
+      "claude_skills_huashu_design_scripts_export_deck_stage_pdf_main",
+      "claude_skills_huashu_design_scripts_export_deck_stage_pdf_parseargs",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_arg",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_files",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_h",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_outdir",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_quality",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_slidesdir",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_w",
+      "claude_skills_huashu_design_scripts_gen_deck_thumbs_width",
+      "ref_pdf_lib",
+      "ref_playwright",
+      "ref_sharp"
+    ],
+    "2": [
+      "claude_skills_huashu_design_scripts_render_video",
+      "claude_skills_huashu_design_scripts_render_video_arg",
+      "claude_skills_huashu_design_scripts_render_video_basename",
+      "claude_skills_huashu_design_scripts_render_video_chromium",
+      "claude_skills_huashu_design_scripts_render_video_dir",
+      "claude_skills_huashu_design_scripts_render_video_duration",
+      "claude_skills_huashu_design_scripts_render_video_font_wait",
+      "claude_skills_huashu_design_scripts_render_video_fs",
+      "claude_skills_huashu_design_scripts_render_video_hasflag",
+      "claude_skills_huashu_design_scripts_render_video_height",
+      "claude_skills_huashu_design_scripts_render_video_hidechromebars",
+      "claude_skills_huashu_design_scripts_render_video_html_abs",
+      "claude_skills_huashu_design_scripts_render_video_injectstyle",
+      "claude_skills_huashu_design_scripts_render_video_keep_chrome",
+      "claude_skills_huashu_design_scripts_render_video_mp4_out",
+      "claude_skills_huashu_design_scripts_render_video_path",
+      "claude_skills_huashu_design_scripts_render_video_ready_timeout",
+      "claude_skills_huashu_design_scripts_render_video_spawnsync",
+      "claude_skills_huashu_design_scripts_render_video_tmp_dir",
+      "claude_skills_huashu_design_scripts_render_video_trim_override",
+      "claude_skills_huashu_design_scripts_render_video_width"
+    ],
+    "3": [
+      "claude_skills_huashu_design_assets_deck_stage",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_collectslides",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_connectedcallback",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_constructor",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_currentslide",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_goto",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_handlehash",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_next",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_prev",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_render",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_restoreslide",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_saveslide",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_setupeventlisteners",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_setupprintstyles",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_totalslides",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_updatedisplay",
+      "claude_skills_huashu_design_assets_deck_stage_deckstage_updatescale"
+    ],
+    "4": [
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_ask_model",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_compress",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_detect_audio_onsets",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_detect_static_segments",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_fmt_ts",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_global_prompt",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_load_api_key",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_log",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_main",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_probe",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_rationale_109",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_rationale_124",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_rationale_8",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_run",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_segment_prompt",
+      "claude_skills_huashu_design_scripts_cloud_ai_review_video_synthesis_prompt",
+      "path"
+    ],
+    "5": [
+      "claude_skills_huashu_design_assets_cursor",
+      "claude_skills_huashu_design_assets_cursor_attachclicktween",
+      "claude_skills_huashu_design_assets_cursor_attachcursortween",
+      "claude_skills_huashu_design_assets_cursor_attachrippletween",
+      "claude_skills_huashu_design_assets_cursor_buildcursorsampler",
+      "claude_skills_huashu_design_assets_cursor_catmullrom",
+      "claude_skills_huashu_design_assets_cursor_clickripple",
+      "claude_skills_huashu_design_assets_cursor_cursor_paths",
+      "claude_skills_huashu_design_assets_cursor_cursoreasing",
+      "claude_skills_huashu_design_assets_cursor_cursoricon",
+      "claude_skills_huashu_design_assets_cursor_cursorsprite",
+      "claude_skills_huashu_design_assets_cursor_hoverhighlight",
+      "claude_skills_huashu_design_assets_cursor_hoverindexat",
+      "claude_skills_huashu_design_assets_cursor_mulberry32",
+      "claude_skills_huashu_design_assets_cursor_rippleringstate"
+    ],
+    "6": [
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_buildauthheaders",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_dirname",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_getduration",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_inferresourceid",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_loadenv",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_main",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_parseargs",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_readv3audio",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_skill_root",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_speedtospeechrate",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_tts",
+      "claude_skills_huashu_design_scripts_cloud_tts_doubao_usage"
+    ],
+    "7": [
+      "claude_skills_huashu_design_scripts_narrate_pipeline",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_calltts",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_dirname",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_ffmpegconcat",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_getduration",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_main",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_makesilence",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_parseargs",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_parsescript",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_skill_root",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_splitbycues",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_tts_script",
+      "claude_skills_huashu_design_scripts_narrate_pipeline_usage"
+    ],
+    "8": [
+      "claude_skills_huashu_design_scripts_html2pptx",
+      "claude_skills_huashu_design_scripts_html2pptx_addbackground",
+      "claude_skills_huashu_design_scripts_html2pptx_addelements",
+      "claude_skills_huashu_design_scripts_html2pptx_chromium",
+      "claude_skills_huashu_design_scripts_html2pptx_extractslidedata",
+      "claude_skills_huashu_design_scripts_html2pptx_getbodydimensions",
+      "claude_skills_huashu_design_scripts_html2pptx_html2pptx",
+      "claude_skills_huashu_design_scripts_html2pptx_path",
+      "claude_skills_huashu_design_scripts_html2pptx_rationale_393",
+      "claude_skills_huashu_design_scripts_html2pptx_sharp",
+      "claude_skills_huashu_design_scripts_html2pptx_validatedimensions",
+      "claude_skills_huashu_design_scripts_html2pptx_validatetextboxposition"
+    ],
+    "9": [
+      "claude_skills_huashu_design_assets_animations",
+      "claude_skills_huashu_design_assets_animations_interpolate",
+      "claude_skills_huashu_design_assets_animations_sprite",
+      "claude_skills_huashu_design_assets_animations_stage",
+      "claude_skills_huashu_design_assets_animations_stage_tick",
+      "claude_skills_huashu_design_assets_animations_stage_updatescale",
+      "claude_skills_huashu_design_assets_animations_usesprite",
+      "claude_skills_huashu_design_assets_animations_usetime"
+    ],
+    "10": [
+      "agents_skills_huashu_design_scripts_verify_video_sh__entry",
+      "claude_skills_huashu_design_scripts_verify_video",
+      "claude_skills_huashu_design_scripts_verify_video_fail",
+      "claude_skills_huashu_design_scripts_verify_video_pass",
+      "claude_skills_huashu_design_scripts_verify_video_sh__entry",
+      "claude_skills_huashu_design_scripts_verify_video_warn"
+    ],
+    "11": [
+      "claude_skills_huashu_design_scripts_export_deck_pptx",
+      "claude_skills_huashu_design_scripts_export_deck_pptx_dirname",
+      "claude_skills_huashu_design_scripts_export_deck_pptx_main",
+      "claude_skills_huashu_design_scripts_export_deck_pptx_parseargs",
+      "module",
+      "ref_pptxgenjs"
+    ],
+    "12": [
+      "claude_skills_huashu_design_scripts_fetch_images",
+      "claude_skills_huashu_design_scripts_fetch_images_api_get",
+      "claude_skills_huashu_design_scripts_fetch_images_fetch",
+      "claude_skills_huashu_design_scripts_fetch_images_main",
+      "claude_skills_huashu_design_scripts_fetch_images_rationale_2",
+      "claude_skills_huashu_design_scripts_fetch_images_safe"
+    ],
+    "13": [
+      "claude_skills_huashu_design_scripts_verify",
+      "claude_skills_huashu_design_scripts_verify_main",
+      "claude_skills_huashu_design_scripts_verify_parse_viewport",
+      "claude_skills_huashu_design_scripts_verify_rationale_2",
+      "claude_skills_huashu_design_scripts_verify_verify_html"
+    ],
+    "14": [
+      "claude_skills_huashu_design_assets_design_canvas",
+      "claude_skills_huashu_design_assets_design_canvas_canvasstyles",
+      "claude_skills_huashu_design_assets_design_canvas_designcanvas",
+      "claude_skills_huashu_design_assets_design_canvas_variation"
+    ],
+    "15": [
+      "agents_skills_huashu_design_scripts_add_music_sh__entry",
+      "claude_skills_huashu_design_scripts_add_music",
+      "claude_skills_huashu_design_scripts_add_music_sh__entry"
+    ],
+    "16": [
+      "agents_skills_huashu_design_scripts_convert_formats_sh__entry",
+      "claude_skills_huashu_design_scripts_convert_formats",
+      "claude_skills_huashu_design_scripts_convert_formats_sh__entry"
+    ],
+    "17": [
+      "agents_skills_huashu_design_scripts_design_gate_hook_sh__entry",
+      "claude_skills_huashu_design_scripts_design_gate_hook",
+      "claude_skills_huashu_design_scripts_design_gate_hook_sh__entry"
+    ],
+    "18": [
+      "agents_skills_huashu_design_scripts_mix_voiceover_sh__entry",
+      "claude_skills_huashu_design_scripts_mix_voiceover",
+      "claude_skills_huashu_design_scripts_mix_voiceover_sh__entry"
+    ],
+    "19": [
+      "agents_skills_huashu_design_scripts_render_narration_sh__entry",
+      "claude_skills_huashu_design_scripts_render_narration",
+      "claude_skills_huashu_design_scripts_render_narration_sh__entry"
+    ],
+    "20": [
+      "agents_skills_huashu_design_scripts_sfx_cues_sh__entry",
+      "claude_skills_huashu_design_scripts_sfx_cues",
+      "claude_skills_huashu_design_scripts_sfx_cues_sh__entry"
+    ],
+    "21": [
+      "claude_skills_huashu_design_assets_android_frame",
+      "claude_skills_huashu_design_assets_android_frame_androidframe",
+      "claude_skills_huashu_design_assets_android_frame_androidframestyles"
+    ],
+    "22": [
+      "claude_skills_huashu_design_assets_browser_window",
+      "claude_skills_huashu_design_assets_browser_window_browserwindow",
+      "claude_skills_huashu_design_assets_browser_window_browserwindowstyles"
+    ],
+    "23": [
+      "claude_skills_huashu_design_assets_ios_frame",
+      "claude_skills_huashu_design_assets_ios_frame_iosframe",
+      "claude_skills_huashu_design_assets_ios_frame_iosframestyles"
+    ],
+    "24": [
+      "claude_skills_huashu_design_assets_macos_window",
+      "claude_skills_huashu_design_assets_macos_window_macoswindow",
+      "claude_skills_huashu_design_assets_macos_window_macoswindowstyles"
+    ],
+    "25": [
+      "claude_skills_huashu_design_assets_narration_stage",
+      "claude_skills_huashu_design_assets_narration_stage_narrationstagelib"
+    ]
+  },
+  "cohesion": {
+    "0": 0.08333333333333333,
+    "1": 0.09782608695652174,
+    "2": 0.09523809523809523,
+    "3": 0.22875816993464052,
+    "4": 0.2549019607843137,
+    "5": 0.17142857142857143,
+    "6": 0.2564102564102564,
+    "7": 0.2564102564102564,
+    "8": 0.25757575757575757,
+    "9": 0.25,
+    "10": 0.7333333333333333,
+    "11": 0.4,
+    "12": 0.5333333333333333,
+    "13": 0.6,
+    "14": 0.5,
+    "15": 0.6666666666666666,
+    "16": 0.6666666666666666,
+    "17": 0.6666666666666666,
+    "18": 0.6666666666666666,
+    "19": 0.6666666666666666,
+    "20": 0.6666666666666666,
+    "21": 0.6666666666666666,
+    "22": 0.6666666666666666,
+    "23": 0.6666666666666666,
+    "24": 0.6666666666666666,
+    "25": 1.0
+  },
+  "gods": [
+    {
+      "id": "claude_skills_huashu_design_assets_deck_stage_deckstage",
+      "label": "DeckStage",
+      "degree": 17
+    },
+    {
+      "id": "claude_skills_huashu_design_scripts_cloud_ai_review_video_main",
+      "label": "main()",
+      "degree": 13
+    },
+    {
+      "id": "claude_skills_huashu_design_scripts_narrate_pipeline_main",
+      "label": "main()",
+      "degree": 9
+    },
+    {
+      "id": "ref_playwright",
+      "label": "playwright",
+      "degree": 7
+    },
+    {
+      "id": "claude_skills_huashu_design_scripts_html2pptx_html2pptx",
+      "label": "html2pptx()",
+      "degree": 7
+    },
+    {
+      "id": "claude_skills_huashu_design_scripts_cloud_tts_doubao_tts",
+      "label": "tts()",
+      "degree": 6
+    },
+    {
+      "id": "claude_skills_huashu_design_scripts_cloud_ai_review_video_fmt_ts",
+      "label": "fmt_ts()",
+      "degree": 5
+    },
+    {
+      "id": "claude_skills_huashu_design_scripts_cloud_tts_doubao_main",
+      "label": "main()",
+      "degree": 5
+    },
+    {
+      "id": "claude_skills_huashu_design_assets_cursor_buildcursorsampler",
+      "label": "buildCursorSampler()",
+      "degree": 4
+    },
+    {
+      "id": "claude_skills_huashu_design_scripts_cloud_ai_review_video_probe",
+      "label": "probe()",
+      "degree": 4
+    }
+  ],
+  "surprises": [
+    {
+      "source": "verify-video.sh script",
+      "target": "fail()",
+      "source_files": [
+        ".agents/skills/huashu-design/scripts/verify-video.sh",
+        ".claude/skills/huashu-design/scripts/verify-video.sh"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "verify-video.sh script",
+      "target": "pass()",
+      "source_files": [
+        ".agents/skills/huashu-design/scripts/verify-video.sh",
+        ".claude/skills/huashu-design/scripts/verify-video.sh"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "verify-video.sh script",
+      "target": "warn()",
+      "source_files": [
+        ".agents/skills/huashu-design/scripts/verify-video.sh",
+        ".claude/skills/huashu-design/scripts/verify-video.sh"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

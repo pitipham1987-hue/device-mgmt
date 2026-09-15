@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>AICAM — M1 Trang chủ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Source+Sans+3:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .hero{padding:22px 24px 6px;}
+  .hero h1{margin:0; font-size:20px; font-weight:700; color:var(--text-heading);}
+  .hero p{margin:4px 0 0; font-size:13px; color:var(--text-secondary);}
+
+  .tile-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:16px 24px;}
+  .tile{background:var(--bg-container); border:1px solid var(--border-split); border-radius:6px; padding:18px 20px; display:flex; flex-direction:column; gap:10px; transition:box-shadow .15s, border-color .15s; cursor:pointer;}
+  .tile:hover{box-shadow:0 4px 14px rgba(0,0,0,.06); border-color:var(--border-base);}
+  .tile-top{display:flex; align-items:center; gap:12px;}
+  .tile-icon{width:40px;height:40px;border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:19px; background:var(--primary-bg); color:var(--primary); flex:none;}
+  .tile-title{font-weight:700; font-size:15px; color:var(--text-heading);}
+  .tile-desc{font-size:12.5px; color:var(--text-secondary); line-height:1.5;}
+  .tile-stat{font-size:12px; color:var(--text-body); font-weight:600; display:flex; align-items:center; gap:6px;}
+  .tile-stat .dot{width:7px;height:7px;border-radius:50%;}
+  .tile-shortcuts{display:flex; flex-direction:column; gap:0; border-top:1px solid var(--border-split); margin-top:2px; padding-top:8px;}
+  .tile-shortcuts a{font-size:12.5px; color:var(--primary); padding:4px 0; text-decoration:none;}
+  .tile-shortcuts a:hover{text-decoration:underline;}
+
+  .config-row-title{padding:4px 24px 0; font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em;}
+  .config-row{display:grid; grid-template-columns:repeat(6,1fr); gap:12px; padding:10px 24px 24px;}
+  .config-item{background:var(--bg-container); border:1px solid var(--border-split); border-radius:6px; padding:14px 12px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer;}
+  .config-item:hover{border-color:var(--border-base);}
+  .config-icon{width:32px;height:32px;border-radius:50%; background:var(--bg-header); display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--text-body);}
+  .config-label{font-size:12.5px; font-weight:600; color:var(--text-heading);}
+
+  .alert-band{margin:0 24px 20px; background:var(--error-bg); border:1px solid #ffccc7; border-radius:6px; padding:10px 16px; display:flex; align-items:center; gap:10px; font-size:13px; color:#8c2b2b;}
+  .alert-band b{color:var(--error);}
+  .alert-band .link{margin-left:auto;}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><img src="../assets/vnptai-brand/logo.svg" alt="VNPT AI"></div>
+    <div class="menu">
+      <div class="menu-item active">Trang chủ</div>
+      <div class="menu-item">Danh sách thiết bị</div>
+      <div class="menu-item">Thêm thiết bị</div>
+      <div class="menu-item">Cấu hình AI</div>
+      <div class="menu-item">Sự kiện &amp; cảnh báo</div>
+      <div class="menu-item">Cấu hình hệ thống</div>
+    </div>
+    <div class="tree-wrap">
+      <div class="tree-title">ĐỊA BÀN</div>
+      <div class="tree-node selected"><span>Toàn hệ thống</span><span class="tcount">2.184</span></div>
+      <div class="tree-node child"><span>TP. Hồ Chí Minh</span><span class="tcount">842</span></div>
+      <div class="tree-node child"><span>Hà Nội</span><span class="tcount err-count">613 · 4 lỗi</span></div>
+      <div class="tree-node child"><span>Đà Nẵng</span><span class="tcount">311</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <div class="breadcrumb"><b>Trang chủ</b></div>
+      <div class="user-mini"><div class="avatar-sq">TV</div> Trực vận hành</div>
+    </div>
+
+    <div class="hero">
+      <h1>Chào buổi chiều, Trực vận hành</h1>
+      <p>2.184 camera · 4 lỗi cần xử lý tại Hà Nội · GPU AI đang dùng 78%</p>
+    </div>
+
+    <div class="alert-band">
+      <span>⚠</span> <b>4 thiết bị mất kết nối</b> tại Hà Nội trong 30 phút qua.
+      <span class="link">Xem ngay →</span>
+    </div>
+
+    <div class="tile-grid">
+      <div class="tile">
+        <div class="tile-top">
+          <div class="tile-icon">📷</div>
+          <div><div class="tile-title">Danh sách thiết bị</div></div>
+        </div>
+        <div class="tile-desc">Xem, lọc và quản lý toàn bộ camera theo địa bàn.</div>
+        <div class="tile-stat"><span class="dot" style="background:var(--success)"></span>2.163 trực tuyến · <span class="dot" style="background:var(--error)"></span>4 mất kết nối</div>
+        <div class="tile-shortcuts">
+          <a href="#">Danh sách toàn bộ</a>
+          <a href="#">Thiết bị đang xuống cấp (17)</a>
+          <a href="#">Thiết bị AI lỗi tài nguyên (3)</a>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-top">
+          <div class="tile-icon">➕</div>
+          <div><div class="tile-title">Thêm thiết bị</div></div>
+        </div>
+        <div class="tile-desc">Quét nhanh, nhập tay, tự đăng ký, RTSP hoặc nhập hàng loạt.</div>
+        <div class="tile-stat"><span class="dot" style="background:var(--primary)"></span>12 thiết bị chờ khởi tạo mật khẩu</div>
+        <div class="tile-shortcuts">
+          <a href="#">Quét nhanh trong mạng LAN</a>
+          <a href="#">Nhập hàng loạt theo file CSV</a>
+          <a href="#">Danh sách chờ tự đăng ký (12)</a>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-top">
+          <div class="tile-icon">🧠</div>
+          <div><div class="tile-title">Cấu hình AI</div></div>
+        </div>
+        <div class="tile-desc">Chọn thuật toán, đặt vùng phát hiện, ngưỡng cảnh báo.</div>
+        <div class="tile-stat"><span class="dot" style="background:var(--warning)"></span>78% tài nguyên GPU đang dùng</div>
+        <div class="tile-shortcuts">
+          <a href="#">Thuật toán đang chạy</a>
+          <a href="#">Cấu hình theo nhóm camera</a>
+          <a href="#">Lịch sử gửi thuật toán</a>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-top">
+          <div class="tile-icon">🚨</div>
+          <div><div class="tile-title">Sự kiện &amp; cảnh báo</div></div>
+        </div>
+        <div class="tile-desc">Dòng sự kiện AI theo thời gian thực, kèm ảnh chụp và nhãn.</div>
+        <div class="tile-stat"><span class="dot" style="background:var(--error)"></span>7 cảnh báo chưa xử lý</div>
+        <div class="tile-shortcuts">
+          <a href="#">Sự kiện 24 giờ qua</a>
+          <a href="#">Quy tắc cảnh báo</a>
+          <a href="#">Kênh gửi thông báo</a>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-top">
+          <div class="tile-icon">💾</div>
+          <div><div class="tile-title">Lưu trữ</div></div>
+        </div>
+        <div class="tile-desc">Dung lượng ghi hình, kế hoạch lưu trữ, tình trạng ổ đĩa.</div>
+        <div class="tile-stat"><span class="dot" style="background:var(--warning)"></span>1 ổ đĩa đầy 96%</div>
+        <div class="tile-shortcuts">
+          <a href="#">Kế hoạch nén/lưu trữ</a>
+          <a href="#">Tình trạng ổ đĩa</a>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-top">
+          <div class="tile-icon">🛡️</div>
+          <div><div class="tile-title">Tuân thủ dữ liệu</div></div>
+        </div>
+        <div class="tile-desc">Dấu vết xử lý dữ liệu sinh trắc học theo Nghị định 13.</div>
+        <div class="tile-stat"><span class="dot" style="background:var(--success)"></span>Đầy đủ nhật ký 90 ngày</div>
+        <div class="tile-shortcuts">
+          <a href="#">Camera đang xử lý sinh trắc học</a>
+          <a href="#">Chính sách thời hạn lưu</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-row-title">Cấu hình nhanh</div>
+    <div class="config-row">
+      <div class="config-item"><div class="config-icon">📷</div><div class="config-label">Camera</div></div>
+      <div class="config-item"><div class="config-icon">🌐</div><div class="config-label">Mạng</div></div>
+      <div class="config-item"><div class="config-icon">💾</div><div class="config-label">Lưu trữ</div></div>
+      <div class="config-item"><div class="config-icon">🧠</div><div class="config-label">Thuật toán</div></div>
+      <div class="config-item"><div class="config-icon">🚨</div><div class="config-label">Sự kiện</div></div>
+      <div class="config-item"><div class="config-icon">⚙️</div><div class="config-label">Hệ thống</div></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>AICAM — Danh sách thiết bị (Hướng 1: Thẻ trạng thái thân thiện)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Source+Sans+3:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#0047BB;
+    --primary-dark:#00173D;
+    --accent:#02AAFA;
+    --bg:#F7F8F9;
+    --card:#FFFFFF;
+    --border:#E7EAEE;
+    --text-heading:#0F1B2D;
+    --text-body:#4B5768;
+    --text-muted:#8A93A2;
+    --ok:#1EA672;
+    --ok-bg:#E7F7EF;
+    --warn:#D98A0B;
+    --warn-bg:#FCF1DD;
+    --err:#D64545;
+    --err-bg:#FBE9E9;
+    --degraded:#8054C7;
+    --degraded-bg:#F1EAFB;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text-body);
+    font-family:'Be Vietnam Pro',sans-serif; font-size:14px;
+  }
+  .tabular{font-family:'Source Sans 3',sans-serif; font-variant-numeric:tabular-nums; font-weight:600;}
+  .app{display:flex; min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{
+    width:236px; flex:none; background:var(--card); border-right:1px solid var(--border);
+    padding:20px 16px; display:flex; flex-direction:column; gap:22px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:4px 6px;}
+  .brand img{height:26px;}
+  .nav-group-label{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:0 10px; margin-bottom:6px;}
+  .nav-item{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--radius-sm);
+    font-weight:600; color:var(--text-body); cursor:pointer;
+  }
+  .nav-item .dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+  .nav-item.active{background:linear-gradient(90deg,var(--primary),var(--accent)); color:#fff;}
+  .nav-item.active .dot{background:#fff;}
+  .region-tree{border-top:1px solid var(--border); padding-top:14px; display:flex; flex-direction:column; gap:2px;}
+  .region-row{display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:var(--radius-sm); cursor:pointer;}
+  .region-row.selected{background:#EFF4FF;}
+  .region-row .name{font-weight:600; color:var(--text-heading); font-size:13px;}
+  .region-row.sub .name{font-weight:500; color:var(--text-body); padding-left:14px;}
+  .region-badge{font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--bg); color:var(--text-muted);}
+  .region-badge.alert{background:var(--err-bg); color:var(--err);}
+
+  /* Main */
+  .main{flex:1; padding:24px 28px; display:flex; flex-direction:column; gap:20px; min-width:0;}
+  .topbar{display:flex; align-items:center; justify-content:space-between;}
+  .page-title{font-size:22px; font-weight:800; color:var(--text-heading);}
+  .page-sub{font-size:13px; color:var(--text-muted); margin-top:2px;}
+  .user-chip{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--border); border-radius:999px; padding:6px 14px 6px 6px;}
+  .avatar{width:30px;height:30px;border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px;}
+
+  /* Resource summary — big friendly tiles */
+  .resource-row{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+  .r-tile{background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; display:flex; flex-direction:column; gap:10px; box-shadow:0 1px 2px rgba(15,27,45,.04);}
+  .r-tile .r-label{font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;}
+  .r-tile .r-value{display:flex; align-items:baseline; gap:6px;}
+  .r-tile .r-value .big{font-size:26px; font-weight:800; color:var(--text-heading);}
+  .r-tile .r-value .of{font-size:13px; color:var(--text-muted);}
+  .bar-track{height:10px; border-radius:999px; background:var(--bg); overflow:hidden;}
+  .bar-fill{height:100%; border-radius:999px; background:linear-gradient(90deg,var(--primary),var(--accent));}
+  .bar-fill.warn{background:linear-gradient(90deg,#E0A100,var(--warn));}
+
+  /* Status legend strip */
+  .legend{display:flex; gap:18px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px 18px; flex-wrap:wrap;}
+  .legend-item{display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--text-body);}
+  .legend-dot{width:9px;height:9px;border-radius:50%;}
+
+  /* Toolbar */
+  .toolbar{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .toolbar-left{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .btn{border:none; border-radius:999px; padding:9px 18px; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;}
+  .btn-primary{background:var(--primary); color:#fff;}
+  .btn-ghost{background:var(--card); color:var(--text-body); border:1px solid var(--border);}
+  .search{display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--border); border-radius:999px; padding:9px 16px; min-width:260px;}
+  .search input{border:none; outline:none; font-family:inherit; font-size:13px; background:transparent; width:100%; color:var(--text-body);}
+
+  /* Device cards grid — the structural signature of this direction */
+  .device-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  .device-card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px 18px; display:flex; flex-direction:column; gap:12px; transition:box-shadow .15s;}
+  .device-card:hover{box-shadow:0 6px 18px rgba(15,27,45,.08);}
+  .dc-top{display:flex; align-items:flex-start; justify-content:space-between;}
+  .dc-name{font-weight:700; color:var(--text-heading); font-size:14.5px;}
+  .dc-loc{font-size:12px; color:var(--text-muted); margin-top:2px;}
+  .dc-thumb{width:100%; height:88px; border-radius:var(--radius-sm); background:linear-gradient(135deg,#EFF3F8,#E4E9F0); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:11px; font-weight:600;}
+  .status-row{display:flex; gap:8px;}
+  .status-pill{display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:11.5px; font-weight:700;}
+  .status-pill .dot{width:7px;height:7px;border-radius:50%;}
+  .pill-ok{background:var(--ok-bg); color:var(--ok);}
+  .pill-warn{background:var(--warn-bg); color:var(--warn);}
+  .pill-err{background:var(--err-bg); color:var(--err);}
+  .pill-degraded{background:var(--degraded-bg); color:var(--degraded);}
+  .dc-foot{display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border); padding-top:10px;}
+  .dc-ai{font-size:11.5px; color:var(--text-muted); font-weight:600;}
+  .dc-actions{display:flex; gap:6px;}
+  .icon-btn{width:26px; height:26px; border-radius:50%; background:var(--bg); border:none; color:var(--text-muted); font-size:12px; cursor:pointer;}
+
+  .note{font-size:11.5px; color:var(--text-muted); text-align:center; padding:6px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><img src="../assets/vnptai-brand/logo.svg" alt="VNPT AI"></div>
+    <div>
+      <div class="nav-group-label">Điều hướng</div>
+      <div class="nav-item"><span class="dot"></span> Trang chủ</div>
+      <div class="nav-item active"><span class="dot"></span> Danh sách thiết bị</div>
+      <div class="nav-item"><span class="dot"></span> Thêm thiết bị</div>
+      <div class="nav-item"><span class="dot"></span> Cấu hình AI</div>
+      <div class="nav-item"><span class="dot"></span> Sự kiện &amp; cảnh báo</div>
+    </div>
+    <div class="region-tree">
+      <div class="nav-group-label">Địa bàn</div>
+      <div class="region-row selected"><span class="name">Toàn hệ thống</span><span class="region-badge">2.184</span></div>
+      <div class="region-row sub"><span class="name">TP. Hồ Chí Minh</span><span class="region-badge">842</span></div>
+      <div class="region-row sub"><span class="name">Hà Nội</span><span class="region-badge alert">613 · 4 lỗi</span></div>
+      <div class="region-row sub"><span class="name">Đà Nẵng</span><span class="region-badge">311</span></div>
+      <div class="region-row sub"><span class="name">Cần Thơ</span><span class="region-badge">218</span></div>
+      <div class="region-row sub"><span class="name">Khác</span><span class="region-badge">200</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Danh sách thiết bị</div>
+        <div class="page-sub">2.184 camera · cập nhật 3 giây trước</div>
+      </div>
+      <div class="user-chip"><div class="avatar">TV</div><span style="font-weight:600;color:var(--text-heading)">Trực vận hành</span></div>
+    </div>
+
+    <div class="resource-row">
+      <div class="r-tile">
+        <div class="r-label">Kênh đang dùng</div>
+        <div class="r-value"><span class="big tabular">2.184</span><span class="of">/ 5.000</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:44%"></div></div>
+      </div>
+      <div class="r-tile">
+        <div class="r-label">Băng thông</div>
+        <div class="r-value"><span class="big tabular">3,1</span><span class="of">/ 8 Gbps</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:39%"></div></div>
+      </div>
+      <div class="r-tile">
+        <div class="r-label">Tài nguyên AI</div>
+        <div class="r-value"><span class="big tabular">78</span><span class="of">% GPU</span></div>
+        <div class="bar-track"><div class="bar-fill warn" style="width:78%"></div></div>
+      </div>
+      <div class="r-tile">
+        <div class="r-label">Đang xuống cấp</div>
+        <div class="r-value"><span class="big tabular" style="color:var(--degraded)">17</span><span class="of">thiết bị</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:12%; background:var(--degraded)"></div></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--ok)"></span> Trực tuyến</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--degraded)"></span> Đang xuống cấp</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--warn)"></span> Kết nối thất bại</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--err)"></span> Mất kết nối</div>
+      <div class="legend-item" style="margin-left:auto; color:var(--text-muted)">Ba trục: Kết nối · Ghi hình · AI hiển thị riêng trên mỗi thẻ</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-primary">+ Thêm thiết bị</button>
+        <button class="btn btn-ghost">Sửa IP hàng loạt</button>
+        <button class="btn btn-ghost">Xuất danh sách</button>
+      </div>
+      <div class="search">🔍 <input placeholder="Tìm theo tên, IP, mã thiết bị…"></div>
+    </div>
+
+    <div class="device-grid">
+      <!-- card 1 -->
+      <div class="device-card">
+        <div class="dc-top"><div><div class="dc-name">CAM-Q1-014 · Ngã tư Hàng Xanh</div><div class="dc-loc">TP. Hồ Chí Minh · Q. Bình Thạnh</div></div><button class="icon-btn">⋮</button></div>
+        <div class="dc-thumb">Xem trực tiếp — placeholder</div>
+        <div class="status-row">
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Trực tuyến</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Đang ghi</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>AI bật</div>
+        </div>
+        <div class="dc-foot"><div class="dc-ai">Nhận diện biển số · GPU 12%</div></div>
+      </div>
+      <!-- card 2 -->
+      <div class="device-card">
+        <div class="dc-top"><div><div class="dc-name">CAM-HN-207 · Cổng khu công nghiệp</div><div class="dc-loc">Hà Nội · Đông Anh</div></div><button class="icon-btn">⋮</button></div>
+        <div class="dc-thumb">Xem trực tiếp — placeholder</div>
+        <div class="status-row">
+          <div class="status-pill pill-degraded"><span class="dot" style="background:var(--degraded)"></span>Xuống cấp</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Đang ghi</div>
+          <div class="status-pill pill-warn"><span class="dot" style="background:var(--warn)"></span>AI lỗi TN</div>
+        </div>
+        <div class="dc-foot"><div class="dc-ai">Độ trễ 640ms · khung hình rớt</div></div>
+      </div>
+      <!-- card 3 -->
+      <div class="device-card">
+        <div class="dc-top"><div><div class="dc-name">CAM-HN-088 · Bãi đỗ trung tâm</div><div class="dc-loc">Hà Nội · Cầu Giấy</div></div><button class="icon-btn">⋮</button></div>
+        <div class="dc-thumb">Xem trực tiếp — placeholder</div>
+        <div class="status-row">
+          <div class="status-pill pill-err"><span class="dot" style="background:var(--err)"></span>Mất kết nối</div>
+          <div class="status-pill pill-err"><span class="dot" style="background:var(--err)"></span>Không ghi</div>
+          <div class="status-pill pill-err"><span class="dot" style="background:var(--err)"></span>AI tắt</div>
+        </div>
+        <div class="dc-foot"><div class="dc-ai">Mất kết nối 14 phút</div></div>
+      </div>
+      <!-- card 4 -->
+      <div class="device-card">
+        <div class="dc-top"><div><div class="dc-name">CAM-DN-042 · Cầu Rồng</div><div class="dc-loc">Đà Nẵng · Hải Châu</div></div><button class="icon-btn">⋮</button></div>
+        <div class="dc-thumb">Xem trực tiếp — placeholder</div>
+        <div class="status-row">
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Trực tuyến</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Đang ghi</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>AI bật</div>
+        </div>
+        <div class="dc-foot"><div class="dc-ai">Mật độ đám đông · GPU 9%</div></div>
+      </div>
+      <!-- card 5 -->
+      <div class="device-card">
+        <div class="dc-top"><div><div class="dc-name">CAM-CT-011 · Bến Ninh Kiều</div><div class="dc-loc">Cần Thơ · Ninh Kiều</div></div><button class="icon-btn">⋮</button></div>
+        <div class="dc-thumb">Xem trực tiếp — placeholder</div>
+        <div class="status-row">
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Trực tuyến</div>
+          <div class="status-pill pill-warn"><span class="dot" style="background:var(--warn)"></span>Lỗi lưu trữ</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>AI bật</div>
+        </div>
+        <div class="dc-foot"><div class="dc-ai">Ổ đĩa đầy 96%</div></div>
+      </div>
+      <!-- card 6 -->
+      <div class="device-card">
+        <div class="dc-top"><div><div class="dc-name">CAM-Q1-071 · Chợ Bến Thành</div><div class="dc-loc">TP. Hồ Chí Minh · Q.1</div></div><button class="icon-btn">⋮</button></div>
+        <div class="dc-thumb">Xem trực tiếp — placeholder</div>
+        <div class="status-row">
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Trực tuyến</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>Đang ghi</div>
+          <div class="status-pill pill-ok"><span class="dot" style="background:var(--ok)"></span>AI bật</div>
+        </div>
+        <div class="dc-foot"><div class="dc-ai">Nhận diện khuôn mặt · GPU 15%</div></div>
+      </div>
+    </div>
+    <div class="note">Xem theo thẻ — chuyển sang "Xem bảng" ở góc phải thanh công cụ khi cần rà soát mật độ cao hơn (placeholder, chưa dựng).</div>
+  </main>
+</div>
+</body>
+</html>
